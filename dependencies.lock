@@ -1,0 +1,144 @@
+{
+    "compile": {
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "compileClasspath": {
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "default": {
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "runtime": {
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "runtimeClasspath": {
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "testCompile": {
+        "junit:junit": {
+            "locked": "4.12",
+            "requested": "4.12"
+        },
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "testCompileClasspath": {
+        "junit:junit": {
+            "locked": "4.12",
+            "requested": "4.12"
+        },
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "testRuntime": {
+        "junit:junit": {
+            "locked": "4.12",
+            "requested": "4.12"
+        },
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    },
+    "testRuntimeClasspath": {
+        "junit:junit": {
+            "locked": "4.12",
+            "requested": "4.12"
+        },
+        "org.springframework.boot:spring-boot-starter-jetty": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-log4j2": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        }
+    }
+}

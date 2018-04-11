@@ -4,19 +4,23 @@ version '1.0-SNAPSHOT'
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath 'com.netflix.nebula:gradle-dependency-lock-plugin:4.+'
     }
 }
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'nebula.dependency-lock'
 
 sourceCompatibility = 1.8
 
