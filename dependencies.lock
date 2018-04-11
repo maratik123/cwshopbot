@@ -72,7 +72,7 @@
     "testCompile": {
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.12"
+            "requested": "4.+"
         },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
@@ -90,7 +90,7 @@
     "testCompileClasspath": {
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.12"
+            "requested": "4.+"
         },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
@@ -108,7 +108,7 @@
     "testRuntime": {
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.12"
+            "requested": "4.+"
         },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
@@ -126,7 +126,7 @@
     "testRuntimeClasspath": {
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.12"
+            "requested": "4.+"
         },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
