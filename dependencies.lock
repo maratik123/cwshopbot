@@ -11,6 +11,10 @@
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
             "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
+            "requested": "latest.release"
         }
     },
     "compileClasspath": {
@@ -24,6 +28,10 @@
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
             "requested": "latest.release"
         }
     },
@@ -39,6 +47,10 @@
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
             "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
+            "requested": "latest.release"
         }
     },
     "runtime": {
@@ -53,6 +65,10 @@
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
             "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
+            "requested": "latest.release"
         }
     },
     "runtimeClasspath": {
@@ -66,6 +82,10 @@
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
             "requested": "latest.release"
         }
     },
@@ -85,6 +105,10 @@
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
             "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
+            "requested": "latest.release"
         }
     },
     "testCompileClasspath": {
@@ -102,6 +126,10 @@
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
             "requested": "latest.release"
         }
     },
@@ -121,6 +149,10 @@
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
             "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
+            "requested": "latest.release"
         }
     },
     "testRuntimeClasspath": {
@@ -138,6 +170,10 @@
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
+            "requested": "latest.release"
+        },
+        "org.telegram:telegrambots": {
+            "locked": "3.6",
             "requested": "latest.release"
         }
     }
