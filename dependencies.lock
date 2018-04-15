@@ -1,180 +1,216 @@
 {
     "compile": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "compileClasspath": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "default": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "runtime": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "runtimeClasspath": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "testCompile": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "testCompileClasspath": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "testRuntime": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     },
     "testRuntimeClasspath": {
+        "com.google.guava:guava": {
+            "locked": "24.1-jre",
+            "requested": "24.1-jre"
+        },
         "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "locked": "2.0.1.RELEASE",
-            "requested": "latest.release"
+            "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
             "locked": "3.6",
-            "requested": "latest.release"
+            "requested": "3.6"
         }
     }
 }
