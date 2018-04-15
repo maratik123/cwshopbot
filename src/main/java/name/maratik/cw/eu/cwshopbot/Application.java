@@ -16,10 +16,12 @@
 package name.maratik.cw.eu.cwshopbot;
 
 import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
+import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
@@ -34,5 +36,11 @@ public class Application {
         logger.info("Main app started. Exiting main thread");
     }
 
-
+    @SuppressWarnings("MethodMayBeStatic")
+    @Bean
+    TelegramBotBuilder telegramBotBuilder() {
+        return new TelegramBotBuilder()
+            .username("[username]")
+            .token("[token]");
+    }
 }
