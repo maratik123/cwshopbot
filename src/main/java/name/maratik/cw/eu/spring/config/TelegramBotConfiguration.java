@@ -15,9 +15,13 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.spring.config;
 
+import name.maratik.cw.eu.spring.TelegramBeanPostProcessor;
+import name.maratik.cw.eu.spring.TelegramBotService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportAware;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.NonNull;
+import org.telegram.telegrambots.ApiContextInitializer;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -26,5 +30,16 @@ public class TelegramBotConfiguration implements ImportAware {
 
     @Override
     public void setImportMetadata(@NonNull AnnotationMetadata importMetadata) {
+    }
+
+    @Bean
+    public TelegramBeanPostProcessor telegramBeanPostProcessor(TelegramBotService telegramBotService) {
+        return new TelegramBeanPostProcessor(telegramBotService);
+    }
+
+    @Bean
+    public TelegramBotService telegramBotService(TelegramBotBuilder telegramBotBuilder) {
+        ApiContextInitializer.init();
+        return new TelegramBotService(telegramBotBuilder);
     }
 }
