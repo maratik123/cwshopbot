@@ -13,15 +13,33 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.controller;
+package name.maratik.cw.eu.spring.model;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+/**
+ * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
+ */
+public class TelegramBotCommand {
+    private final String command;
+    private final String description;
 
-@RestController
-public class HealthController {
-    @GetMapping("/ping")
-    public String ping() {
-        return "OK";
+    public TelegramBotCommand(String command, String description) {
+        this.command = command;
+        this.description = description;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String toString() {
+        return "TelegramBotCommand{" +
+            "command='" + command + '\'' +
+            ", description='" + description + '\'' +
+            '}';
     }
 }

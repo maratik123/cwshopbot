@@ -13,15 +13,18 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.controller;
+package name.maratik.cw.eu.spring.config;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.ImportAware;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.lang.NonNull;
 
-@RestController
-public class HealthController {
-    @GetMapping("/ping")
-    public String ping() {
-        return "OK";
+/**
+ * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
+ */
+public class TelegramBotConfiguration implements ImportAware {
+
+    @Override
+    public void setImportMetadata(@NonNull AnnotationMetadata importMetadata) {
     }
 }
