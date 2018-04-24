@@ -29,7 +29,7 @@ import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 @Configuration
 @EnableTelegramBot
-@PropertySource("file:${HOME}/cwshopbot/auth.properties")
+@PropertySource("file:${HOME}/cwshopbotconfig/auth.properties")
 public class Application {
     private static final Logger logger = LogManager.getLogger(Application.class);
 
