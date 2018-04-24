@@ -45,6 +45,7 @@ public class Application {
         @Value("${name.maratik.cw.eu.cwshopbot.username}") String username,
         @Value("${name.maratik.cw.eu.cwshopbot.username}") String token
     ) {
+        logger.debug("username = {}", username);
         return new TelegramBotBuilder()
             .username(username)
             .token(token);
