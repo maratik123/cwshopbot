@@ -23,6 +23,7 @@ import name.maratik.cw.eu.spring.model.TelegramHandler;
 import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
@@ -38,6 +39,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -111,12 +113,15 @@ public class TelegramBotService {
             .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> client)
             .put(Message.class, (telegramMessageCommand, update) -> update.getMessage())
             .put(User.class, (telegramMessageCommand, update) -> update.getMessage().getFrom())
+            .put(long.class, (telegramMessageCommand, update) -> update.getMessage().getFrom().getId().longValue())
+            .put(Long.class, (telegramMessageCommand, update) -> update.getMessage().getFrom().getId().longValue())
             .build();
+
+        addHelpMethod();
     }
 
     @SuppressWarnings("WeakerAccess")
     public void updateLongPolling(Update update) {
-        logger.debug("updateLongPolling: {}", update);
         CompletableFuture.runAsync(() ->
             updateProcess(update).ifPresent(result -> {
                 try {
@@ -169,12 +174,14 @@ public class TelegramBotService {
 
     private String buildHelpMessage() {
         StringBuilder sb = new StringBuilder();
-        getCommandList().forEach(method -> sb
-            .append(method.getCommand())
-            .append(' ')
-            .append(method.getDescription())
-            .append('\n')
-        );
+        getCommandList()
+            .sorted(Comparator.comparing(TelegramBotCommand::getCommand))
+            .forEach(method -> sb
+                .append(method.getCommand())
+                .append(' ')
+                .append(method.getDescription())
+                .append('\n')
+            );
         return sb.toString();
     }
 
@@ -213,10 +220,10 @@ public class TelegramBotService {
         defaultMessageHandler = new TelegramHandler(bean, method, null);
     }
 
-    public void addHelpMethod() {
+    private void addHelpMethod() {
         try {
             Method helpMethod = getClass().getMethod("helpMethod");
-            TelegramCommand command = AnnotationUtils.findAnnotation(helpMethod, TelegramCommand.class);
+            TelegramCommand command = AnnotatedElementUtils.getMergedAnnotation(helpMethod, TelegramCommand.class);
             if (command != null) {
                 for (String cmd : command.value()) {
                     //noinspection ObjectAllocationInLoop
@@ -229,7 +236,7 @@ public class TelegramBotService {
     }
 
     @SuppressWarnings("WeakerAccess")
-    @TelegramCommand(value = "/help", isHelp = true)
+    @TelegramCommand(value = "/help", isHelp = true, description = "This help")
     public void helpMethod() {
     }
 

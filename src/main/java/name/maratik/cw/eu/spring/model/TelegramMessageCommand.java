@@ -35,7 +35,7 @@ public class TelegramMessageCommand {
         if (isSlashStart(message)) {
             int spacePos = message.indexOf(' ');
             if (spacePos != -1) {
-                command = message.substring(0, spacePos - 1);
+                command = message.substring(0, spacePos);
                 argument = message.substring(spacePos + 1);
             } else {
                 command = message;

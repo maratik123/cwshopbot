@@ -19,14 +19,17 @@ import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @Configuration
 @EnableTelegramBot
+@PropertySource("file:${HOME}/cwshopbot/auth.properties")
 public class Application {
     private static final Logger logger = LogManager.getLogger(Application.class);
 
@@ -38,9 +41,12 @@ public class Application {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Bean
-    TelegramBotBuilder telegramBotBuilder() {
+    TelegramBotBuilder telegramBotBuilder(
+        @Value("${name.maratik.cw.eu.cwshopbot.username}") String username,
+        @Value("${name.maratik.cw.eu.cwshopbot.username}") String token
+    ) {
         return new TelegramBotBuilder()
-            .username("[username]")
-            .token("[token]");
+            .username(username)
+            .token(token);
     }
 }

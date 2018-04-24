@@ -47,9 +47,10 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(@NonNull Object bean, String beanName) throws BeansException {
-        if (AnnotationUtils.findAnnotation(bean.getClass(), TelegramBot.class) != null) {
-            logger.info("Init TelegramBot controller: {}", bean.getClass());
-            botControllerMap.put(beanName, bean.getClass());
+        Class<?> beanClass = bean.getClass();
+        if (AnnotationUtils.findAnnotation(beanClass, TelegramBot.class) != null) {
+            logger.info("Init TelegramBot controller: {}", beanClass);
+            botControllerMap.put(beanName, beanClass);
         }
         return bean;
     }
@@ -66,7 +67,6 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
                     bindMessageController(bean, method);
                 }
             }
-            telegramBotService.addHelpMethod();
         }
         return bean;
     }
