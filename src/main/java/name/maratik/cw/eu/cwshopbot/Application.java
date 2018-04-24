@@ -43,9 +43,8 @@ public class Application {
     @Bean
     TelegramBotBuilder telegramBotBuilder(
         @Value("${name.maratik.cw.eu.cwshopbot.username}") String username,
-        @Value("${name.maratik.cw.eu.cwshopbot.username}") String token
+        @Value("${name.maratik.cw.eu.cwshopbot.token}") String token
     ) {
-        logger.debug("username = {}", username);
         return new TelegramBotBuilder()
             .username(username)
             .token(token);
