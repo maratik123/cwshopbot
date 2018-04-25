@@ -233,7 +233,7 @@ public class TelegramBotService {
     public void addHandler(Object bean, Method method) {
         TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(method, TelegramCommand.class);
         if (command != null) {
-            for (String cmd : command.value()) {
+            for (String cmd : command.commands()) {
                 //noinspection ObjectAllocationInLoop
                 commandList.put(cmd, new TelegramHandler(bean, method, command));
             }
@@ -247,7 +247,7 @@ public class TelegramBotService {
     public void addForwardMessageHandler(Object bean, Method method) {
         TelegramForward forward = AnnotatedElementUtils.findMergedAnnotation(method, TelegramForward.class);
         if (forward != null) {
-            String[] fromArr = forward.value();
+            String[] fromArr = forward.from();
             if (fromArr.length == 0) {
                 defaultForwardHandler = new TelegramHandler(bean, method, null);
             } else {
@@ -265,7 +265,7 @@ public class TelegramBotService {
             Method helpMethod = getClass().getMethod("helpMethod");
             TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(helpMethod, TelegramCommand.class);
             if (command != null) {
-                for (String cmd : command.value()) {
+                for (String cmd : command.commands()) {
                     //noinspection ObjectAllocationInLoop
                     commandList.put(cmd, new TelegramHandler(this, helpMethod, command));
                 }
@@ -276,7 +276,7 @@ public class TelegramBotService {
     }
 
     @SuppressWarnings("WeakerAccess")
-    @TelegramCommand(value = "/help", isHelp = true, description = "This help")
+    @TelegramCommand(commands = "/help", isHelp = true, description = "This help")
     public void helpMethod() {
     }
 

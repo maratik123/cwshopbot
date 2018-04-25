@@ -41,7 +41,7 @@ public class ShopController {
             ));
     }
 
-    @TelegramCommand(value = "/text", description = "This is a test method")
+    @TelegramCommand(commands = "/text", description = "This is a test method")
     public SendMessage test(long userId, String message, User user) {
         return processMessage(userId, message, user);
     }
@@ -57,7 +57,7 @@ public class ShopController {
             ));
     }
 
-    @TelegramCommand(value = "/hiddenCommand", description = "This is a hidden test method", hidden = true)
+    @TelegramCommand(commands = "/hiddenCommand", description = "This is a hidden test method", hidden = true)
     public SendMessage testHidden(long userId, User user, String message) {
         return processMessage(userId, message, user);
     }
