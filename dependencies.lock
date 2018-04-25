@@ -17,8 +17,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "compileClasspath": {
@@ -39,8 +39,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "default": {
@@ -61,8 +61,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "runtime": {
@@ -83,8 +83,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "runtimeClasspath": {
@@ -105,8 +105,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "testCompile": {
@@ -131,8 +131,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "testCompileClasspath": {
@@ -157,8 +157,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "testRuntime": {
@@ -183,8 +183,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     },
     "testRuntimeClasspath": {
@@ -209,8 +209,8 @@
             "requested": "2.0.1.RELEASE"
         },
         "org.telegram:telegrambots": {
-            "locked": "3.6",
-            "requested": "3.6"
+            "locked": "3.6.1",
+            "requested": "3.6.1"
         }
     }
 }

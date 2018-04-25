@@ -17,6 +17,7 @@ package name.maratik.cw.eu.spring;
 
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
+import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,11 +61,14 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
         Class<?> original = botControllerMap.get(beanName);
         if (original != null) {
             for (Method method : original.getDeclaredMethods()) {
-                if (AnnotatedElementUtils.isAnnotated(method, TelegramCommand.class)) {
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramCommand.class)) {
                     bindCommandController(bean, method);
                 }
-                if (AnnotatedElementUtils.isAnnotated(method, TelegramMessage.class)) {
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramMessage.class)) {
                     bindMessageController(bean, method);
+                }
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramForward.class)) {
+                    bindForwardController(bean, method);
                 }
             }
         }
@@ -72,18 +76,17 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
     }
 
     private void bindMessageController(Object bean, Method method) {
-        logger.info("Init TelegramBot message controller: {}:{}",
-            () -> AnnotatedElementUtils.findMergedAnnotation(method, TelegramMessage.class),
-            method::getName
-        );
+        logger.info("Init TelegramBot message controller: {}:{}", bean::getClass, method::getName);
         telegramBotService.addDefaultMessageHandler(bean, method);
     }
 
     private void bindCommandController(Object bean, Method method) {
-        logger.info("Init TelegramBot command controller: {}:{}",
-            () -> AnnotatedElementUtils.findMergedAnnotation(method, TelegramCommand.class),
-            method::getName
-        );
+        logger.info("Init TelegramBot command controller: {}:{}", bean::getClass, method::getName);
         telegramBotService.addHandler(bean, method);
+    }
+
+    private void bindForwardController(Object bean, Method method) {
+        logger.info("Init TelegramBot forward controller: {}:{}", bean::getClass, method::getName);
+        telegramBotService.addForwardMessageHandler(bean, method);
     }
 }

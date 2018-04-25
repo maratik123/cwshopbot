@@ -15,6 +15,10 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.spring.model;
 
+import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.User;
+
 import java.util.Optional;
 
 /**
@@ -24,29 +28,30 @@ public class TelegramMessageCommand {
     private final String command;
     private final String argument;
     private final boolean isCommand;
+    private final Long forwardedFrom;
 
-    public TelegramMessageCommand(String command, String argument) {
-        this.command = command;
-        this.argument = argument;
-        isCommand = isSlashStart(command);
-    }
-
-    public TelegramMessageCommand(String message) {
-        if (isSlashStart(message)) {
-            int spacePos = message.indexOf(' ');
+    public TelegramMessageCommand(Update update) {
+        Message message = update.getMessage();
+        String messageText = message.getText();
+        if (isSlashStart(messageText)) {
+            int spacePos = messageText.indexOf(' ');
             if (spacePos != -1) {
-                command = message.substring(0, spacePos);
-                argument = message.substring(spacePos + 1);
+                command = messageText.substring(0, spacePos);
+                argument = messageText.substring(spacePos + 1);
             } else {
-                command = message;
+                command = messageText;
                 argument = null;
             }
             isCommand = true;
         } else {
             command = null;
-            argument = message;
+            argument = messageText;
             isCommand = false;
         }
+        this.forwardedFrom = Optional.ofNullable(message.getForwardFrom())
+            .map(User::getId)
+            .map(Integer::longValue)
+            .orElse(null);
     }
 
     public Optional<String> getCommand() {
@@ -61,12 +66,17 @@ public class TelegramMessageCommand {
         return isCommand;
     }
 
+    public Optional<Long> getForwardedFrom() {
+        return Optional.ofNullable(forwardedFrom);
+    }
+
     @Override
     public String toString() {
         return "TelegramMessageCommand{" +
             "command='" + command + '\'' +
             ", argument='" + argument + '\'' +
             ", isCommand=" + isCommand +
+            ", forwardedFrom=" + forwardedFrom +
             '}';
     }
 

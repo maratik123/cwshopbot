@@ -17,14 +17,15 @@ package name.maratik.cw.eu.spring;
 
 import com.google.common.collect.ImmutableMap;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
+import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import name.maratik.cw.eu.spring.model.TelegramBotCommand;
 import name.maratik.cw.eu.spring.model.TelegramHandler;
 import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -38,10 +39,13 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -59,24 +63,24 @@ public class TelegramBotService {
     private final String token;
     private final String path;
 
-
-    private final TelegramBotsApi api;
+    private final Executor botExecutor;
 
     private final Map<String, TelegramHandler> commandList = new LinkedHashMap<>();
-    private final Executor botExecutor;
+    private final Map<Long, TelegramHandler> forwardHandlerList = new HashMap<>();
+    private final ConfigurableBeanFactory beanFactory;
     private TelegramHandler defaultMessageHandler;
+    private TelegramHandler defaultForwardHandler;
 
     private final DefaultAbsSender client;
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
 
-    public TelegramBotService(TelegramBotBuilder botBuilder) {
+    public TelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
         logger.info("Build TelegramBot: {}", botBuilder);
 
         username = botBuilder.getUsername();
         token = botBuilder.getToken();
         path = botBuilder.getPath();
-
-        api = new TelegramBotsApi();
 
         try {
             switch (botBuilder.getType()) {
@@ -104,17 +108,24 @@ public class TelegramBotService {
             throw new RuntimeException(e);
         }
 
+        BiFunction<TelegramMessageCommand, Update, Long> userIdExtractor = (telegramMessageCommand, update) ->
+            update.getMessage().getFrom().getId().longValue();
+
         argumentMapper = ImmutableMap.<Type, BiFunction<TelegramMessageCommand, Update, ?>>builder()
             .put(Update.class, (telegramMessageCommand, update) -> update)
             .put(TelegramMessageCommand.class, (telegramMessageCommand, update) -> telegramMessageCommand)
             .put(String.class, (telegramMessageCommand, update) -> telegramMessageCommand.getArgument().orElse(null))
             .put(TelegramBotsApi.class, (telegramMessageCommand, update) -> api)
             .put(TelegramBotService.class, (telegramMessageCommand, update) -> this)
-            .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> client)
+            .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> getClient())
             .put(Message.class, (telegramMessageCommand, update) -> update.getMessage())
             .put(User.class, (telegramMessageCommand, update) -> update.getMessage().getFrom())
-            .put(long.class, (telegramMessageCommand, update) -> update.getMessage().getFrom().getId().longValue())
-            .put(Long.class, (telegramMessageCommand, update) -> update.getMessage().getFrom().getId().longValue())
+            .put(long.class, userIdExtractor)
+            .put(Long.class, userIdExtractor)
+            .put(Instant.class, ((telegramMessageCommand, update) -> {
+                Message message = update.getMessage();
+                return Instant.ofEpochSecond(Optional.ofNullable(message.getForwardDate()).orElse(message.getDate()));
+            }))
             .build();
 
         addHelpMethod();
@@ -138,11 +149,20 @@ public class TelegramBotService {
         if (update.getMessage() == null) {
             return Optional.empty();
         }
-        TelegramMessageCommand command = new TelegramMessageCommand(update.getMessage().getText());
-        return (command.isCommand()
-            ? command.getCommand().map(commandList::get)
-            : Optional.ofNullable(defaultMessageHandler)
-        ).flatMap(commandHandler -> {
+        TelegramMessageCommand command = new TelegramMessageCommand(update);
+        Optional<TelegramHandler> optionalCommandHandler;
+        if (command.getForwardedFrom().isPresent()) {
+            optionalCommandHandler = Optional.ofNullable(
+                forwardHandlerList.getOrDefault(command.getForwardedFrom().get(), defaultForwardHandler)
+            );
+        } else {
+            optionalCommandHandler = command.getCommand().map(commandList::get);
+            if (!optionalCommandHandler.isPresent()) {
+                optionalCommandHandler = Optional.ofNullable(defaultMessageHandler);
+            }
+        }
+
+        return optionalCommandHandler.flatMap(commandHandler -> {
             try {
                 Method method = commandHandler.getMethod();
                 Object[] arguments = makeArgumentList(method, command, update);
@@ -156,6 +176,10 @@ public class TelegramBotService {
                     } else if (methodGenericReturnType instanceof Class<?> &&
                         BotApiMethod.class.isAssignableFrom((Class<?>) methodGenericReturnType)) {
                         return Optional.ofNullable((BotApiMethod<?>) method.invoke(commandHandler.getBean(), arguments));
+                    } else {
+                        logger.error("Unsupported handler '{}' return type: {}",
+                            commandHandler, methodGenericReturnType
+                        );
                     }
                 }
             } catch (Exception e) {
@@ -207,9 +231,9 @@ public class TelegramBotService {
     }
 
     public void addHandler(Object bean, Method method) {
-        TelegramCommand command = AnnotationUtils.findAnnotation(method, TelegramCommand.class);
+        TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(method, TelegramCommand.class);
         if (command != null) {
-            for (String cmd : command.value()) {
+            for (String cmd : command.commands()) {
                 //noinspection ObjectAllocationInLoop
                 commandList.put(cmd, new TelegramHandler(bean, method, command));
             }
@@ -220,12 +244,28 @@ public class TelegramBotService {
         defaultMessageHandler = new TelegramHandler(bean, method, null);
     }
 
+    public void addForwardMessageHandler(Object bean, Method method) {
+        TelegramForward forward = AnnotatedElementUtils.findMergedAnnotation(method, TelegramForward.class);
+        if (forward != null) {
+            String[] fromArr = forward.from();
+            if (fromArr.length == 0) {
+                defaultForwardHandler = new TelegramHandler(bean, method, null);
+            } else {
+                for (String from : fromArr) {
+                    Long parsedFrom = Long.valueOf(Objects.requireNonNull(beanFactory.resolveEmbeddedValue(from)));
+                    //noinspection ObjectAllocationInLoop
+                    forwardHandlerList.put(parsedFrom, new TelegramHandler(bean, method, null));
+                }
+            }
+        }
+    }
+
     private void addHelpMethod() {
         try {
             Method helpMethod = getClass().getMethod("helpMethod");
-            TelegramCommand command = AnnotatedElementUtils.getMergedAnnotation(helpMethod, TelegramCommand.class);
+            TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(helpMethod, TelegramCommand.class);
             if (command != null) {
-                for (String cmd : command.value()) {
+                for (String cmd : command.commands()) {
                     //noinspection ObjectAllocationInLoop
                     commandList.put(cmd, new TelegramHandler(this, helpMethod, command));
                 }
@@ -236,7 +276,7 @@ public class TelegramBotService {
     }
 
     @SuppressWarnings("WeakerAccess")
-    @TelegramCommand(value = "/help", isHelp = true, description = "This help")
+    @TelegramCommand(commands = "/help", isHelp = true, description = "This help")
     public void helpMethod() {
     }
 

@@ -26,10 +26,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.time.Clock;
+
 @SpringBootApplication
 @Configuration
 @EnableTelegramBot
-@PropertySource("file:${HOME}/cwshopbotconfig/auth.properties")
+@PropertySource({
+    "file:${HOME}/cwshopbotconfig/auth.properties",
+    "classpath:cwshopbot.properties"
+})
 public class Application {
     private static final Logger logger = LogManager.getLogger(Application.class);
 
@@ -48,5 +53,11 @@ public class Application {
         return new TelegramBotBuilder()
             .username(username)
             .token(token);
+    }
+
+    @SuppressWarnings("MethodMayBeStatic")
+    @Bean
+    Clock clock() {
+        return Clock.systemUTC();
     }
 }

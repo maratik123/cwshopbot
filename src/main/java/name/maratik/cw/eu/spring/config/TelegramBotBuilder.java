@@ -20,7 +20,7 @@ package name.maratik.cw.eu.spring.config;
  */
 public class TelegramBotBuilder {
 
-    public static final int DEFAULT_MAX_THREADS = 100;
+    public static final int DEFAULT_MAX_THREADS = 30;
 
     public enum BotType {
         LONG_POLLING, WEBHOOK
