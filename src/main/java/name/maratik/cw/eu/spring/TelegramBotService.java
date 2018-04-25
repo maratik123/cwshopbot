@@ -137,6 +137,7 @@ public class TelegramBotService {
             updateProcess(update).ifPresent(result -> {
                 try {
                     client.execute(result);
+                    logger.debug("Update: {}. Message: {}. Successfully sent", update, result);
                 } catch (TelegramApiException e) {
                     logger.error("Update: {}. Can not send message {} to telegram: ", update, result, e);
                 }
