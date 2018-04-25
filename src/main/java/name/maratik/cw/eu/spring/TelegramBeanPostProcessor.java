@@ -60,7 +60,9 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(@NonNull Object bean, String beanName) throws BeansException {
         Class<?> original = botControllerMap.get(beanName);
         if (original != null) {
+            logger.info("Processing class {} as bean", bean::getClass,  () -> beanName);
             for (Method method : original.getDeclaredMethods()) {
+                logger.info("Found method {}", method::getName);
                 if (AnnotatedElementUtils.hasAnnotation(method, TelegramCommand.class)) {
                     bindCommandController(bean, method);
                 }
