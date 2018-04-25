@@ -15,15 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.spring.annotation;
 
-import org.springframework.core.annotation.AliasFor;
-
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public @interface TelegramForward {
-    @AliasFor("from")
     String[] value() default {};
-
-    @AliasFor("value")
-    String[] from() default {};
 }
