@@ -15,14 +15,23 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.botcontroller;
 
+import com.google.common.cache.Cache;
+import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -30,6 +39,17 @@ import org.telegram.telegrambots.api.objects.User;
 @TelegramBot
 public class ShopController {
     private static final Logger logger = LogManager.getLogger(ShopController.class);
+
+    private final Clock clock;
+    private final int forwardStaleSec;
+    private final ConcurrentMap<Long, Long> forwardUserCache;
+
+    public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
+                          @ForwardUser Cache<Long, Long> forwardUserCache) {
+        this.clock = clock;
+        this.forwardStaleSec = forwardStaleSec;
+        this.forwardUserCache = forwardUserCache.asMap();
+    }
 
     @TelegramMessage
     public SendMessage message(long userId, User user, String message) {
@@ -63,15 +83,42 @@ public class ShopController {
     }
 
     @TelegramForward("${cwuserid}")
-    public SendMessage forward(String message, User user, long userId) {
-        logger.info("Accepted incoming forward data: {}", message);
+    public SendMessage forward(Update update, String messageText, User user, long userId, Instant forwardTime,
+                               Message message) {
+        logger.info("Accepted incoming forward data: {}", messageText);
+
+        if (messageIsStale(forwardTime)) {
+            logger.info("Forwarded stale update: {}", update);
+            return new SendMessage()
+                .setChatId(userId)
+                .setText("Please, send fresh forward");
+        }
+
+        Long previousUserForwarded = forwardUserCache.putIfAbsent(
+            message.getForwardFromMessageId().longValue(),
+            user.getId().longValue()
+        );
+
+        if (previousUserForwarded != null) {
+            return new SendMessage()
+                .setChatId(userId)
+                .setText(
+                    previousUserForwarded != userId
+                        ? "This forward is not belong to you"
+                        : "I've seen this forward already"
+                );
+        }
 
         return new SendMessage()
             .setChatId(userId)
             .setText(String.format("Hi %s! You've forwarded me message: %s",
                 user.getFirstName(),
-                message
+                messageText
             ));
+    }
+
+    private boolean messageIsStale(Instant forwardTime) {
+        return clock.instant().minusSeconds(forwardStaleSec).isAfter(forwardTime);
     }
 
     @TelegramForward

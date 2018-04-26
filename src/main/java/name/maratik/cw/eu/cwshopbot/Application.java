@@ -15,6 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
 import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import java.time.Clock;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 @Configuration
@@ -46,7 +50,7 @@ public class Application {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Bean
-    TelegramBotBuilder telegramBotBuilder(
+    public TelegramBotBuilder telegramBotBuilder(
         @Value("${name.maratik.cw.eu.cwshopbot.username}") String username,
         @Value("${name.maratik.cw.eu.cwshopbot.token}") String token
     ) {
@@ -57,7 +61,16 @@ public class Application {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Bean
-    Clock clock() {
+    public Clock clock() {
         return Clock.systemUTC();
+    }
+
+    @Bean
+    @ForwardUser
+    public Cache<Long, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec) {
+        return CacheBuilder.newBuilder()
+            .expireAfterWrite(forwardStaleSec, TimeUnit.SECONDS)
+            .maximumSize(1000)
+            .build();
     }
 }
