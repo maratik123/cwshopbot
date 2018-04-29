@@ -20,6 +20,7 @@ import name.maratik.cw.eu.spring.TelegramBotService;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportAware;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.NonNull;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -33,6 +34,7 @@ public class TelegramBotConfiguration implements ImportAware {
     public void setImportMetadata(@NonNull AnnotationMetadata importMetadata) {
     }
 
+    @Order(10)
     @Bean
     public TelegramBeanPostProcessor telegramBeanPostProcessor(TelegramBotService telegramBotService) {
         return new TelegramBeanPostProcessor(telegramBotService);

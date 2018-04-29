@@ -18,7 +18,7 @@ public class WebhookTelegramBotService extends TelegramBotService {
     private final String path;
 
     public WebhookTelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-        super(botBuilder, api, beanFactory);
+        super(api, beanFactory);
         username = botBuilder.getUsername();
         token = botBuilder.getToken();
         path = botBuilder.getPath();

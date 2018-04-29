@@ -18,7 +18,6 @@ package name.maratik.cw.eu.spring;
 import com.google.common.collect.ImmutableMap;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
-import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import name.maratik.cw.eu.spring.model.TelegramBotCommand;
 import name.maratik.cw.eu.spring.model.TelegramHandler;
 import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
@@ -65,9 +64,8 @@ public abstract class TelegramBotService implements AutoCloseable {
     private final DefaultAbsSender client;
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
 
-    public TelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
+    public TelegramBotService(TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-        logger.info("Build TelegramBot: {}", botBuilder);
 
         try {
             client = createAndRegisterClient(api);

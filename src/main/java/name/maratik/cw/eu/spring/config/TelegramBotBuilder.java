@@ -90,7 +90,7 @@ public class TelegramBotBuilder {
     @Override
     public String toString() {
         return "TelegramBotBuilder{" +
-            ", username='" + username + '\'' +
+            "username='" + username + '\'' +
             ", token='" + token + '\'' +
             ", path='" + path + '\'' +
             ", maxThreads=" + maxThreads +
