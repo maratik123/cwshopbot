@@ -22,11 +22,6 @@ public class TelegramBotBuilder {
 
     public static final int DEFAULT_MAX_THREADS = 30;
 
-    public enum BotType {
-        LONG_POLLING, WEBHOOK
-    }
-
-    private BotType type = BotType.LONG_POLLING;
     private String username;
     private String token;
     private String path;
@@ -35,22 +30,9 @@ public class TelegramBotBuilder {
     public TelegramBotBuilder() {
     }
 
-    public TelegramBotBuilder(BotType type, String username, String token, String path, int maxThreads) {
-        this.type = type;
-        this.username = username;
-        this.token = token;
-        this.path = path;
-        this.maxThreads = maxThreads;
-    }
-
     public TelegramBotBuilder(String username, String token) {
         this.username = username;
         this.token = token;
-    }
-
-    public TelegramBotBuilder type(BotType type) {
-        this.type = type;
-        return this;
     }
 
     public TelegramBotBuilder username(String username) {
@@ -71,14 +53,6 @@ public class TelegramBotBuilder {
     public TelegramBotBuilder maxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         return this;
-    }
-
-    public BotType getType() {
-        return type;
-    }
-
-    public void setType(BotType type) {
-        this.type = type;
     }
 
     public String getUsername() {
@@ -116,7 +90,6 @@ public class TelegramBotBuilder {
     @Override
     public String toString() {
         return "TelegramBotBuilder{" +
-            "type=" + type +
             ", username='" + username + '\'' +
             ", token='" + token + '\'' +
             ", path='" + path + '\'' +

@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.botcontroller;
 
 import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
@@ -42,10 +43,10 @@ public class ShopController {
 
     private final Clock clock;
     private final int forwardStaleSec;
-    private final ConcurrentMap<Long, Long> forwardUserCache;
+    private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
-                          @ForwardUser Cache<Long, Long> forwardUserCache) {
+                          @ForwardUser Cache<ForwardKey, Long> forwardUserCache) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
@@ -94,10 +95,7 @@ public class ShopController {
                 .setText("Please, send fresh forward");
         }
 
-        Long previousUserForwarded = forwardUserCache.putIfAbsent(
-            message.getForwardFromMessageId().longValue(),
-            user.getId().longValue()
-        );
+        Long previousUserForwarded = forwardUserCache.putIfAbsent(ForwardKey.of(message), userId);
 
         if (previousUserForwarded != null) {
             return new SendMessage()

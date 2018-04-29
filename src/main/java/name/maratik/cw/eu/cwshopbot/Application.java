@@ -18,8 +18,10 @@ package name.maratik.cw.eu.cwshopbot;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
+import name.maratik.cw.eu.spring.config.TelegramBotType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +50,11 @@ public class Application {
         logger.info("Main app started. Exiting main thread");
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
+    @Bean
+    public TelegramBotType telegramBotType() {
+        return TelegramBotType.LONG_POLLING;
+    }
+
     @Bean
     public TelegramBotBuilder telegramBotBuilder(
         @Value("${name.maratik.cw.eu.cwshopbot.username}") String username,
@@ -59,7 +65,6 @@ public class Application {
             .token(token);
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Bean
     public Clock clock() {
         return Clock.systemUTC();
@@ -67,7 +72,7 @@ public class Application {
 
     @Bean
     @ForwardUser
-    public Cache<Long, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec) {
+    public Cache<ForwardKey, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec) {
         return CacheBuilder.newBuilder()
             .expireAfterWrite(forwardStaleSec, TimeUnit.SECONDS)
             .maximumSize(1000)

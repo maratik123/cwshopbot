@@ -33,9 +33,8 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -47,23 +46,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class TelegramBotService {
+public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
 
-    private final String username;
-    private final String token;
-    private final String path;
-
-    private final Executor botExecutor;
 
     private final Map<String, TelegramHandler> commandList = new LinkedHashMap<>();
     private final Map<Long, TelegramHandler> forwardHandlerList = new HashMap<>();
@@ -78,31 +69,8 @@ public class TelegramBotService {
         this.beanFactory = beanFactory;
         logger.info("Build TelegramBot: {}", botBuilder);
 
-        username = botBuilder.getUsername();
-        token = botBuilder.getToken();
-        path = botBuilder.getPath();
-
         try {
-            switch (botBuilder.getType()) {
-                case LONG_POLLING:
-                    botExecutor = Executors.newFixedThreadPool(
-                        botBuilder.getMaxThreads() > 0
-                            ? botBuilder.getMaxThreads()
-                            : TelegramBotBuilder.DEFAULT_MAX_THREADS
-                    );
-                    TelegramLongPollingBot longPollingClient = new TelegramBotLongPollingImpl();
-                    api.registerBot(longPollingClient);
-                    client = longPollingClient;
-                    break;
-                case WEBHOOK:
-                    TelegramWebhookBot webhookClient = new TelegramBotWebhookImpl();
-                    api.registerBot(webhookClient);
-                    client = webhookClient;
-                    botExecutor = null;
-                    break;
-                default:
-                    throw new RuntimeException("Unknown bot type requested: " + botBuilder.getType());
-            }
+            client = createAndRegisterClient(api);
         } catch (TelegramApiException e) {
             logger.error("Error while creating TelegramBotsApi", e);
             throw new RuntimeException(e);
@@ -117,7 +85,7 @@ public class TelegramBotService {
             .put(String.class, (telegramMessageCommand, update) -> telegramMessageCommand.getArgument().orElse(null))
             .put(TelegramBotsApi.class, (telegramMessageCommand, update) -> api)
             .put(TelegramBotService.class, (telegramMessageCommand, update) -> this)
-            .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> getClient())
+            .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> client)
             .put(Message.class, (telegramMessageCommand, update) -> update.getMessage())
             .put(User.class, (telegramMessageCommand, update) -> update.getMessage().getFrom())
             .put(long.class, userIdExtractor)
@@ -131,18 +99,7 @@ public class TelegramBotService {
         addHelpMethod();
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public void updateLongPolling(Update update) {
-        CompletableFuture.runAsync(() ->
-            updateProcess(update).ifPresent(result -> {
-                try {
-                    client.execute(result);
-                    logger.debug("Update: {}. Message: {}. Successfully sent", update, result);
-                } catch (TelegramApiException e) {
-                    logger.error("Update: {}. Can not send message {} to telegram: ", update, result, e);
-                }
-        }), botExecutor);
-    }
+    protected abstract DefaultAbsSender createAndRegisterClient(TelegramBotsApi api) throws TelegramApiRequestException;
 
     @SuppressWarnings("WeakerAccess")
     public Optional<BotApiMethod<?>> updateProcess(Update update) {
@@ -281,44 +238,7 @@ public class TelegramBotService {
     public void helpMethod() {
     }
 
-    private class TelegramBotLongPollingImpl extends TelegramLongPollingBot {
-
-        @Override
-        public void onUpdateReceived(Update update) {
-            updateLongPolling(update);
-        }
-
-        @Override
-        public String getBotUsername() {
-            return username;
-        }
-
-        @Override
-        public String getBotToken() {
-            return token;
-        }
-    }
-
-    private class TelegramBotWebhookImpl extends TelegramWebhookBot {
-
-        @Override
-        public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-            return updateProcess(update).orElse(null);
-        }
-
-        @Override
-        public String getBotUsername() {
-            return username;
-        }
-
-        @Override
-        public String getBotToken() {
-            return token;
-        }
-
-        @Override
-        public String getBotPath() {
-            return path;
-        }
+    @Override
+    public void close() {
     }
 }

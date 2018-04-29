@@ -44,11 +44,13 @@ wrapper {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web") {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        [ 'logging', 'tomcat' ].each {
+            exclude group: 'org.springframework.boot', module: "spring-boot-starter-${it}"
+        }
     }
-    compile "org.springframework.boot:spring-boot-starter-log4j2"
-    compile "org.springframework.boot:spring-boot-starter-jetty"
+    [ 'log4j2', 'jetty' ].each {
+        compile "org.springframework.boot:spring-boot-starter-${it}"
+    }
     compile "org.telegram:telegrambots:${telegrambotsVersion}"
     compile "com.google.guava:guava:${guavaVersion}"
     compile "com.amazonaws:aws-java-sdk-dynamodb:${awsJavaSdkVersion}"
@@ -56,7 +58,7 @@ dependencies {
         compile "org.apache.logging.log4j:log4j-${it}"
     }
 
-    testCompile("org.springframework.boot:spring-boot-starter-test") {
+    testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     }
@@ -67,5 +69,10 @@ bootJar {
 }
 
 bootRun {
-    jvmArgs = ['-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager']
+    jvmArgs = [
+            '-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager',
+            '-Xms128M',
+            '-Xmx512M',
+            '-server'
+    ]
 }
