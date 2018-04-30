@@ -33,7 +33,6 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -54,25 +53,16 @@ import java.util.stream.Stream;
 public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
 
-
     private final Map<String, TelegramHandler> commandList = new LinkedHashMap<>();
     private final Map<Long, TelegramHandler> forwardHandlerList = new HashMap<>();
     private final ConfigurableBeanFactory beanFactory;
     private TelegramHandler defaultMessageHandler;
     private TelegramHandler defaultForwardHandler;
 
-    private final DefaultAbsSender client;
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
 
     public TelegramBotService(TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-
-        try {
-            client = createAndRegisterClient(api);
-        } catch (TelegramApiException e) {
-            logger.error("Error while creating TelegramBotsApi", e);
-            throw new RuntimeException(e);
-        }
 
         BiFunction<TelegramMessageCommand, Update, Long> userIdExtractor = (telegramMessageCommand, update) ->
             update.getMessage().getFrom().getId().longValue();
@@ -83,7 +73,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             .put(String.class, (telegramMessageCommand, update) -> telegramMessageCommand.getArgument().orElse(null))
             .put(TelegramBotsApi.class, (telegramMessageCommand, update) -> api)
             .put(TelegramBotService.class, (telegramMessageCommand, update) -> this)
-            .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> client)
+            .put(DefaultAbsSender.class, (telegramMessageCommand, update) -> getClient())
             .put(Message.class, (telegramMessageCommand, update) -> update.getMessage())
             .put(User.class, (telegramMessageCommand, update) -> update.getMessage().getFrom())
             .put(long.class, userIdExtractor)
@@ -96,8 +86,6 @@ public abstract class TelegramBotService implements AutoCloseable {
 
         addHelpMethod();
     }
-
-    protected abstract DefaultAbsSender createAndRegisterClient(TelegramBotsApi api) throws TelegramApiRequestException;
 
     @SuppressWarnings("WeakerAccess")
     public Optional<BotApiMethod<?>> updateProcess(Update update) {
@@ -146,7 +134,7 @@ public abstract class TelegramBotService implements AutoCloseable {
     }
 
     private void sendHelpList(Update update) throws TelegramApiException {
-        client.execute(new SendMessage()
+        getClient().execute(new SendMessage()
             .setChatId(update.getMessage().getChatId())
             .setText(buildHelpMessage())
         );
@@ -175,9 +163,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             ));
     }
 
-    public DefaultAbsSender getClient() {
-        return client;
-    }
+    public abstract DefaultAbsSender getClient();
 
     private Object[] makeArgumentList(Method method, TelegramMessageCommand telegramMessageCommand, Update update) {
         return Arrays.stream(method.getGenericParameterTypes())

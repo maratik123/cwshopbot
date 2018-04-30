@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
@@ -25,20 +24,26 @@ public class LongPollingTelegramBotService extends TelegramBotService implements
     private final String username;
     private final String token;
     private final ExecutorService botExecutor;
+    private final TelegramLongPollingBot client;
 
     public LongPollingTelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
         super(api, beanFactory);
-        logger.info("Registerig Long Polling with {}", botBuilder);
+        logger.info("Registering Long Polling with {}", botBuilder);
         username = botBuilder.getUsername();
         token = botBuilder.getToken();
         botExecutor = Executors.newFixedThreadPool(botBuilder.getMaxThreads());
+        client = new TelegramBotLongPollingImpl();
+        try {
+            api.registerBot(client);
+        } catch (TelegramApiRequestException e) {
+            logger.error("Can not register Long Polling with {}", botBuilder, e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    protected DefaultAbsSender createAndRegisterClient(TelegramBotsApi api) throws TelegramApiRequestException {
-        TelegramLongPollingBot longPollingClient = new TelegramBotLongPollingImpl();
-        api.registerBot(longPollingClient);
-        return longPollingClient;
+    public TelegramLongPollingBot getClient() {
+        return client;
     }
 
     @Override
