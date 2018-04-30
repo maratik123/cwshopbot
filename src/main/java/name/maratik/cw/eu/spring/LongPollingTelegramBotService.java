@@ -28,6 +28,7 @@ public class LongPollingTelegramBotService extends TelegramBotService implements
 
     public LongPollingTelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
         super(api, beanFactory);
+        logger.info("Registerig Long Polling with {}", botBuilder);
         username = botBuilder.getUsername();
         token = botBuilder.getToken();
         botExecutor = Executors.newFixedThreadPool(botBuilder.getMaxThreads());
