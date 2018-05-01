@@ -12,7 +12,8 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,7 +32,11 @@ public class LongPollingTelegramBotService extends TelegramBotService implements
         logger.info("Registering Long Polling with {}", botBuilder);
         username = botBuilder.getUsername();
         token = botBuilder.getToken();
-        botExecutor = Executors.newFixedThreadPool(botBuilder.getMaxThreads());
+        botExecutor = new ThreadPoolExecutor(1, botBuilder.getMaxThreads(),
+            1L, TimeUnit.HOURS,
+            new SynchronousQueue<>()
+        );
+
         client = new TelegramBotLongPollingImpl();
         try {
             api.registerBot(client);

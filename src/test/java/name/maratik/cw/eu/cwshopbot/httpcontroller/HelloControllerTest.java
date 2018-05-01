@@ -13,7 +13,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.controller;
+package name.maratik.cw.eu.cwshopbot.httpcontroller;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(HealthController.class)
-public class HealthControllerTest {
+@WebMvcTest(HelloController.class)
+public class HelloControllerTest {
 
     @MockBean
     private TelegramBotsApi api;
@@ -40,10 +40,10 @@ public class HealthControllerTest {
     private MockMvc mvc;
 
     @Test
-    public void testPing() throws Exception {
-        mvc.perform(get("/ping"))
+    public void testIndex() throws Exception {
+        mvc.perform(get("/"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string("OK"));
+                .andExpect(content().string("Hello, world!"));
     }
 }

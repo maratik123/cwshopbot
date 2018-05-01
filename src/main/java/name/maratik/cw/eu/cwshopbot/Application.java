@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot;
 
+import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
@@ -32,6 +33,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
@@ -72,10 +75,20 @@ public class Application {
 
     @Bean
     @ForwardUser
-    public Cache<ForwardKey, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec) {
+    public Cache<ForwardKey, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec, Clock clock) {
+        Instant zero = Instant.ofEpochSecond(0);
         return CacheBuilder.newBuilder()
+            .ticker(new Ticker() {
+                @Override
+                public long read() {
+                    return zero.until(clock.instant(), ChronoUnit.NANOS);
+                }
+            })
             .expireAfterWrite(forwardStaleSec, TimeUnit.SECONDS)
-            .maximumSize(1000)
+            .removalListener(notification -> logger.debug(
+                "Removed forward {} from forward user cache due to {}, evicted = {}",
+                notification::toString, notification::getCause, notification::wasEvicted
+            ))
             .build();
     }
 }

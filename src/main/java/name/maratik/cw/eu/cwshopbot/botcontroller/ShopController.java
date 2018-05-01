@@ -18,6 +18,8 @@ package name.maratik.cw.eu.cwshopbot.botcontroller;
 import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
+import name.maratik.cw.eu.cwshopbot.service.CWParser;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
@@ -32,6 +34,7 @@ import org.telegram.telegrambots.api.objects.User;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -44,12 +47,14 @@ public class ShopController {
     private final Clock clock;
     private final int forwardStaleSec;
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
+    private final CWParser<ShopInfo> shopInfoParser;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
-                          @ForwardUser Cache<ForwardKey, Long> forwardUserCache) {
+                          @ForwardUser Cache<ForwardKey, Long> forwardUserCache, CWParser<ShopInfo> shopInfoParser) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
+        this.shopInfoParser = shopInfoParser;
     }
 
     @TelegramMessage
@@ -107,12 +112,16 @@ public class ShopController {
                 );
         }
 
+        Optional<ShopInfo> shopInfo = shopInfoParser.parse(message);
+
         return new SendMessage()
             .setChatId(userId)
-            .setText(String.format("Hi %s! You've forwarded me message: %s",
-                user.getFirstName(),
-                messageText
-            ));
+            .setText(shopInfo
+                .map(s -> "You've send shop with name='" + s.getShopName() + "' " +
+                    "for char='" + s.getCharName() + "' " +
+                    "with command='" + s.getShopCommand() + '\'')
+                .orElse("Unknown forward")
+            );
     }
 
     private boolean messageIsStale(Instant forwardTime) {
