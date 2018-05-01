@@ -89,6 +89,7 @@ public class Application {
                 "Removed forward {} from forward user cache due to {}, evicted = {}",
                 notification::toString, notification::getCause, notification::wasEvicted
             ))
+            .maximumSize(1000)
             .build();
     }
 }
