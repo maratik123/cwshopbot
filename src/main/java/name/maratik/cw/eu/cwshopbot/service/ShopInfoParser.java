@@ -16,16 +16,20 @@ import java.util.Optional;
 @Component
 public class ShopInfoParser implements CWParser<ShopInfo> {
 
-    public static final Comparator<MessageEntity> MESSAGE_ENTITY_COMPARATOR = Comparator.comparing(MessageEntity::getOffset);
+    private static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
+        Comparator.comparing(MessageEntity::getOffset);
 
     @Override
     public Optional<ShopInfo> parse(Message message) {
+        if (!message.getText().startsWith("Welcome, to the ")) {
+            return Optional.empty();
+        }
         List<MessageEntity> messageEntities = message.getEntities();
         if (messageEntities == null) {
             return Optional.empty();
         }
         Iterator<MessageEntity> messageEntityIterator = messageEntities.stream()
-            .sorted(MESSAGE_ENTITY_COMPARATOR)
+            .sorted(MESSAGE_ENTITY_OFFSET_COMPARATOR)
             .limit(2)
             .iterator();
         Optional<String> shopName = extractBoldText(messageEntityIterator);
@@ -37,10 +41,10 @@ public class ShopInfoParser implements CWParser<ShopInfo> {
             return Optional.empty();
         }
         Optional<String> shopCommand = messageEntities.stream()
-            .max(MESSAGE_ENTITY_COMPARATOR)
+            .max(MESSAGE_ENTITY_OFFSET_COMPARATOR)
             .map(MessageEntity::getText);
         return shopCommand
-            .filter(s -> s.startsWith("/"))
+            .filter(s -> s.startsWith("/ws_"))
             .map(s -> ShopInfo.builder()
                     .setShopName(shopName.get())
                     .setCharName(charName.get())
