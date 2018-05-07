@@ -57,6 +57,26 @@ public class ShopController {
         this.shopInfoParser = shopInfoParser;
     }
 
+    @TelegramCommand(commands = "/license", description = "Terms and conditions")
+    public SendMessage license(long userId) {
+        return new SendMessage()
+            .enableMarkdown(true)
+            .setChatId(userId)
+            .setText("cwshopbot  Copyright (C) 2018  maratik\n" +
+                "This program comes with ABSOLUTELY NO WARRANTY.\n" +
+                "This is free software, and you are welcome to redistribute it\n" +
+                "under conditions of [GNU Affero Public License v3.0 or later](https://www.gnu.org/licenses/).\n" +
+                "For sources see /source");
+    }
+
+    @TelegramCommand(commands = "/source", description = "Source code", hidden = true)
+    public SendMessage source(long userId) {
+        return new SendMessage()
+            .enableMarkdown(true)
+            .setChatId(userId)
+            .setText("[here](https://github.com/maratik123/cwshopbot)");
+    }
+
     @TelegramMessage
     public SendMessage message(long userId, User user, String message) {
         return new SendMessage()
