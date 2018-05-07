@@ -1,0 +1,528 @@
+#    cwshopbot
+#    Copyright (C) 2018  Marat Bukharov.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+stock:
+  tradeable: true
+  01:
+    name: Thread
+  02:
+    name: Stick
+  03:
+    name: Pelt
+  04:
+    name: Bone
+  05:
+    name: Coal
+  06:
+    name: Charcoal
+  07:
+    name: Powder
+  08:
+    name: Iron Ore
+  09:
+    name: Cloth
+  10:
+    name: Silver Ore
+  13:
+    name: Magic Stone
+  14:
+    name: Wooden shaft
+    tradeable: false
+    recipe:
+      07: 1
+      02: 5
+  15:
+    name: Sapphire
+  16:
+    name: Solvent
+  17:
+    name: Ruby
+  18:
+    name: Hardener
+  19:
+    name: Steel
+    recipe:
+      08: 2
+      07: 2
+  20:
+    name: Leather
+    recipe:
+      03: 4
+  21:
+    name: Bone Powder
+    recipe:
+      04: 4
+  22:
+    name: String
+    recipe:
+      02: 3
+  23:
+    name: Coke
+    recipe:
+      05: 3
+      06: 3
+  24:
+    name: Purified powder
+    tradeable: false
+    recipe:
+      21: 2
+      07: 2
+      13: 1
+  25:
+    name: Silver alloy
+    tradeable: false
+    recipe:
+      24: 1
+      10: 1
+      19: 1
+  27:
+    name: Steel mold
+    tradeable: false
+    recipe:
+      08: 2
+      07: 2
+      22: 2
+  28:
+    name: Silver mold
+    tradeable: false
+    recipe:
+      23: 2
+      10: 2
+      22: 2
+  31:
+    name: Rope
+    recipe:
+      22: 1
+      01: 4
+  33:
+    name: Metal plate
+    recipe:
+      08: 3
+      07: 3
+      02: 3
+crafting:
+  tradeable: false
+  r01:
+    name: Champion Sword recipe
+  k01:
+    name: Champion blade
+  r02:
+    name: Trident recipe
+  k02:
+    name: Trident blade
+  r03:
+    name: Hunter Bow recipe
+  k03:
+    name: Hunter shaft
+  r04:
+    name: War hammer recipe
+  k04:
+    name: War hammer head
+  r05:
+    name: Hunter Dagger recipe
+  k05:
+    name: Hunter blade
+  r06:
+    name: Order Armor recipe
+  k06:
+    name: Order Armor piece
+  r07:
+    name: Order Helmet recipe
+  k07:
+    name: Order Helmet fragment
+  r08:
+    name: Order Boots recipe
+  k08:
+    name: Order Boots part
+  r09:
+    name: Order Gauntlets recipe
+  k09:
+    name: Order Gauntlets part
+  r10:
+    name: Order shield recipe
+  k10:
+    name: Order shield part
+  r11:
+    name: Hunter Armor recipe
+  k11:
+    name: Hunter Armor part
+  r12:
+    name: Hunter Helmet recipe
+  k12:
+    name: Hunter Helmet fragment
+  r13:
+    name: Hunter Boots recipe
+  k13:
+    name: Hunter Boots part
+  r14:
+    name: Hunter Gloves recipe
+  k14:
+    name: Hunter Gloves part
+  r15:
+    name: Clarity Robe recipe
+  k15:
+    name: Clarity Robe piece
+  r16:
+    name: Clarity Circlet recipe
+  k16:
+    name: Clarity Circlet fragment
+  r17:
+    name: Clarity Shoes recipe
+  k17:
+    name: Clarity Shoes part
+  r18:
+    name: Clarity Bracers recipe
+  k18:
+    name: Clarity Bracers part
+misc:
+  tradeable: false
+  100:
+    name: Pouch of gold
+    recipe:
+      20: 2
+      01: 12
+  501:
+    name: Wrapping
+    recipe:
+      09: 3
+      22: 3
+equipment:
+  tradeable: false
+  tch:
+    name: Torch
+    mana: 80
+    recipe:
+      23: 1
+      05: 5
+  505:
+    name: Wooden arrows pack
+    mana: 80
+    recipe:
+      02: 6
+      08: 1
+  511:
+    name: Steel arrows pack
+    mana: 120
+    recipe:
+      02: 4
+      19: 1
+  a27:
+    name: Order Armor
+    type: heavy armor
+    wear: body
+    att: 5
+    def: 25
+    recipe:
+      23: 9
+      33: 15
+      r06: 1
+      k06: 3
+      31: 12
+      15: 3
+      27: 3
+      16: 5
+  a28:
+    name: Order Helmet
+    type: heavy armor
+    wear: head
+    att: 3
+    def: 15
+    recipe:
+      23: 7
+      33: 12
+      k07: 3
+      r07: 1
+      31: 9
+      15: 1
+      27: 2
+      16: 3
+  a29:
+    name: Order Boots
+    type: heavy armor
+    wear: legs
+    att: 2
+    def: 10
+    recipe:
+      23: 5
+      33: 9
+      k08: 3
+      r08: 1
+      31: 7
+      27: 1
+      16: 1
+  a30:
+    name: Order Gauntlets
+    type: heavy armor
+    wear: hands
+    att: 2
+    def: 10
+    recipe:
+      23: 5
+      33: 9
+      k09: 3
+      r09: 1
+      31: 7
+      27: 1
+      16: 1
+  a31:
+    name: Order Shield
+    type: shield
+    wear: secondary hand
+    def: 10
+    recipe:
+      23: 7
+      33: 7
+      k10: 3
+      r10: 1
+      25: 15
+      27: 1
+  a32:
+    name: Hunter Armor
+    type: light armor
+    wear: body
+    att: 8
+    def: 18
+    recipe:
+      23: 9
+      k11: 3
+      r11: 1
+      20: 24
+      31: 12
+      15: 3
+      27: 3
+      16: 5
+  a33:
+    name: Hunter Helmet
+    type: light armor
+    wear: head
+    att: 5
+    def: 11
+    recipe:
+      23: 7
+      k12: 3
+      r12: 1
+      20: 18
+      31: 9
+      15: 1
+      27: 2
+      16: 3
+  a34:
+    name: Hunter Boots
+    type: light armor
+    wear: legs
+    att: 3
+    def: 8
+    recipe:
+      23: 5
+      k13: 3
+      r13: 1
+      20: 12
+      31: 7
+      27: 1
+      16: 1
+  a35:
+    name: Hunter Gloves
+    type: light armor
+    wear: hands
+    att: 3
+    def: 8
+    recipe:
+      23: 5
+      k14: 3
+      r14: 1
+      20: 12
+      31: 7
+      27: 1
+      16: 1
+  a36:
+    name: Clarity Robe
+    type: robe armor
+    wear: body
+    att: 4
+    def: 20
+    manaboost: 120
+    recipe:
+      k15: 3
+      r15: 1
+      23: 9
+      20: 15
+      31: 12
+      15: 5
+      27: 1
+      16: 7
+  a37:
+    name: Clarity Circlet
+    type: robe armor
+    wear: head
+    att: 2
+    def: 12
+    manaboost: 80
+    recipe:
+      k16: 3
+      r16: 1
+      23: 7
+      20: 9
+      31: 9
+      15: 3
+      27: 2
+      16: 5
+  a38:
+    name: Clarity Shoes
+    type: robe armor
+    wear: legs
+    att: 1
+    def: 9
+    manaboost: 40
+    recipe:
+      k17: 3
+      r17: 1
+      23: 3
+      20: 7
+      31: 5
+      15: 1
+      27: 1
+      16: 3
+  a39:
+    name: Clarity Bracers
+    type: robe armor
+    wear: hands
+    att: 1
+    def: 9
+    manaboost: 40
+    recipe:
+      k18: 3
+      r18: 1
+      23: 3
+      20: 7
+      31: 5
+      15: 1
+      27: 1
+      16: 3
+  w28:
+    name: Champion Sword
+    type: sword
+    wear: primary hand
+    att: 31
+    recipe:
+      k01: 3
+      r01: 1
+      23: 41
+      18: 3
+      33: 41
+      17: 1
+      25: 27
+      27: 3
+  w29:
+    name: Trident
+    type: spear
+    wear: primary hand
+    att: 16
+    def: 14
+    recipe:
+      23: 41
+      18: 3
+      17: 1
+      25: 27
+      27: 3
+      k02: 3
+      r02: 1
+      14: 41
+  w30:
+    name: Hunter Bow
+    type: bow
+    wear: primary hand
+    att: 22
+    def: 8
+    recipe:
+      23: 41
+      18: 3
+      k03: 3
+      r03: 1
+      17: 1
+      25: 27
+      27: 3
+      14: 41
+  w31:
+    name: War hammer
+    type: blunt
+    wear: primary hand
+    att: 15
+    def: 15
+    recipe:
+      23: 41
+      18: 3
+      33: 41
+      17: 1
+      25: 27
+      27: 3
+      k04: 3
+      r04: 1
+  w32:
+    name: Hunter Dagger
+    type: dagger
+    wear: secondary hand
+    att: 10
+    recipe:
+      23: 7
+      k05: 3
+      r05: 1
+      33: 7
+      25: 15
+      27: 1
+craftbook:
+  1:
+    mana: 10
+    items:
+      - 14
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 31
+      - 33
+      - 100
+      - 501
+      - 505
+      - tch
+  2:
+    mana: 15
+    items:
+      - 25
+      - 27
+      - 28
+      - 511
+  3:
+    mana: 150
+    items:
+      - a27
+      - a28
+      - a29
+      - a30
+      - a31
+      - a32
+      - a33
+      - a34
+      - a35
+      - a36
+      - a37
+      - a38
+      - a39
+      - w28
+      - w29
+      - w30
+      - w31
+      - w32
