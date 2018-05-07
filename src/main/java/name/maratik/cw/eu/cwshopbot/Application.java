@@ -31,6 +31,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication
 @Configuration
 @EnableTelegramBot
+@EnableScheduling
 @PropertySource({
     "file:${HOME}/cwshopbotconfig/auth.properties",
     "classpath:cwshopbot.properties"
@@ -90,6 +92,7 @@ public class Application {
                 notification::toString, notification::getCause, notification::wasEvicted
             ))
             .maximumSize(1000)
+            .recordStats()
             .build();
     }
 }

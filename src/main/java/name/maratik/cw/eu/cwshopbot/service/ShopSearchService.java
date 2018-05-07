@@ -15,13 +15,28 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.service;
 
-import org.telegram.telegrambots.api.objects.Message;
+import name.maratik.cw.eu.cwshopbot.model.SearchDescriptor;
+import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public interface CWParser<T> {
-    Optional<T> parse(Message message);
+@Service
+public class ShopSearchService {
+    private static final Comparator<ShopInfo> NOT_A_MOON_KING_DRIVEN_SORT_ORDER =
+        Comparator.comparing((ShopInfo shopInfo) -> !shopInfo.getShopCommand().equals("/ws_pj3q1"))
+            .thenComparing(ShopInfo::getShopCommand);
+
+    public List<ShopInfo> findShop(SearchDescriptor searchDescriptor) {
+        List<ShopInfo> stub = Collections.emptyList();
+        return stub.stream()
+            .sorted(NOT_A_MOON_KING_DRIVEN_SORT_ORDER)
+            .collect(Collectors.toList());
+    }
 }

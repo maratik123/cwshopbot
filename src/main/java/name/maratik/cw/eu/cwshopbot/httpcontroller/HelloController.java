@@ -27,6 +27,6 @@ public class HelloController {
     @GetMapping("/")
     public String index() {
         logger.info("Index is called");
-        return "<a href=\"https://seal.beyondsecurity.com/vulnerability-scanner-verification/maratik.name\"><img src=\"https://seal.beyondsecurity.com/verification-images/maratik.name/vulnerability-scanner-2.gif\" alt=\"Website Security Test\" border=\"0\" /></a>";
+        return "Hello world!";
     }
 }

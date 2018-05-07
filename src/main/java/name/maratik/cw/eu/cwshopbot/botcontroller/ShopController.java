@@ -100,7 +100,7 @@ public class ShopController {
                 .setText("Please, send fresh forward");
         }
 
-        Long previousUserForwarded = forwardUserCache.putIfAbsent(ForwardKey.of(message), userId);
+        Long previousUserForwarded = forwardUserCache.putIfAbsent(new ForwardKey(message), userId);
 
         if (previousUserForwarded != null) {
             return new SendMessage()
@@ -117,8 +117,8 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .setText(shopInfo
-                .map(s -> "You've send shop with name='" + s.getShopName() + "' " +
-                    "for char='" + s.getCharName() + "' " +
+                .map(s -> "You've sent shop with name='" + s.getShopName() + "'\n" +
+                    "for char='" + s.getCharName() + "'\n" +
                     "with command='" + s.getShopCommand() + '\'')
                 .orElse("Unknown forward")
             );

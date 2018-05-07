@@ -13,15 +13,37 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.service;
+package name.maratik.cw.eu.cwshopbot.model;
 
-import org.telegram.telegrambots.api.objects.Message;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public interface CWParser<T> {
-    Optional<T> parse(Message message);
+public enum ShopState implements EnumWithCode {
+    OPEN("open"),
+    CLOSED("closed");
+
+    private final String code;
+    private final static Map<String, ShopState> cache = Util.createCache(values());
+
+    ShopState(String code) {
+        this.code = code;
+    }
+
+    @Override
+    @JsonValue
+    public String getCode() {
+        return code;
+    }
+
+    @JsonCreator
+    public static Optional<ShopState> findByCode(String code) {
+        return Optional.ofNullable(cache.get(code));
+    }
 }

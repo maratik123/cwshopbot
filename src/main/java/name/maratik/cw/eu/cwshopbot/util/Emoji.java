@@ -13,15 +13,12 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.service;
-
-import org.telegram.telegrambots.api.objects.Message;
-
-import java.util.Optional;
+package name.maratik.cw.eu.cwshopbot.util;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public interface CWParser<T> {
-    Optional<T> parse(Message message);
+public class Emoji {
+    public static final String GOLD = "\uD83D\uDCB0";
+    public static final String MANA = "\uD83D\uDCA7";
 }
