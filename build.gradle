@@ -54,6 +54,7 @@ dependencies {
     compile "com.amazonaws:aws-java-sdk-dynamodb:${awsJavaSdkVersion}"
     compile 'org.apache.logging.log4j:log4j-jcl'
     compile 'org.apache.logging.log4j:log4j-jul'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
 
     testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'

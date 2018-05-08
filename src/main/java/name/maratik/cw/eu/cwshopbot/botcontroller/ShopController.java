@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.botcontroller;
 
 import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.dao.AssetsDao;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
 import name.maratik.cw.eu.cwshopbot.service.CWParser;
@@ -48,13 +49,17 @@ public class ShopController {
     private final int forwardStaleSec;
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
     private final CWParser<ShopInfo> shopInfoParser;
+    private final AssetsDao.AssetsDto assetsDto;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
-                          @ForwardUser Cache<ForwardKey, Long> forwardUserCache, CWParser<ShopInfo> shopInfoParser) {
+                          @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
+                          CWParser<ShopInfo> shopInfoParser,
+                          AssetsDao.AssetsDto assetsDto) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
+        this.assetsDto = assetsDto;
     }
 
     @TelegramCommand(commands = "/license", description = "Terms and conditions")
@@ -89,6 +94,7 @@ public class ShopController {
 
     @TelegramCommand(commands = "/text", description = "This is a test method")
     public SendMessage test(long userId, String message, User user) {
+        logger.info("AssetsDto: {}", assetsDto);
         return processMessage(userId, message, user);
     }
 

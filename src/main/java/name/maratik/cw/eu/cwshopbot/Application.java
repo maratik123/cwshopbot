@@ -19,6 +19,7 @@ import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.dao.AssetsDao;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
@@ -94,5 +95,10 @@ public class Application {
             .maximumSize(1000)
             .recordStats()
             .build();
+    }
+
+    @Bean
+    public AssetsDao.AssetsDto assetsDto(AssetsDao assetsDao) {
+        return assetsDao.getAssetsDto();
     }
 }
