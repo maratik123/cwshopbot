@@ -20,6 +20,7 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemLocation;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matchers;
@@ -161,13 +162,15 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
     }
 
     @Test
-    public void shouldAtLeastOneWearableEquipmentParamPositive() {
+    public void shouldAtLeastOneWearableEquipmentNotArrowsPackAndToolsParamPositive() {
         assets.getWearableItems().values().stream()
             .filter(wearableItem -> wearableItem.getItemLocation() == ItemLocation.EQUIPMENT)
+            .filter(wearableItem -> wearableItem.getItemType() != ItemType.ARROWS_PACK)
+            .filter(wearableItem -> wearableItem.getItemType() != ItemType.TOOL)
             .forEach(wearableItem -> assertTrue(
-                wearableItem.getAttack() >= 0 ||
-                wearableItem.getDefence() >= 0 ||
-                wearableItem.getManaboost() >= 0
+                wearableItem.getAttack() > 0 ||
+                wearableItem.getDefence() > 0 ||
+                wearableItem.getManaboost() > 0
             ));
     }
 }
