@@ -101,17 +101,17 @@ public class AssetsDao {
                             assetsPartDto, craftbook, assetsDto, recipe, itemType)
                             .build();
                     });
-            }).collect(toImmutableMap(Item::getId, item -> item)));
+            })
+            .collect(toImmutableMap(Item::getId, item -> item)));
 
         logger.info("Assets loaded. Assets size is: {}", () -> result.getAllItems().size());
 
         return result;
     }
 
-    private static <T extends Item.AbstractItemBuilder<T, R>, R> T fillItemProps(T builder, String id,
-                                                                                 ResourceItem resourceItem,
-                                                                                 ItemLocation itemLocation,
-                                                                                 AssetsPartDto assetsPartDto) {
+    private static <T extends Item.AbstractItemBuilder<T, R>, R>
+    T fillItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation,
+                    AssetsPartDto assetsPartDto) {
         return builder
             .setId(id)
             .setName(resourceItem.getName())
@@ -121,21 +121,22 @@ public class AssetsDao {
             );
     }
 
-    private static <T extends CraftableItem.AbstractCraftableItemBuilder<T, R>, R> T fillCraftableItemProps(
-        T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation, AssetsPartDto assetsPartDto,
-        Craftbook craftbook, AssetsDto assetsDto, Map<String, Integer> recipe
-    ) {
+    private static <T extends CraftableItem.AbstractCraftableItemBuilder<T, R>, R>
+    T fillCraftableItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation,
+                             AssetsPartDto assetsPartDto, Craftbook craftbook, AssetsDto assetsDto,
+                             Map<String, Integer> recipe) {
         return fillItemProps(builder, id, resourceItem, itemLocation, assetsPartDto)
             .setCraftbook(craftbook)
             .setMana(Optional.ofNullable(resourceItem.getMana())
                 .orElseGet(() -> assetsDto.getCraftbook().get(craftbook.getCode()).getMana())
-            ).putAllRecipeItems(recipe);
+            )
+            .putAllRecipeItems(recipe);
     }
 
     private static <T extends WearableItem.AbstractWearableItemBuilder<T, R>, R>
-    T fillWearableItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation, AssetsPartDto assetsPartDto,
-                            Craftbook craftbook, AssetsDto assetsDto, Map<String, Integer> recipe,
-                            ItemType itemType) {
+    T fillWearableItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation,
+                            AssetsPartDto assetsPartDto, Craftbook craftbook, AssetsDto assetsDto,
+                            Map<String, Integer> recipe, ItemType itemType) {
         return fillCraftableItemProps(builder, id, resourceItem, itemLocation, assetsPartDto, craftbook, assetsDto,
             recipe
         )

@@ -23,12 +23,16 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemLocation;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
@@ -50,6 +54,21 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
     @Autowired
     private Assets assets;
 
+    private Matcher<String> anyOfAllItems;
+    private Matcher<String> anyOfCraftableItems;
+
+    @PostConstruct
+    public void init() {
+        anyOfAllItems = anyOf(assets.getAllItems().keySet().stream()
+            .map(Matchers::equalTo)
+            .collect(toList())
+        );
+        anyOfCraftableItems = anyOf(assets.getCraftableItems().keySet().stream()
+            .map(Matchers::equalTo)
+            .collect(toList())
+        );
+    }
+
     @Test
     public void shouldAssetsExists() {
         logger.info("Assets: {}", assets);
@@ -66,24 +85,12 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
 
     @Test
     public void shouldAllCraftableItemsInAllItems() {
-        assets.getCraftableItems().keySet().forEach(id -> assertThat(
-            id,
-            anyOf(assets.getAllItems().keySet().stream()
-                .map(Matchers::equalTo)
-                .collect(toList())
-            )
-        ));
+        assets.getCraftableItems().keySet().forEach(id -> assertThat(id, anyOfAllItems));
     }
 
     @Test
     public void shouldAllWearableItemsInCraftableItems() {
-        assets.getWearableItems().keySet().forEach(id -> assertThat(
-            id,
-            anyOf(assets.getCraftableItems().keySet().stream()
-                .map(Matchers::equalTo)
-                .collect(toList())
-            )
-        ));
+        assets.getWearableItems().keySet().forEach(id -> assertThat(id, anyOfCraftableItems));
     }
 
     @Test
@@ -118,13 +125,7 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
     public void shouldAllRecipeIngridientsAreItems() {
         assets.getCraftableItems().values().stream()
             .flatMap(craftableItem -> craftableItem.getRecipe().keySet().stream())
-            .forEach(id -> assertThat(
-                id,
-                anyOf(assets.getAllItems().keySet().stream()
-                    .map(Matchers::equalTo)
-                    .collect(toList())
-                )
-            ));
+            .forEach(id -> assertThat(id, anyOfAllItems));
     }
 
     @Test
@@ -163,10 +164,10 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
 
     @Test
     public void shouldAtLeastOneWearableEquipmentNotArrowsPackAndToolsParamPositive() {
+        Set<ItemType> arrowsPackAndTool = EnumSet.of(ItemType.ARROWS_PACK, ItemType.TOOL);
         assets.getWearableItems().values().stream()
             .filter(wearableItem -> wearableItem.getItemLocation() == ItemLocation.EQUIPMENT)
-            .filter(wearableItem -> wearableItem.getItemType() != ItemType.ARROWS_PACK)
-            .filter(wearableItem -> wearableItem.getItemType() != ItemType.TOOL)
+            .filter(wearableItem -> !arrowsPackAndTool.contains(wearableItem.getItemType()))
             .forEach(wearableItem -> assertTrue(
                 wearableItem.getAttack() > 0 ||
                 wearableItem.getDefence() > 0 ||
