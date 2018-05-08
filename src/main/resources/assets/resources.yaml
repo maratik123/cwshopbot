@@ -211,12 +211,16 @@ equipment:
   505:
     name: Wooden arrows pack
     mana: 80
+    type: arrows pack
+    wear: secondary hand
     recipe:
       02: 6
       08: 1
   511:
     name: Steel arrows pack
     mana: 120
+    type: arrows pack
+    wear: secondary hand
     recipe:
       02: 4
       19: 1

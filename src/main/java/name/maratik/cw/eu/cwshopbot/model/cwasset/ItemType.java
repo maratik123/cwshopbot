@@ -35,7 +35,8 @@ public enum ItemType implements EnumWithCode {
     BOW("bow", ItemClass.PRIMARY_WEAPON),
     BLUNT("blunt", ItemClass.PRIMARY_WEAPON),
     DAGGER("dagger", ItemClass.SECONDARY_WEAPON),
-    TOOL("tool", ItemClass.SECONDARY_WEAPON);
+    TOOL("tool", ItemClass.SECONDARY_WEAPON),
+    ARROWS_PACK("arrows pack", ItemClass.SECONDARY_WEAPON);
 
     private final String code;
     private final ItemClass itemClass;

@@ -42,11 +42,14 @@ wrapper {
     distributionType = 'ALL'
 }
 
+configurations {
+    compile.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    compile.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    compile.exclude group: 'com.vaadin.external.google', module: 'android-json'
+}
+
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-    }
+    compile('org.springframework.boot:spring-boot-starter-web')
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile "org.telegram:telegrambots:${telegrambotsVersion}"
@@ -56,10 +59,7 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-jul'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
 
-    testCompile('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-    }
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 bootJar {

@@ -20,6 +20,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import name.maratik.cw.eu.cwshopbot.dao.AssetsDao;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import name.maratik.cw.eu.spring.config.TelegramBotType;
 import org.apache.logging.log4j.LogManager;
@@ -84,8 +85,7 @@ public class InternalConfig {
     }
 
     @Bean
-    public AssetsDao.AssetsDto assetsDto(ResourceLoader resourceLoader) throws IOException {
-        AssetsDao assetsDao = new AssetsDao(resourceLoader.getResource("classpath:assets/resources.yaml"));
-        return assetsDao.getAssetsDto();
+    public Assets assets(ResourceLoader resourceLoader) throws IOException {
+        return new AssetsDao(resourceLoader.getResource("classpath:assets/resources.yaml")).createAssets();
     }
 }

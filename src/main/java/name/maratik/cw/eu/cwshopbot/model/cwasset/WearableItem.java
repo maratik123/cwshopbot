@@ -28,7 +28,7 @@ public class WearableItem extends CraftableItem {
     private final int defence;
     private final int manaboost;
 
-    public WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<Item, Integer> recipe,
+    public WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<String, Integer> recipe,
                         int mana, Craftbook craftbook, ItemType itemType, BodyPart bodyPart, int attack, int defence,
                         int manaboost) {
         super(id, name, itemLocation, tradeable, recipe, mana, craftbook);

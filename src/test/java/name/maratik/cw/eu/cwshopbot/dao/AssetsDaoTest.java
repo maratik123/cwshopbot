@@ -16,11 +16,19 @@
 package name.maratik.cw.eu.cwshopbot.dao;
 
 import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ResourceLoader;
+
+import java.io.IOException;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -32,11 +40,19 @@ import static org.junit.Assert.assertThat;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @SpringBootTest
+@Import(AssetsDaoTest.TestConfig.class)
 public class AssetsDaoTest extends MockedTelegramBotsApiTest {
     private static final Logger logger = LogManager.getLogger(AssetsDaoTest.class);
 
     @Autowired
-    AssetsDao.AssetsDto assetsDto;
+    private AssetsDao assetsDao;
+
+    private AssetsDao.AssetsDto assetsDto;
+
+    @Before
+    public void init() {
+        assetsDto = assetsDao.getAssetsDto();
+    }
 
     @Test
     public void shouldAssetsDtoLoad() {
@@ -48,5 +64,20 @@ public class AssetsDaoTest extends MockedTelegramBotsApiTest {
     public void shouldNotEmptyCraftbookMap() {
         assertThat(assetsDto.getCraftbook().keySet(), containsInAnyOrder("1", "2", "3"));
         assetsDto.getCraftbook().values().forEach(craftbook -> assertThat(craftbook.getItems(), not(empty())));
+    }
+
+    @Test
+    public void shouldCreateAssets() {
+        Assets assets = assetsDao.createAssets();
+        logger.info("Assets: {}", assets);
+        assertNotNull(assets);
+    }
+
+    @Configuration
+    public static class TestConfig {
+        @Bean
+        public AssetsDao assetsDao(ResourceLoader resourceLoader) throws IOException {
+            return new AssetsDao(resourceLoader.getResource("classpath:test-assets.yaml"));
+        }
     }
 }

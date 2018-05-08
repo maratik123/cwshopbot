@@ -22,7 +22,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -37,6 +38,6 @@ public class ShopSearchService {
         List<ShopInfo> stub = Collections.emptyList();
         return stub.stream()
             .sorted(NOT_A_MOON_KING_DRIVEN_SORT_ORDER)
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 }

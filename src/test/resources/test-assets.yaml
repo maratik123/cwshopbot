@@ -1,0 +1,64 @@
+#    cwshopbot
+#    Copyright (C) 2018  Marat Bukharov.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+stock:
+  tradeable: true
+  rawItem:
+    name: Raw Item
+  craftableItem:
+    name: Craftable Item
+    recipe:
+      rawItem: 1
+  unsoldableItem:
+    name: Unsoldable Item
+    tradeable: false
+    recipe:
+      rawItem: 1
+      craftableItem: 2
+misc:
+  tradeable: false
+  miscItem:
+    name: Misc Item
+    recipe:
+      craftableItem: 2
+    mana: 4
+crafting:
+  tradeable: true
+  craftingItem:
+    name: Crafting Item
+equipment:
+  tradeable: false
+  someHandItem:
+    name: Some Hand Item
+    att: 1
+    manaboost: 1
+    recipe:
+      unsoldableItem: 1
+    type: heavy armor
+    wear: hands
+craftbook:
+  1:
+    mana: 1
+    items:
+      - craftableItem
+  2:
+    mana: 2
+    items:
+      - unsoldableItem
+  3:
+    mana: 3
+    items:
+      - miscItem
+      - someHandItem

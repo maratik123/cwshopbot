@@ -22,7 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,7 +35,7 @@ public class HealthControllerTest extends MockedTelegramBotsApiTest {
     @Test
     public void testPing() throws Exception {
         mvc.perform(get("/ping"))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string("OK"));
     }

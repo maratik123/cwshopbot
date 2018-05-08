@@ -16,38 +16,138 @@
 package name.maratik.cw.eu.cwshopbot.dao;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.BodyPart;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Craftbook;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemLocation;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemType;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class AssetsDao {
+    private static final Logger logger = LogManager.getLogger(AssetsDao.class);
+
     private final AssetsDto assetsDto;
 
     public AssetsDao(Resource assets) throws IOException {
+        logger.info("Loading assets");
         try (InputStream is = assets.getInputStream()) {
             assetsDto = new ObjectMapper(new YAMLFactory())
                 .registerModule(new Jdk8Module())
                 .readValue(is, AssetsDto.class);
         }
+        logger.info("Assets successfully loaded, assets parts size: {}, craftbooks: {}",
+            () -> assetsDto.getAssetsPartMap().size(),
+            () -> assetsDto.getCraftbook().size()
+        );
     }
 
     public AssetsDto getAssetsDto() {
         return assetsDto;
     }
 
+    public Assets createAssets() {
+        logger.info("Decoding assets");
+        Map<String, String> reverseCraftbookMap = assetsDto.getCraftbook().entrySet().stream()
+            .flatMap(entry -> entry.getValue().getItems().stream()
+                .map(id -> new AbstractMap.SimpleImmutableEntry<>(id, entry.getKey()))
+            )
+            .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+        Assets result = new Assets(assetsDto.getAssetsPartMap().entrySet().stream()
+            .flatMap(assetsPartEntry -> {
+                AssetsPartDto assetsPartDto = assetsPartEntry.getValue();
+                ItemLocation itemLocation = ItemLocation.findByCode(assetsPartEntry.getKey())
+                    .orElseThrow(RuntimeException::new);
+                return assetsPartDto.getItems().entrySet().stream()
+                    .map(itemEntry -> {
+                        String id = itemEntry.getKey();
+                        ResourceItem resourceItem = itemEntry.getValue();
+
+                        Map<String, Integer> recipe = resourceItem.getRecipe();
+                        if (recipe == null) {
+                            return fillItemProps(Item.itemBuilder(), id, resourceItem, itemLocation, assetsPartDto)
+                                .build();
+                        }
+                        Craftbook craftbook = Craftbook.findByCode(reverseCraftbookMap.get(id))
+                            .orElseThrow(RuntimeException::new);
+                        ItemType itemType = resourceItem.getType();
+                        if (itemType == null) {
+                            return fillCraftableItemProps(CraftableItem.craftableItemBuilder(), id, resourceItem,
+                                itemLocation, assetsPartDto, craftbook, assetsDto, recipe)
+                                .build();
+                        }
+                        return fillWearableItemProps(WearableItem.wearableItemBuilder(), id, resourceItem, itemLocation,
+                            assetsPartDto, craftbook, assetsDto, recipe, itemType)
+                            .build();
+                    });
+            }).collect(toImmutableMap(Item::getId, item -> item)));
+
+        logger.info("Assets loaded. Assets size is: {}", () -> result.getAllItems().size());
+
+        return result;
+    }
+
+    private static <T extends Item.AbstractItemBuilder<T, R>, R> T fillItemProps(T builder, String id,
+                                                                                 ResourceItem resourceItem,
+                                                                                 ItemLocation itemLocation,
+                                                                                 AssetsPartDto assetsPartDto) {
+        return builder
+            .setId(id)
+            .setName(resourceItem.getName())
+            .setItemLocation(itemLocation)
+            .setTradeable(Optional.ofNullable(resourceItem.getTradeable())
+                .orElseGet(assetsPartDto::isTradeable)
+            );
+    }
+
+    private static <T extends CraftableItem.AbstractCraftableItemBuilder<T, R>, R> T fillCraftableItemProps(
+        T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation, AssetsPartDto assetsPartDto,
+        Craftbook craftbook, AssetsDto assetsDto, Map<String, Integer> recipe
+    ) {
+        return fillItemProps(builder, id, resourceItem, itemLocation, assetsPartDto)
+            .setCraftbook(craftbook)
+            .setMana(Optional.ofNullable(resourceItem.getMana())
+                .orElseGet(() -> assetsDto.getCraftbook().get(craftbook.getCode()).getMana())
+            ).putAllRecipeItems(recipe);
+    }
+
+    private static <T extends WearableItem.AbstractWearableItemBuilder<T, R>, R>
+    T fillWearableItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation, AssetsPartDto assetsPartDto,
+                            Craftbook craftbook, AssetsDto assetsDto, Map<String, Integer> recipe,
+                            ItemType itemType) {
+        return fillCraftableItemProps(builder, id, resourceItem, itemLocation, assetsPartDto, craftbook, assetsDto,
+            recipe
+        )
+            .setAttack(resourceItem.getAtt())
+            .setDefence(resourceItem.getDef())
+            .setManaboost(resourceItem.getManaboost())
+            .setBodyPart(resourceItem.getWear())
+            .setItemType(itemType);
+    }
+
     public static class AssetsDto {
+        @JsonProperty(required = true)
         private Map<String, CraftbookDto> craftbook;
         private final Map<String, AssetsPartDto> assetsPartMap = new HashMap<>();
 
@@ -78,6 +178,7 @@ public class AssetsDao {
     }
 
     public static class AssetsPartDto {
+        @JsonProperty(required = true)
         private boolean tradeable;
         private final Map<String, ResourceItem> items = new HashMap<>();
 
@@ -108,7 +209,9 @@ public class AssetsDao {
     }
 
     public static class CraftbookDto {
+        @JsonProperty(required = true)
         private int mana;
+        @JsonProperty(required = true)
         private Set<String> items;
 
         public int getMana() {
@@ -137,15 +240,24 @@ public class AssetsDao {
     }
 
     public static class ResourceItem {
+        @JsonProperty(required = true)
         private String name;
+        @JsonProperty(required = false)
         private Boolean tradeable;
+        @JsonProperty(required = false)
         private Map<String, Integer> recipe;
+        @JsonProperty(required = false)
         private Integer mana;
+        @JsonProperty(required = false)
         private ItemType type;
+        @JsonProperty(required = false)
         private BodyPart wear;
-        private Integer att;
-        private Integer def;
-        private Integer manaboost;
+        @JsonProperty(required = false, defaultValue = "0")
+        private int att;
+        @JsonProperty(required = false, defaultValue = "0")
+        private int def;
+        @JsonProperty(required = false, defaultValue = "0")
+        private int manaboost;
 
         public String getName() {
             return name;
@@ -195,27 +307,27 @@ public class AssetsDao {
             this.wear = wear;
         }
 
-        public Integer getAtt() {
+        public int getAtt() {
             return att;
         }
 
-        public void setAtt(Integer att) {
+        public void setAtt(int att) {
             this.att = att;
         }
 
-        public Integer getDef() {
+        public int getDef() {
             return def;
         }
 
-        public void setDef(Integer def) {
+        public void setDef(int def) {
             this.def = def;
         }
 
-        public Integer getManaboost() {
+        public int getManaboost() {
             return manaboost;
         }
 
-        public void setManaboost(Integer manaboost) {
+        public void setManaboost(int manaboost) {
             this.manaboost = manaboost;
         }
 

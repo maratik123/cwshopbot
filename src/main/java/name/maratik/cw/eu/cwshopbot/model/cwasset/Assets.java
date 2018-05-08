@@ -140,6 +140,10 @@ public class Assets {
             '}';
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     private static <K extends Enum<K>, V, T extends Map.Entry<K, ImmutableSet.Builder<V>>>
     Collector<T, ?, ImmutableMap<K, Set<V>>> createImmutableMapCollector() {
         return toImmutableEnumMap(Map.Entry::getKey, entry -> entry.getValue().build());

@@ -24,19 +24,19 @@ import java.util.Objects;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class CraftableItem extends Item {
-    private final Map<Item, Integer> recipe;
+    private final Map<String, Integer> recipe;
     private final int mana;
     private final Craftbook craftbook;
 
     public CraftableItem(String id, String name, ItemLocation itemLocation, boolean tradeable,
-                         Map<Item, Integer> recipe, int mana, Craftbook craftbook) {
+                         Map<String, Integer> recipe, int mana, Craftbook craftbook) {
         super(id, name, itemLocation, tradeable);
         this.recipe = Objects.requireNonNull(recipe);
         this.mana = mana;
         this.craftbook = Objects.requireNonNull(craftbook);
     }
 
-    public Map<Item, Integer> getRecipe() {
+    public Map<String, Integer> getRecipe() {
         return recipe;
     }
 
@@ -80,12 +80,17 @@ public class CraftableItem extends Item {
 
     public abstract static class AbstractCraftableItemBuilder<T extends AbstractCraftableItemBuilder<T, R>, R>
         extends AbstractItemBuilder<T, R> {
-        protected final ImmutableMap.Builder<Item, Integer> recipeBuilder = ImmutableMap.builder();
+        protected final ImmutableMap.Builder<String, Integer> recipeBuilder = ImmutableMap.builder();
         protected int mana;
         protected Craftbook craftbook;
 
-        public T putRecipeItem(Item item, int quantity) {
-            recipeBuilder.put(item, quantity);
+        public T putRecipeItem(String id, int quantity) {
+            recipeBuilder.put(id, quantity);
+            return getThis();
+        }
+
+        public T putAllRecipeItems(Map<String, Integer> recipe) {
+            recipeBuilder.putAll(recipe);
             return getThis();
         }
 
