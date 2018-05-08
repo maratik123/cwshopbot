@@ -203,6 +203,8 @@ equipment:
   tch:
     name: Torch
     mana: 80
+    type: tool
+    wear: secondary hand
     recipe:
       23: 1
       05: 5

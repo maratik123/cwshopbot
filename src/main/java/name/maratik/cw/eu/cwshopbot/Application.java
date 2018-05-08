@@ -15,37 +15,25 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot;
 
-import com.google.common.base.Ticker;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
-import name.maratik.cw.eu.cwshopbot.dao.AssetsDao;
-import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
-import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
-import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
-import name.maratik.cw.eu.spring.config.TelegramBotType;
+import name.maratik.cw.eu.cwshopbot.config.ExternalConfig;
+import name.maratik.cw.eu.cwshopbot.config.InternalConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 @Configuration
-@EnableTelegramBot
-@EnableScheduling
 @PropertySource({
     "file:${HOME}/cwshopbotconfig/auth.properties",
     "classpath:cwshopbot.properties"
+})
+@Import({
+    InternalConfig.class,
+    ExternalConfig.class
 })
 public class Application {
     private static final Logger logger = LogManager.getLogger(Application.class);
@@ -54,51 +42,5 @@ public class Application {
         logger.info("Starting main app");
         SpringApplication.run(Application.class, args);
         logger.info("Main app started. Exiting main thread");
-    }
-
-    @Bean
-    public TelegramBotType telegramBotType() {
-        return TelegramBotType.LONG_POLLING;
-    }
-
-    @Bean
-    public TelegramBotBuilder telegramBotBuilder(
-        @Value("${name.maratik.cw.eu.cwshopbot.username}") String username,
-        @Value("${name.maratik.cw.eu.cwshopbot.token}") String token
-    ) {
-        return new TelegramBotBuilder()
-            .username(username)
-            .token(token);
-    }
-
-    @Bean
-    public Clock clock() {
-        return Clock.systemUTC();
-    }
-
-    @Bean
-    @ForwardUser
-    public Cache<ForwardKey, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec, Clock clock) {
-        Instant zero = Instant.ofEpochSecond(0);
-        return CacheBuilder.newBuilder()
-            .ticker(new Ticker() {
-                @Override
-                public long read() {
-                    return zero.until(clock.instant(), ChronoUnit.NANOS);
-                }
-            })
-            .expireAfterWrite(forwardStaleSec, TimeUnit.SECONDS)
-            .removalListener(notification -> logger.debug(
-                "Removed forward {} from forward user cache due to {}, evicted = {}",
-                notification::toString, notification::getCause, notification::wasEvicted
-            ))
-            .maximumSize(1000)
-            .recordStats()
-            .build();
-    }
-
-    @Bean
-    public AssetsDao.AssetsDto assetsDto(AssetsDao assetsDao) {
-        return assetsDao.getAssetsDto();
     }
 }

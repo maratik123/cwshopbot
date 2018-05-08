@@ -13,16 +13,18 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.util;
+package name.maratik.cw.eu.cwshopbot.mock;
+
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.telegram.telegrambots.TelegramBotsApi;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class Emoji {
-    public static final String GOLD = "\uD83D\uDCB0";
-    public static final String MANA = "\uD83D\uDCA7";
-    public static final String BOX = "\uD83D\uDCE6";
-    public static final String HAMMERS = "\u2692";
-    public static final String CHEST = "\uD83D\uDDC3";
-    public static final String LABEL = "\uD83C\uDFF7";
+@RunWith(SpringRunner.class)
+public abstract class MockedTelegramBotsApiTest {
+    @MockBean
+    protected TelegramBotsApi telegramBotsApi;
 }

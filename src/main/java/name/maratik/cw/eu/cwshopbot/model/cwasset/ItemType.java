@@ -13,7 +13,7 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model;
+package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -34,7 +34,8 @@ public enum ItemType implements EnumWithCode {
     SPEAR("spear", ItemClass.PRIMARY_WEAPON),
     BOW("bow", ItemClass.PRIMARY_WEAPON),
     BLUNT("blunt", ItemClass.PRIMARY_WEAPON),
-    DAGGER("dagger", ItemClass.SECONDARY_WEAPON);
+    DAGGER("dagger", ItemClass.SECONDARY_WEAPON),
+    TOOL("tool", ItemClass.SECONDARY_WEAPON);
 
     private final String code;
     private final ItemClass itemClass;

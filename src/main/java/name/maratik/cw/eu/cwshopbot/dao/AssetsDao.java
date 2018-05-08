@@ -15,30 +15,31 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.dao;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import name.maratik.cw.eu.cwshopbot.model.BodyPart;
-import name.maratik.cw.eu.cwshopbot.model.ItemType;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Repository;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.BodyPart;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.ItemType;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Repository
 public class AssetsDao {
     private final AssetsDto assetsDto;
 
-    public AssetsDao(ResourceLoader resourceLoader) throws IOException {
-        try (InputStream is = resourceLoader.getResource("classpath:assets/resources.yaml").getInputStream()) {
+    public AssetsDao(Resource assets) throws IOException {
+        try (InputStream is = assets.getInputStream()) {
             assetsDto = new ObjectMapper(new YAMLFactory())
-                .registerModule(new Jdk8Module()).readValue(is, AssetsDto.class);
+                .registerModule(new Jdk8Module())
+                .readValue(is, AssetsDto.class);
         }
     }
 
@@ -46,15 +47,15 @@ public class AssetsDao {
         return assetsDto;
     }
 
-    public class AssetsDto {
-        private CraftbookMapDto craftbook;
-        private Map<String, AssetsPartDto> assetsPartMap;
+    public static class AssetsDto {
+        private Map<String, CraftbookDto> craftbook;
+        private final Map<String, AssetsPartDto> assetsPartMap = new HashMap<>();
 
-        public CraftbookMapDto getCraftbook() {
+        public Map<String, CraftbookDto> getCraftbook() {
             return craftbook;
         }
 
-        public void setCraftbook(CraftbookMapDto craftbook) {
+        public void setCraftbook(Map<String, CraftbookDto> craftbook) {
             this.craftbook = craftbook;
         }
 
@@ -62,8 +63,9 @@ public class AssetsDao {
             return assetsPartMap;
         }
 
-        public void setAssetsPartMap(Map<String, AssetsPartDto> assetsPartMap) {
-            this.assetsPartMap = assetsPartMap;
+        @JsonAnySetter
+        public void putAssetsPart(String key, AssetsPartDto assetsPartDto) {
+            assetsPartMap.put(key, assetsPartDto);
         }
 
         @Override
@@ -75,9 +77,9 @@ public class AssetsDao {
         }
     }
 
-    public class AssetsPartDto {
+    public static class AssetsPartDto {
         private boolean tradeable;
-        private Map<String, ResourceItem> items;
+        private final Map<String, ResourceItem> items = new HashMap<>();
 
         public boolean isTradeable() {
             return tradeable;
@@ -91,8 +93,9 @@ public class AssetsDao {
             return items;
         }
 
-        public void setItems(Map<String, ResourceItem> items) {
-            this.items = items;
+        @JsonAnySetter
+        public void putItem(String key, ResourceItem resourceItem) {
+            items.put(key, resourceItem);
         }
 
         @Override
@@ -104,26 +107,7 @@ public class AssetsDao {
         }
     }
 
-    public class CraftbookMapDto {
-        private Map<String, CraftbookDto> craftbookMap;
-
-        public Map<String, CraftbookDto> getCraftbookMap() {
-            return craftbookMap;
-        }
-
-        public void setCraftbookMap(Map<String, CraftbookDto> craftbookMap) {
-            this.craftbookMap = craftbookMap;
-        }
-
-        @Override
-        public String toString() {
-            return "CraftbookMapDto{" +
-                "craftbookMap=" + craftbookMap +
-                '}';
-        }
-    }
-
-    public class CraftbookDto {
+    public static class CraftbookDto {
         private int mana;
         private Set<String> items;
 
@@ -152,15 +136,16 @@ public class AssetsDao {
         }
     }
 
-    public class ResourceItem {
+    public static class ResourceItem {
         private String name;
         private Boolean tradeable;
-        private RecipeDto recipe;
+        private Map<String, Integer> recipe;
         private Integer mana;
         private ItemType type;
         private BodyPart wear;
         private Integer att;
         private Integer def;
+        private Integer manaboost;
 
         public String getName() {
             return name;
@@ -178,11 +163,11 @@ public class AssetsDao {
             this.tradeable = tradeable;
         }
 
-        public RecipeDto getRecipe() {
+        public Map<String, Integer> getRecipe() {
             return recipe;
         }
 
-        public void setRecipe(RecipeDto recipe) {
+        public void setRecipe(Map<String, Integer> recipe) {
             this.recipe = recipe;
         }
 
@@ -226,6 +211,14 @@ public class AssetsDao {
             this.def = def;
         }
 
+        public Integer getManaboost() {
+            return manaboost;
+        }
+
+        public void setManaboost(Integer manaboost) {
+            this.manaboost = manaboost;
+        }
+
         @Override
         public String toString() {
             return "ResourceItem{" +
@@ -237,25 +230,7 @@ public class AssetsDao {
                 ", wear=" + wear +
                 ", att=" + att +
                 ", def=" + def +
-                '}';
-        }
-    }
-
-    public class RecipeDto {
-        private Map<String, Integer> recipeMap;
-
-        public Map<String, Integer> getRecipeMap() {
-            return recipeMap;
-        }
-
-        public void setRecipeMap(Map<String, Integer> recipeMap) {
-            this.recipeMap = recipeMap;
-        }
-
-        @Override
-        public String toString() {
-            return "RecipeDto{" +
-                "recipeMap=" + recipeMap +
+                ", manaboost=" + manaboost +
                 '}';
         }
     }

@@ -13,16 +13,38 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.util;
+package name.maratik.cw.eu.cwshopbot.model.cwasset;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class Emoji {
-    public static final String GOLD = "\uD83D\uDCB0";
-    public static final String MANA = "\uD83D\uDCA7";
-    public static final String BOX = "\uD83D\uDCE6";
-    public static final String HAMMERS = "\u2692";
-    public static final String CHEST = "\uD83D\uDDC3";
-    public static final String LABEL = "\uD83C\uDFF7";
+public enum Craftbook implements EnumWithCode {
+    CRAFTBOOK_1("1"),
+    CRAFTBOOK_2("2"),
+    CRAFTBOOK_3("3");
+
+    private final String code;
+    private static final Map<String, Craftbook> cache = Util.createCache(values());
+
+    Craftbook(String code) {
+        this.code = code;
+    }
+
+    @JsonValue
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @JsonCreator
+    public static Optional<Craftbook> findByCode(String code) {
+        return Optional.ofNullable(cache.get(code));
+    }
 }

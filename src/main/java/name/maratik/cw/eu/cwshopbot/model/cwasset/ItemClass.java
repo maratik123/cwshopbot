@@ -13,10 +13,13 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model;
+package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class Assets {
+public enum ItemClass {
+    PRIMARY_WEAPON,
+    SECONDARY_WEAPON,
+    ARMOR;
 }

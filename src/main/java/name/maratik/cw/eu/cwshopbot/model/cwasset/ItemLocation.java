@@ -13,7 +13,7 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model;
+package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -22,24 +22,27 @@ import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 import java.util.Map;
 import java.util.Optional;
 
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.BOX;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.CHEST;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.HAMMERS;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.LABEL;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum BodyPart implements EnumWithCode {
-    BODY("body", ItemClass.ARMOR),
-    HANDS("hands", ItemClass.ARMOR),
-    LEGS("legs", ItemClass.ARMOR),
-    HEAD("head", ItemClass.ARMOR),
-    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON),
-    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON);
+public enum ItemLocation implements EnumWithCode {
+    STOCK("stock", BOX + "Resources"),
+    CRAFTING("crafting", HAMMERS + "Crafting"),
+    MISC("misc", CHEST + "Misc"),
+    EQUIPMENT("equipment", LABEL + "Equipment");
 
     private final String code;
-    private final ItemClass itemClass;
-    private static final Map<String, BodyPart> cache = Util.createCache(values());
+    private final String buttonText;
+    private static final Map<String, ItemLocation> cache = Util.createCache(values());
 
-    BodyPart(String code, ItemClass itemClass) {
+    ItemLocation(String code, String buttonText) {
         this.code = code;
-        this.itemClass = itemClass;
+        this.buttonText = buttonText;
     }
 
     @Override
@@ -48,12 +51,12 @@ public enum BodyPart implements EnumWithCode {
         return code;
     }
 
-    @JsonCreator
-    public static Optional<BodyPart> findByCode(String code) {
-        return Optional.ofNullable(cache.get(code));
+    public String getButtonText() {
+        return buttonText;
     }
 
-    public ItemClass getItemClass() {
-        return itemClass;
+    @JsonCreator
+    public static Optional<ItemLocation> findByCode(String code) {
+        return Optional.ofNullable(cache.get(code));
     }
 }
