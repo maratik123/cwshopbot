@@ -37,8 +37,12 @@ public class CacheMaintenance {
 
     @Scheduled(fixedRate = 60 * 1000L)
     public void cleanupForwardUserCache() {
-        logger.debug("Stat before cleanup: {}", forwardUserCache::stats);
-        forwardUserCache.cleanUp();
-        logger.debug("Stat after cleanup: {}", forwardUserCache::stats);
+        try {
+            logger.debug("Stat before cleanup: {}", forwardUserCache::stats);
+            forwardUserCache.cleanUp();
+            logger.debug("Stat after cleanup: {}", forwardUserCache::stats);
+        } catch (Exception e) {
+            logger.error("Failed with cleanupForwardUserCache", e);
+        }
     }
 }
