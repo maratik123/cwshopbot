@@ -69,10 +69,10 @@ public class ShopController {
     }
 
     @TelegramCommand(commands = "/t_*", description = "Info about item")
-    public SendMessage itemInfo(long userId, String message) {
+    public SendMessage itemInfo(long userId, Update update) {
         return new SendMessage()
             .setChatId(userId)
-            .setText(itemSearchService.findByCode(message.substring(3)));
+            .setText(itemSearchService.findByCode(update.getMessage().getText().substring(3)));
     }
 
     private static SendMessage processMessage(long userId, String message, User user) {
