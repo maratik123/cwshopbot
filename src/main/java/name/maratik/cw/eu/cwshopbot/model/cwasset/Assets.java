@@ -49,28 +49,15 @@ public class Assets {
         allItems.forEach((id, item) -> item.apply(new Item.Visitor() {
             @Override
             public void visit(Item item) {
-                visitItem(item);
-            }
-
-            @Override
-            public void visit(CraftableItem craftableItem) {
-                visitCraftableItem(craftableItem);
-            }
-
-            @Override
-            public void visit(WearableItem wearableItem) {
-                visitWearableItem(wearableItem);
-            }
-
-            private void visitItem(Item item) {
                 itemsByItemLocationBuilder.computeIfAbsent(
                     item.getItemLocation(),
                     itemLocation -> ImmutableSet.builder()
                 ).add(item);
             }
 
-            private void visitCraftableItem(CraftableItem craftableItem) {
-                visitItem(item);
+            @Override
+            public void visit(CraftableItem craftableItem) {
+                visit((Item) craftableItem);
 
                 itemsByCraftbookBuilder.computeIfAbsent(
                     craftableItem.getCraftbook(),
@@ -79,8 +66,9 @@ public class Assets {
                 craftableItemsBuilder.put(id, craftableItem);
             }
 
-            private void visitWearableItem(WearableItem wearableItem) {
-                visitCraftableItem(wearableItem);
+            @Override
+            public void visit(WearableItem wearableItem) {
+                visit((CraftableItem) wearableItem);
 
                 itemsByBodyPartBuilder.computeIfAbsent(
                     wearableItem.getBodyPart(),

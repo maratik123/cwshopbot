@@ -54,6 +54,7 @@ public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
 
     private final Map<String, TelegramHandler> commandList = new LinkedHashMap<>();
+    private final Map<String, TelegramHandler> patternCommandList = new LinkedHashMap<>();
     private final Map<Long, TelegramHandler> forwardHandlerList = new HashMap<>();
     private final ConfigurableBeanFactory beanFactory;
     private TelegramHandler defaultMessageHandler;
@@ -102,7 +103,15 @@ public abstract class TelegramBotService implements AutoCloseable {
         } else {
             optionalCommandHandler = command.getCommand().map(commandList::get);
             if (!optionalCommandHandler.isPresent()) {
-                optionalCommandHandler = Optional.ofNullable(defaultMessageHandler);
+                if (command.getCommand().isPresent()) {
+                    optionalCommandHandler = patternCommandList.entrySet().stream()
+                        .filter(entry -> command.getCommand().get().startsWith(entry.getKey()))
+                        .map(Map.Entry::getValue)
+                        .findFirst();
+                }
+                if (!optionalCommandHandler.isPresent()) {
+                    optionalCommandHandler = Optional.ofNullable(defaultMessageHandler);
+                }
             }
         }
 
@@ -155,12 +164,20 @@ public abstract class TelegramBotService implements AutoCloseable {
 
     @SuppressWarnings("WeakerAccess")
     public Stream<TelegramBotCommand> getCommandList() {
-        return commandList.entrySet().stream()
-            .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
-            .map(entry -> new TelegramBotCommand(
-                entry.getKey(),
-                entry.getValue().getTelegramCommand().map(TelegramCommand::description).orElse("")
-            ));
+        return Stream.concat(
+            commandList.entrySet().stream()
+                .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
+                .map(entry -> new TelegramBotCommand(
+                    entry.getKey(),
+                    entry.getValue().getTelegramCommand().map(TelegramCommand::description).orElse("")
+                )),
+            patternCommandList.entrySet().stream()
+                .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
+                .map(entry -> new TelegramBotCommand(
+                    entry.getKey() + '*',
+                    entry.getValue().getTelegramCommand().map(TelegramCommand::description).orElse("")
+                ))
+        );
     }
 
     public abstract DefaultAbsSender getClient();
@@ -177,7 +194,12 @@ public abstract class TelegramBotService implements AutoCloseable {
         if (command != null) {
             for (String cmd : command.commands()) {
                 //noinspection ObjectAllocationInLoop
-                commandList.put(cmd, new TelegramHandler(bean, method, command));
+                TelegramHandler telegramHandler = new TelegramHandler(bean, method, command);
+                if (cmd.endsWith("*")) {
+                    patternCommandList.put(cmd.substring(0, cmd.length() - 1), telegramHandler);
+                } else {
+                    commandList.put(cmd, telegramHandler);
+                }
             }
         }
     }

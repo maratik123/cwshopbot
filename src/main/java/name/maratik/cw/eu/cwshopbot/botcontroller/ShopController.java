@@ -20,6 +20,7 @@ import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
 import name.maratik.cw.eu.cwshopbot.service.CWParser;
+import name.maratik.cw.eu.cwshopbot.service.ItemSearchService;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
@@ -48,49 +49,30 @@ public class ShopController {
     private final int forwardStaleSec;
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
     private final CWParser<ShopInfo> shopInfoParser;
+    private final ItemSearchService itemSearchService;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
-                          CWParser<ShopInfo> shopInfoParser) {
+                          CWParser<ShopInfo> shopInfoParser, ItemSearchService itemSearchService) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
-    }
-
-    @TelegramCommand(commands = "/license", description = "Terms and conditions")
-    public SendMessage license(long userId) {
-        return new SendMessage()
-            .enableMarkdown(true)
-            .setChatId(userId)
-            .setText("cwshopbot  Copyright (C) 2018  maratik\n" +
-                "This program comes with ABSOLUTELY NO WARRANTY.\n" +
-                "This is free software, and you are welcome to redistribute it\n" +
-                "under conditions of [GNU Affero Public License v3.0 or later](https://www.gnu.org/licenses/).\n" +
-                "For sources see /source");
-    }
-
-    @TelegramCommand(commands = "/source", description = "Source code", hidden = true)
-    public SendMessage source(long userId) {
-        return new SendMessage()
-            .enableMarkdown(true)
-            .setChatId(userId)
-            .setText("[here](https://github.com/maratik123/cwshopbot)");
+        this.itemSearchService = itemSearchService;
     }
 
     @TelegramMessage
-    public SendMessage message(long userId, User user, String message) {
+    public SendMessage message(long userId, String message) {
         return new SendMessage()
             .setChatId(userId)
-            .setText(String.format("Hi %s! You've sent me message: \"%s\"",
-                user.getFirstName(),
-                message
-            ));
+            .setText(itemSearchService.findByCode(message));
     }
 
-    @TelegramCommand(commands = "/text", description = "This is a test method")
-    public SendMessage test(long userId, String message, User user) {
-        return processMessage(userId, message, user);
+    @TelegramCommand(commands = "/t_*", description = "Info about item")
+    public SendMessage itemInfo(long userId, String message) {
+        return new SendMessage()
+            .setChatId(userId)
+            .setText(itemSearchService.findByCode(message.substring(3)));
     }
 
     private static SendMessage processMessage(long userId, String message, User user) {
@@ -102,11 +84,6 @@ public class ShopController {
                 user.getFirstName(),
                 message
             ));
-    }
-
-    @TelegramCommand(commands = "/hiddenCommand", description = "This is a hidden test method", hidden = true)
-    public SendMessage testHidden(long userId, User user, String message) {
-        return processMessage(userId, message, user);
     }
 
     @TelegramForward("${cwuserid}")
@@ -145,10 +122,6 @@ public class ShopController {
             );
     }
 
-    private boolean messageIsStale(Instant forwardTime) {
-        return clock.instant().minusSeconds(forwardStaleSec).isAfter(forwardTime);
-    }
-
     @TelegramForward
     public SendMessage defaultForward(long userId, User user) {
         logger.info("Accepted unsupported forward data from user: ", userId);
@@ -157,5 +130,28 @@ public class ShopController {
             .setText(String.format("Hi %s, I can't recognize you!",
                 user.getFirstName()
             ));
+    }
+    @TelegramCommand(commands = "/license", description = "Terms and conditions")
+    public SendMessage license(long userId) {
+        return new SendMessage()
+            .enableMarkdown(true)
+            .setChatId(userId)
+            .setText("cwshopbot  Copyright (C) 2018  maratik\n" +
+                "This program comes with ABSOLUTELY NO WARRANTY.\n" +
+                "This is free software, and you are welcome to redistribute it\n" +
+                "under conditions of [GNU Affero Public License v3.0 or later](https://www.gnu.org/licenses/).\n" +
+                "For sources see /source");
+    }
+
+    @TelegramCommand(commands = "/source", description = "Source code", hidden = true)
+    public SendMessage source(long userId) {
+        return new SendMessage()
+            .enableMarkdown(true)
+            .setChatId(userId)
+            .setText("[here](https://github.com/maratik123/cwshopbot)");
+    }
+
+    private boolean messageIsStale(Instant forwardTime) {
+        return clock.instant().minusSeconds(forwardStaleSec).isAfter(forwardTime);
     }
 }

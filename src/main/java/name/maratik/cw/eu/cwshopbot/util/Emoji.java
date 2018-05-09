@@ -25,4 +25,6 @@ public class Emoji {
     public static final String HAMMERS = "\u2692";
     public static final String CHEST = "\uD83D\uDDC3";
     public static final String LABEL = "\uD83C\uDFF7";
+    public static final String SWORDS = "\u2694\uFE0F";
+    public static final String SHIELD = "\uD83D\uDEE1";
 }

@@ -49,7 +49,7 @@ public class Item {
         return tradeable;
     }
 
-    void apply(Visitor visitor) {
+    public void apply(Visitor visitor) {
         visitor.visit(this);
     }
 
