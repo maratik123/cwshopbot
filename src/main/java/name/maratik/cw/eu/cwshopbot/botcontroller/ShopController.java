@@ -69,6 +69,13 @@ public class ShopController {
             .setText(itemSearchService.findByCode(message));
     }
 
+    @TelegramCommand(commands = "/start", description = "Start command", hidden = true)
+    public SendMessage startCommand(long userId) {
+        return new SendMessage()
+            .setChatId(userId)
+            .setText("Now you can press /help to view help");
+    }
+
     @TelegramCommand(commands = "/t_*", description = "Info about item")
     public SendMessage itemInfo(long userId, Update update) {
         return new SendMessage()
