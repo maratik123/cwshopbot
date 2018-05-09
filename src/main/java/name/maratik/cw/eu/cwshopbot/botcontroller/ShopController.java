@@ -77,6 +77,14 @@ public class ShopController {
             .setText(itemSearchService.findByCode(update.getMessage().getText().substring(3)));
     }
 
+    @TelegramCommand(commands = "/view_*", description = "View recipe")
+    public SendMessage recipeView(long userId, Update update) {
+        return new SendMessage()
+            .setChatId(userId)
+            .enableMarkdown(true)
+            .setText(itemSearchService.findRecipeByCode(update.getMessage().getText().substring(6)));
+    }
+
     private static SendMessage processMessage(long userId, String message, User user) {
         logger.info("Incoming message from: {}, data: {}", userId, message);
 

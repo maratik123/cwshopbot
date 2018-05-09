@@ -21,11 +21,14 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 import org.springframework.stereotype.Service;
 
+import java.util.AbstractMap;
 import java.util.Comparator;
+import java.util.Map;
 
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHIELD;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SWORDS;
+import static name.maratik.cw.eu.cwshopbot.util.Utils.putCommandLink;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -49,12 +52,50 @@ public class ItemSearchService {
         return new ItemOutput(item).getMessage();
     }
 
+    public String findRecipeByCode(String code) {
+        CraftableItem craftableItem = assets.getCraftableItems().get(code);
+        if (craftableItem == null) {
+            return "404 Not found";
+        }
+        return new RecipeOutput(craftableItem).getMessage();
+    }
+
     private interface SearchOutput {
         String getMessage();
     }
 
+    private class RecipeOutput implements SearchOutput {
+        private final String message;
+
+        private RecipeOutput(CraftableItem craftableItem) {
+            Map<String, Integer> recipe = craftableItem.getRecipe();
+            StringBuilder sb = new StringBuilder("Recipe for: *")
+                .append(craftableItem.getName()).append("*\n")
+                .append(MANA + " cost: ").append(craftableItem.getMana()).append("\n\n");
+            recipe.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
+                    assets.getAllItems().get(entry.getKey()),
+                    entry.getValue()
+                ))
+                .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
+                .forEach(entry -> {
+                    Item item = entry.getKey();
+                    sb.append(item.getName()).append(" (");
+                    putCommandLink(sb, "/a_" + item.getId())
+                        .append(") x ").append(entry.getValue()).append('\n');
+                });
+            message = sb.toString();
+        }
+
+        @Override
+        public String getMessage() {
+            return message;
+        }
+    }
+
     private static class ItemOutput implements SearchOutput {
         private final String message;
+
         private ItemOutput(Item item) {
             StringBuilder sb = new StringBuilder();
             item.apply(new MessageConstructor(sb));
@@ -75,12 +116,12 @@ public class ItemSearchService {
 
             @Override
             public void visit(Item item) {
-                sb.append("Code: ").append(item.getId()).append('\n');
-                sb.append("Name: *").append(item.getName()).append("*\n");
-                sb.append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
+                sb.append("Code: ").append(item.getId()).append('\n')
+                    .append("Name: *").append(item.getName()).append("*\n")
+                    .append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
                 if (item.isTradeable()) {
-                    sb.append("Can be exchanged using [/t_").append(item.getId()).append("](/t_")
-                        .append(item.getId()).append(") command\n");
+                    sb.append("Can be exchanged using ");
+                    putCommandLink(sb, "/t_" + item.getId()).append(" command\n");
                 }
             }
 
@@ -88,11 +129,11 @@ public class ItemSearchService {
             public void visit(CraftableItem craftableItem) {
                 visit((Item) craftableItem);
 
-                sb.append('\n');
-                sb.append("To view recipe click: [/view_").append(craftableItem.getId())
-                    .append("](/view_").append(craftableItem.getId()).append(")\n");
-                sb.append(MANA + " cost: ").append(craftableItem.getMana()).append('\n');
-                sb.append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n');
+                sb.append('\n')
+                    .append("To view recipe click: ");
+                putCommandLink(sb, "/view_" + craftableItem.getId()).append('\n')
+                    .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
+                    .append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n');
             }
 
             @Override
@@ -116,8 +157,8 @@ public class ItemSearchService {
                 if (needNewLine) {
                     sb.append('\n');
                 }
-                sb.append("Body part: ").append(wearableItem.getBodyPart().getCode()).append('\n');
-                sb.append("Class: ").append(wearableItem.getItemType().getCode()).append('\n');
+                sb.append("Body part: ").append(wearableItem.getBodyPart().getCode()).append('\n')
+                    .append("Class: ").append(wearableItem.getItemType().getCode()).append('\n');
             }
         }
     }
