@@ -60,7 +60,7 @@ public class WearableItem extends CraftableItem {
     }
 
     @Override
-    void apply(Visitor visitor) {
+    public void apply(Visitor visitor) {
         visitor.visit(this);
     }
 

@@ -49,7 +49,7 @@ public class CraftableItem extends Item {
     }
 
     @Override
-    void apply(Visitor visitor) {
+    public void apply(Visitor visitor) {
         visitor.visit(this);
     }
 
