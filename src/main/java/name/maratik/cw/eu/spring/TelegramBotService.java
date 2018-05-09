@@ -115,6 +115,8 @@ public abstract class TelegramBotService implements AutoCloseable {
             }
         }
 
+        logger.debug("Command handler: {}", optionalCommandHandler);
+
         return optionalCommandHandler.flatMap(commandHandler -> {
             try {
                 Method method = commandHandler.getMethod();
