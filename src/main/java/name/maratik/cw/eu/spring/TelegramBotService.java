@@ -155,7 +155,10 @@ public abstract class TelegramBotService implements AutoCloseable {
     private String buildHelpMessage() {
         StringBuilder sb = new StringBuilder();
         getCommandList()
-            .sorted(Comparator.comparing(TelegramBotCommand::getCommand))
+            .sorted(Comparator.comparing(
+                (TelegramBotCommand command) -> command.getCommand().equals("/license") ||
+                    command.getCommand().equals("/license")
+                ).thenComparing(TelegramBotCommand::getCommand))
             .forEach(method -> sb
                 .append(method.getCommand())
                 .append(' ')
