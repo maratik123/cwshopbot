@@ -59,6 +59,7 @@ public abstract class TelegramBotService implements AutoCloseable {
     private final ConfigurableBeanFactory beanFactory;
     private TelegramHandler defaultMessageHandler;
     private TelegramHandler defaultForwardHandler;
+    private String prefixHelpMessage;
 
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
 
@@ -154,10 +155,13 @@ public abstract class TelegramBotService implements AutoCloseable {
 
     private String buildHelpMessage() {
         StringBuilder sb = new StringBuilder();
+        if (prefixHelpMessage != null) {
+            sb.append(prefixHelpMessage);
+        }
         getCommandList()
             .sorted(Comparator.comparing(
                 (TelegramBotCommand command) -> command.getCommand().equals("/license") ||
-                    command.getCommand().equals("/license")
+                    command.getCommand().equals("/help")
                 ).thenComparing(TelegramBotCommand::getCommand))
             .forEach(method -> sb
                 .append(method.getCommand())
@@ -252,5 +256,13 @@ public abstract class TelegramBotService implements AutoCloseable {
 
     @Override
     public void close() {
+    }
+
+    public void addHelpPrefixMethod(Object bean, Method method) {
+        try {
+            prefixHelpMessage = (String) method.invoke(bean);
+        } catch (Exception e) {
+            logger.error("Can not get help prefix", e);
+        }
     }
 }

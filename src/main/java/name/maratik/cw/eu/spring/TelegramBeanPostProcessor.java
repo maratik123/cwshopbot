@@ -18,6 +18,7 @@ package name.maratik.cw.eu.spring;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
+import name.maratik.cw.eu.spring.annotation.TelegramHelp;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,6 +73,9 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
                 if (AnnotatedElementUtils.hasAnnotation(method, TelegramForward.class)) {
                     bindForwardController(bean, method);
                 }
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramHelp.class)) {
+                    bindHelpPrefix(bean, method);
+                }
             }
         }
         return bean;
@@ -90,5 +94,10 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
     private void bindForwardController(Object bean, Method method) {
         logger.info("Init TelegramBot forward controller: {}:{}", bean::getClass, method::getName);
         telegramBotService.addForwardMessageHandler(bean, method);
+    }
+
+    private void bindHelpPrefix(Object bean, Method method) {
+        logger.info("Init TelegramBot help prefix method: {}:{}", bean::getClass, method::getName);
+        telegramBotService.addHelpPrefixMethod(bean, method);
     }
 }

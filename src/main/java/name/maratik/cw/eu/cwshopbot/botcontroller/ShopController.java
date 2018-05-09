@@ -24,6 +24,7 @@ import name.maratik.cw.eu.cwshopbot.service.ItemSearchService;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
+import name.maratik.cw.eu.spring.annotation.TelegramHelp;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,9 +67,10 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(itemSearchService.findByCode(message));
+            .setText(getMessage(itemSearchService.findByCodeThenName(message)));
     }
 
+    @SuppressWarnings("MethodMayBeStatic")
     @TelegramCommand(commands = "/start", description = "Start command", hidden = true)
     public SendMessage startCommand(long userId) {
         return new SendMessage()
@@ -81,7 +83,12 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(itemSearchService.findByCode(update.getMessage().getText().substring(3)));
+            .setText(getMessage(itemSearchService.findByCode(update.getMessage().getText().substring(3))));
+    }
+
+    @TelegramCommand(commands = "/a_*", description = "Copy of /t_*", hidden = true)
+    public SendMessage itemInfoA(long userId, Update update) {
+        return itemInfo(userId, update);
     }
 
     @TelegramCommand(commands = "/view_*", description = "View recipe")
@@ -89,18 +96,11 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(itemSearchService.findRecipeByCode(update.getMessage().getText().substring(6)));
+            .setText(getMessage(itemSearchService.findRecipeByCode(update.getMessage().getText().substring(6))));
     }
 
-    private static SendMessage processMessage(long userId, String message, User user) {
-        logger.info("Incoming message from: {}, data: {}", userId, message);
-
-        return new SendMessage()
-            .setChatId(userId)
-            .setText(String.format("Hi %s! You've sent me command with argument: \"%s\"",
-                user.getFirstName(),
-                message
-            ));
+    private static String getMessage(Optional<String> message) {
+        return message.orElse("404 not found");
     }
 
     @TelegramForward("${cwuserid}")
@@ -139,6 +139,7 @@ public class ShopController {
             );
     }
 
+    @SuppressWarnings("MethodMayBeStatic")
     @TelegramForward
     public SendMessage defaultForward(long userId, User user) {
         logger.info("Accepted unsupported forward data from user: ", userId);
@@ -148,6 +149,8 @@ public class ShopController {
                 user.getFirstName()
             ));
     }
+
+    @SuppressWarnings("MethodMayBeStatic")
     @TelegramCommand(commands = "/license", description = "Terms and conditions")
     public SendMessage license(long userId) {
         return new SendMessage()
@@ -160,12 +163,20 @@ public class ShopController {
                 "For sources see /source");
     }
 
+    @SuppressWarnings("MethodMayBeStatic")
     @TelegramCommand(commands = "/source", description = "Source code", hidden = true)
     public SendMessage source(long userId) {
         return new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)
             .setText("[here](https://github.com/maratik123/cwshopbot)");
+    }
+
+    @SuppressWarnings("MethodMayBeStatic")
+    @TelegramHelp
+    public String getHelpPrefix() {
+        return "To find something just type it's code (or part of name)\n" +
+            "Also, you can use the commands from list:\n\n";
     }
 
     private boolean messageIsStale(Instant forwardTime) {

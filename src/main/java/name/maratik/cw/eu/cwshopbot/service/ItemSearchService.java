@@ -23,8 +23,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHIELD;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SWORDS;
@@ -44,20 +47,40 @@ public class ItemSearchService {
         this.assets = assets;
     }
 
-    public String findByCode(String code) {
-        Item item = assets.getAllItems().get(code);
-        if (item == null) {
-            return "404 Not found";
+    public Optional<String> findByCodeThenName(String search) {
+        Optional<String> result = findByCode(search);
+        if (result.isPresent()) {
+            return result;
         }
-        return new ItemOutput(item).getMessage();
+        return findByName(search);
     }
 
-    public String findRecipeByCode(String code) {
-        CraftableItem craftableItem = assets.getCraftableItems().get(code);
-        if (craftableItem == null) {
-            return "404 Not found";
+    public Optional<String> findByName(String name) {
+        List<Item> items = assets.getAllItems().values().stream()
+            .filter(item -> item.getName().contains(name))
+            .sorted(ITEM_NAME_COMPARATOR)
+            .limit(LIST_LIMIT)
+            .collect(toImmutableList());
+
+        if (items.isEmpty()) {
+            return Optional.empty();
         }
-        return new RecipeOutput(craftableItem).getMessage();
+        if (items.size() == 1) {
+            return Optional.of(new ItemOutput(items.get(0)).getMessage());
+        }
+        return Optional.of(new ListOutput(items).getMessage());
+    }
+
+    public Optional<String> findByCode(String code) {
+        return Optional.ofNullable(assets.getAllItems().get(code))
+            .map(ItemOutput::new)
+            .map(SearchOutput::getMessage);
+    }
+
+    public Optional<String> findRecipeByCode(String code) {
+        return Optional.ofNullable(assets.getCraftableItems().get(code))
+            .map(RecipeOutput::new)
+            .map(SearchOutput::getMessage);
     }
 
     private interface SearchOutput {
@@ -165,9 +188,20 @@ public class ItemSearchService {
 
     private static class ListOutput implements SearchOutput {
 
+        private final String message;
+
+        private ListOutput(List<Item> items) {
+            StringBuilder sb = new StringBuilder();
+            items.forEach(item -> {
+                putCommandLink(sb, "/t_" + item.getId())
+                    .append(' ').append(item.getName()).append('\n');
+            });
+            message = sb.toString();
+        }
+
         @Override
         public String getMessage() {
-            return "";
+            return message;
         }
     }
 }
