@@ -56,8 +56,9 @@ public class ItemSearchService {
     }
 
     public Optional<String> findByName(String name) {
+        String lowerName = name.toLowerCase();
         List<Item> items = assets.getAllItems().values().stream()
-            .filter(item -> item.getName().contains(name))
+            .filter(item -> item.getName().toLowerCase().contains(lowerName))
             .sorted(ITEM_NAME_COMPARATOR)
             .limit(LIST_LIMIT)
             .collect(toImmutableList());
@@ -72,7 +73,8 @@ public class ItemSearchService {
     }
 
     public Optional<String> findByCode(String code) {
-        return Optional.ofNullable(assets.getAllItems().get(code))
+        String lowerCode = code.toLowerCase();
+        return Optional.ofNullable(assets.getAllItems().get(lowerCode))
             .map(ItemOutput::new)
             .map(SearchOutput::getMessage);
     }
