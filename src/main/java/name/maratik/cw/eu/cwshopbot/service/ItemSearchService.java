@@ -76,7 +76,7 @@ public class ItemSearchService {
             @Override
             public void visit(Item item) {
                 sb.append("Code: ").append(item.getId()).append('\n');
-                sb.append("Name: ").append(item.getName()).append('\n');
+                sb.append("Name: *").append(item.getName()).append("*\n");
                 sb.append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
                 if (item.isTradeable()) {
                     sb.append("Can be exchanged using /t_").append(item.getId()).append(" command\n");

@@ -65,6 +65,7 @@ public class ShopController {
     public SendMessage message(long userId, String message) {
         return new SendMessage()
             .setChatId(userId)
+            .enableMarkdown(true)
             .setText(itemSearchService.findByCode(message));
     }
 
@@ -72,6 +73,7 @@ public class ShopController {
     public SendMessage itemInfo(long userId, Update update) {
         return new SendMessage()
             .setChatId(userId)
+            .enableMarkdown(true)
             .setText(itemSearchService.findByCode(update.getMessage().getText().substring(3)));
     }
 
