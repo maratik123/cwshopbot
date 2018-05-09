@@ -79,7 +79,8 @@ public class ItemSearchService {
                 sb.append("Name: *").append(item.getName()).append("*\n");
                 sb.append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
                 if (item.isTradeable()) {
-                    sb.append("Can be exchanged using /t_").append(item.getId()).append(" command\n");
+                    sb.append("Can be exchanged using [/t_").append(item.getId()).append("](/t_")
+                        .append(item.getId()).append(") command\n");
                 }
             }
 
@@ -88,7 +89,8 @@ public class ItemSearchService {
                 visit((Item) craftableItem);
 
                 sb.append('\n');
-                sb.append("To view recipe click: /view_").append(craftableItem.getId()).append('\n');
+                sb.append("To view recipe click: [/view_").append(craftableItem.getId())
+                    .append("](/view_").append(craftableItem.getId()).append(")\n");
                 sb.append(MANA + " cost: ").append(craftableItem.getMana()).append('\n');
                 sb.append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n');
             }
