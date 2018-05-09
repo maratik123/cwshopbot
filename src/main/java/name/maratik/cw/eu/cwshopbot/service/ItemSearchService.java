@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.service;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Craftbook;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ import static name.maratik.cw.eu.cwshopbot.util.Utils.putCommandLink;
 @Service
 public class ItemSearchService {
     private static final Comparator<Item> ITEM_NAME_COMPARATOR = Comparator.comparing(Item::getName);
-    private static final int LIST_LIMIT = 20;
+    private static final int LIST_LIMIT = 30;
 
     private final Assets assets;
 
@@ -47,7 +48,7 @@ public class ItemSearchService {
         this.assets = assets;
     }
 
-    public Optional<String> findByCodeThenName(String search) {
+    public Optional<String> findByCodeThenByName(String search) {
         Optional<String> result = findByCode(search);
         if (result.isPresent()) {
             return result;
@@ -63,13 +64,14 @@ public class ItemSearchService {
             .limit(LIST_LIMIT)
             .collect(toImmutableList());
 
-        if (items.isEmpty()) {
-            return Optional.empty();
+        switch (items.size()) {
+            case 0:
+                return Optional.empty();
+            case 1:
+                return Optional.of(new ItemOutput(items.get(0)).getMessage());
+            default:
+                return Optional.of(new ListOutput(items).getMessage());
         }
-        if (items.size() == 1) {
-            return Optional.of(new ItemOutput(items.get(0)).getMessage());
-        }
-        return Optional.of(new ListOutput(items).getMessage());
     }
 
     public Optional<String> findByCode(String code) {
@@ -82,6 +84,18 @@ public class ItemSearchService {
     public Optional<String> findRecipeByCode(String code) {
         return Optional.ofNullable(assets.getCraftableItems().get(code))
             .map(RecipeOutput::new)
+            .map(SearchOutput::getMessage);
+    }
+
+    public Optional<String> getCraftbook(String craftbookCode) {
+        return Craftbook.findByCode(craftbookCode)
+            .map(craftbook -> assets.getItemsByCraftbook().get(craftbook))
+            .filter(craftableItems -> !craftableItems.isEmpty())
+            .map(craftableItems -> craftableItems.stream()
+                .sorted(ITEM_NAME_COMPARATOR)
+                .collect(toImmutableList())
+            )
+            .map(ListOutput::new)
             .map(SearchOutput::getMessage);
     }
 
@@ -192,7 +206,7 @@ public class ItemSearchService {
 
         private final String message;
 
-        private ListOutput(List<Item> items) {
+        private ListOutput(List<? extends Item> items) {
             StringBuilder sb = new StringBuilder();
             items.forEach(item -> {
                 putCommandLink(sb, "/t_" + item.getId())

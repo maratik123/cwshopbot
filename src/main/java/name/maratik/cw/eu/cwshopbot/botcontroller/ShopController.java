@@ -26,6 +26,7 @@ import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.annotation.TelegramHelp;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
+import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +68,7 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findByCodeThenName(message)));
+            .setText(getMessage(itemSearchService.findByCodeThenByName(message)));
     }
 
     @SuppressWarnings("MethodMayBeStatic")
@@ -79,28 +80,38 @@ public class ShopController {
     }
 
     @TelegramCommand(commands = "/t_*", description = "Info about item")
-    public SendMessage itemInfo(long userId, Update update) {
+    public SendMessage itemInfo(long userId, Message message) {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findByCode(update.getMessage().getText().substring(3))));
+            .setText(getMessage(itemSearchService.findByCode(message.getText().substring(3))));
+    }
+
+    @TelegramCommand(
+        commands = { "/craftbook_1", "/craftbook_2", "/craftbook_3" },
+        description = "Show craftbook"
+    )
+    public SendMessage showCraftbook(long userId, TelegramMessageCommand command) {
+        Optional<String> result = command.getCommand()
+            .map(cmd -> cmd.substring(11))
+            .flatMap(itemSearchService::getCraftbook);
+        return new SendMessage()
+            .setChatId(userId)
+            .enableMarkdown(true)
+            .setText(getMessage(result));
     }
 
     @TelegramCommand(commands = "/a_*", description = "Copy of /t_*", hidden = true)
-    public SendMessage itemInfoA(long userId, Update update) {
-        return itemInfo(userId, update);
+    public SendMessage itemInfoA(long userId, Message message) {
+        return itemInfo(userId, message);
     }
 
     @TelegramCommand(commands = "/view_*", description = "View recipe")
-    public SendMessage recipeView(long userId, Update update) {
+    public SendMessage recipeView(long userId, Message message) {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findRecipeByCode(update.getMessage().getText().substring(6))));
-    }
-
-    private static String getMessage(Optional<String> message) {
-        return message.orElse("404 not found");
+            .setText(getMessage(itemSearchService.findRecipeByCode(message.getText().substring(6))));
     }
 
     @TelegramForward("${cwuserid}")
@@ -181,5 +192,9 @@ public class ShopController {
 
     private boolean messageIsStale(Instant forwardTime) {
         return clock.instant().minusSeconds(forwardStaleSec).isAfter(forwardTime);
+    }
+
+    private static String getMessage(Optional<String> message) {
+        return message.orElse("404 not found");
     }
 }
