@@ -126,6 +126,7 @@ public abstract class TelegramBotService implements AutoCloseable {
                     sendHelpList(update);
                 } else {
                     Type methodGenericReturnType = method.getGenericReturnType();
+                    logger.debug("Derived method return type: {}", methodGenericReturnType);
                     if (methodGenericReturnType == void.class) {
                         method.invoke(commandHandler.getBean(), arguments);
                     } else if (methodGenericReturnType instanceof Class<?> &&
