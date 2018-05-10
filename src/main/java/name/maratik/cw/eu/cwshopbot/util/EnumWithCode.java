@@ -28,7 +28,7 @@ public interface EnumWithCode {
 
     class Util {
         public static <T extends EnumWithCode> Map<String, T> createCache(T[] values) {
-            return Arrays.stream(values).collect(toImmutableMap(T::getCode, t -> t));
+            return Arrays.stream(values).collect(toImmutableMap(T::getCode, value -> value));
         }
     }
 }

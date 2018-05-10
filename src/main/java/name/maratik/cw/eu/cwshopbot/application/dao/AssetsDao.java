@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 /**
@@ -74,35 +75,36 @@ public class AssetsDao {
                 .map(id -> new AbstractMap.SimpleImmutableEntry<>(id, entry.getKey()))
             )
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        Assets result = new Assets(assetsDto.getAssetsPartMap().entrySet().stream()
-            .flatMap(assetsPartEntry -> {
-                AssetsPartDto assetsPartDto = assetsPartEntry.getValue();
-                ItemLocation itemLocation = ItemLocation.findByCode(assetsPartEntry.getKey())
-                    .orElseThrow(RuntimeException::new);
-                return assetsPartDto.getItems().entrySet().stream()
-                    .map(itemEntry -> {
-                        String id = itemEntry.getKey();
-                        ResourceItem resourceItem = itemEntry.getValue();
+        Assets result = Assets.builder()
+            .setAllItemList(assetsDto.getAssetsPartMap().entrySet().stream()
+                .flatMap(assetsPartEntry -> {
+                    AssetsPartDto assetsPartDto = assetsPartEntry.getValue();
+                    ItemLocation itemLocation = ItemLocation.findByCode(assetsPartEntry.getKey())
+                        .orElseThrow(RuntimeException::new);
+                    return assetsPartDto.getItems().entrySet().stream()
+                        .map(itemEntry -> {
+                            String id = itemEntry.getKey();
+                            ResourceItem resourceItem = itemEntry.getValue();
 
-                        Map<String, Integer> recipe = resourceItem.getRecipe();
-                        if (recipe == null) {
-                            return fillItemProps(Item.itemBuilder(), id, resourceItem, itemLocation, assetsPartDto)
+                            Map<String, Integer> recipe = resourceItem.getRecipe();
+                            if (recipe == null) {
+                                return fillItemProps(Item.itemBuilder(), id, resourceItem, itemLocation, assetsPartDto)
+                                    .build();
+                            }
+                            Craftbook craftbook = Craftbook.findByCode(reverseCraftbookMap.get(id))
+                                .orElseThrow(RuntimeException::new);
+                            ItemType itemType = resourceItem.getType();
+                            if (itemType == null) {
+                                return fillCraftableItemProps(CraftableItem.craftableItemBuilder(), id, resourceItem,
+                                    itemLocation, assetsPartDto, craftbook, assetsDto, recipe)
+                                    .build();
+                            }
+                            return fillWearableItemProps(WearableItem.wearableItemBuilder(), id, resourceItem, itemLocation,
+                                assetsPartDto, craftbook, assetsDto, recipe, itemType)
                                 .build();
-                        }
-                        Craftbook craftbook = Craftbook.findByCode(reverseCraftbookMap.get(id))
-                            .orElseThrow(RuntimeException::new);
-                        ItemType itemType = resourceItem.getType();
-                        if (itemType == null) {
-                            return fillCraftableItemProps(CraftableItem.craftableItemBuilder(), id, resourceItem,
-                                itemLocation, assetsPartDto, craftbook, assetsDto, recipe)
-                                .build();
-                        }
-                        return fillWearableItemProps(WearableItem.wearableItemBuilder(), id, resourceItem, itemLocation,
-                            assetsPartDto, craftbook, assetsDto, recipe, itemType)
-                            .build();
-                    });
-            })
-            .collect(toImmutableMap(Item::getId, item -> item)));
+                        });
+                }).collect(toImmutableList())
+            ).build();
 
         logger.info("Assets loaded. Assets size is: {}", () -> result.getAllItems().size());
 

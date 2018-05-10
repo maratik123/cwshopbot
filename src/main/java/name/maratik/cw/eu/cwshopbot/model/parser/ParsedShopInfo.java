@@ -15,7 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
+import com.google.common.collect.ImmutableList;
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -25,12 +30,14 @@ public class ParsedShopInfo {
     private final String charName;
     private final String shopCommand;
     private final ShopState shopState;
+    private final List<ShopLine> shopLines;
 
-    public ParsedShopInfo(String shopName, String charName, String shopCommand, ShopState shopState) {
-        this.shopName = shopName;
-        this.charName = charName;
-        this.shopCommand = shopCommand;
-        this.shopState = shopState;
+    public ParsedShopInfo(String shopName, String charName, String shopCommand, ShopState shopState, List<ShopLine> shopLines) {
+        this.shopName = Objects.requireNonNull(shopName);
+        this.charName = Objects.requireNonNull(charName);
+        this.shopCommand = Objects.requireNonNull(shopCommand);
+        this.shopState = Objects.requireNonNull(shopState);
+        this.shopLines = Objects.requireNonNull(shopLines);
     }
 
     public String getShopName() {
@@ -49,13 +56,18 @@ public class ParsedShopInfo {
         return shopState;
     }
 
+    public List<ShopLine> getShopLines() {
+        return shopLines;
+    }
+
     @Override
     public String toString() {
-        return "ShopInfo{" +
+        return "ParsedShopInfo{" +
             "shopName='" + shopName + '\'' +
             ", charName='" + charName + '\'' +
             ", shopCommand='" + shopCommand + '\'' +
             ", shopState=" + shopState +
+            ", shopLines=" + shopLines +
             '}';
     }
 
@@ -68,6 +80,7 @@ public class ParsedShopInfo {
         private String shopName;
         private String shopCommand;
         private ShopState shopState;
+        private ImmutableList.Builder<ShopLine> shopLines;
 
         public Builder setCharName(String charName) {
             this.charName = charName;
@@ -89,29 +102,31 @@ public class ParsedShopInfo {
             return this;
         }
 
+        public Builder addShopLine(ShopLine shopLine) {
+            shopLines.add(shopLine);
+            return this;
+        }
+
         public ParsedShopInfo build() {
-            return new ParsedShopInfo(shopName, charName, shopCommand, shopState);
+            return new ParsedShopInfo(shopName, charName, shopCommand, shopState, shopLines.build());
         }
     }
 
-    /**
-     * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
-     */
     public static class ShopLine {
-        private final String itemName;
+        private final Item item;
         private final int mana;
         private final int price;
         private final String craftCommand;
 
-        public ShopLine(String itemName, int mana, int price, String craftCommand) {
-            this.itemName = itemName;
+        public ShopLine(Item item, int mana, int price, String craftCommand) {
+            this.item = Objects.requireNonNull(item);
             this.mana = mana;
             this.price = price;
-            this.craftCommand = craftCommand;
+            this.craftCommand = Objects.requireNonNull(craftCommand);
         }
 
-        public String getItemName() {
-            return itemName;
+        public Item getItem() {
+            return item;
         }
 
         public int getMana() {
@@ -129,7 +144,7 @@ public class ParsedShopInfo {
         @Override
         public String toString() {
             return "ShopLine{" +
-                "itemName='" + itemName + '\'' +
+                "item=" + item +
                 ", mana=" + mana +
                 ", price=" + price +
                 ", craftCommand='" + craftCommand + '\'' +
@@ -141,13 +156,13 @@ public class ParsedShopInfo {
         }
 
         public static class Builder {
-            private String itemName;
+            private Item item;
             private int mana;
             private int price;
             private String craftCommand;
 
-            public Builder setItemName(String itemName) {
-                this.itemName = itemName;
+            public Builder setItem(Item item) {
+                this.item = item;
                 return this;
             }
 
@@ -167,7 +182,7 @@ public class ParsedShopInfo {
             }
 
             public ShopLine build() {
-                return new ShopLine(itemName, mana, price, craftCommand);
+                return new ShopLine(item, mana, price, craftCommand);
             }
         }
     }

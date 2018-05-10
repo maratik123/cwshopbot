@@ -30,7 +30,7 @@ public enum ShopState implements EnumWithCode {
     CLOSED("closed");
 
     private final String code;
-    private final static Map<String, ShopState> cache = Util.createCache(values());
+    private static final Map<String, ShopState> cache = Util.createCache(values());
 
     ShopState(String code) {
         this.code = code;

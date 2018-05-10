@@ -25,12 +25,14 @@ public class Item {
     private final String name;
     private final ItemLocation itemLocation;
     private final boolean tradeable;
+    private final String lowerName;
 
     public Item(String id, String name, ItemLocation itemLocation, boolean tradeable) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.itemLocation = Objects.requireNonNull(itemLocation);
         this.tradeable = tradeable;
+        this.lowerName = name.toLowerCase();
     }
 
     public String getId() {
@@ -47,6 +49,10 @@ public class Item {
 
     public boolean isTradeable() {
         return tradeable;
+    }
+
+    public String getLowerName() {
+        return lowerName;
     }
 
     public void apply(Visitor visitor) {

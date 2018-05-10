@@ -18,13 +18,19 @@ package name.maratik.cw.eu.cwshopbot.model.cwasset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Maps.toImmutableEnumMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -37,60 +43,17 @@ public class Assets {
     private final Map<Craftbook, Set<CraftableItem>> itemsByCraftbook;
     private final Map<String, CraftableItem> craftableItems;
     private final Map<String, WearableItem> wearableItems;
+    private final Map<String, Set<CraftableItem>> craftableItemsByRecipe;
 
-    public Assets(Map<String, Item> allItems) {
+    protected Assets(Map<String, Item> allItems, Map<ItemLocation, Set<Item>> itemsByItemLocation, Map<BodyPart, Set<WearableItem>> itemsByBodyPart, Map<ItemType, Set<WearableItem>> itemsByItemType, Map<Craftbook, Set<CraftableItem>> itemsByCraftbook, Map<String, CraftableItem> craftableItems, Map<String, WearableItem> wearableItems, Map<String, Set<CraftableItem>> craftableItemsByRecipe) {
         this.allItems = Objects.requireNonNull(allItems);
-        Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder = new EnumMap<>(ItemLocation.class);
-        Map<BodyPart, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder = new EnumMap<>(BodyPart.class);
-        Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder = new EnumMap<>(ItemType.class);
-        Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder = new EnumMap<>(Craftbook.class);
-        ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder = ImmutableMap.builder();
-        ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder = ImmutableMap.builder();
-        allItems.forEach((id, item) -> item.apply(new Item.Visitor() {
-            @Override
-            public void visit(Item item) {
-                itemsByItemLocationBuilder.computeIfAbsent(
-                    item.getItemLocation(),
-                    itemLocation -> ImmutableSet.builder()
-                ).add(item);
-            }
-
-            @Override
-            public void visit(CraftableItem craftableItem) {
-                visit((Item) craftableItem);
-
-                itemsByCraftbookBuilder.computeIfAbsent(
-                    craftableItem.getCraftbook(),
-                    craftbook -> ImmutableSet.builder()
-                ).add(craftableItem);
-                craftableItemsBuilder.put(id, craftableItem);
-            }
-
-            @Override
-            public void visit(WearableItem wearableItem) {
-                visit((CraftableItem) wearableItem);
-
-                itemsByBodyPartBuilder.computeIfAbsent(
-                    wearableItem.getBodyPart(),
-                    bodyPart -> ImmutableSet.builder()
-                ).add(wearableItem);
-                itemsByItemTypeBuilder.computeIfAbsent(
-                    wearableItem.getItemType(),
-                    itemType -> ImmutableSet.builder()
-                ).add(wearableItem);
-                wearableItemsBuilder.put(id, wearableItem);
-            }
-        }));
-        itemsByItemLocation = itemsByItemLocationBuilder.entrySet().stream()
-            .collect(createImmutableMapCollector());
-        itemsByBodyPart = itemsByBodyPartBuilder.entrySet().stream()
-            .collect(createImmutableMapCollector());
-        itemsByItemType = itemsByItemTypeBuilder.entrySet().stream()
-            .collect(createImmutableMapCollector());
-        itemsByCraftbook = itemsByCraftbookBuilder.entrySet().stream()
-            .collect(createImmutableMapCollector());
-        craftableItems = craftableItemsBuilder.build();
-        wearableItems = wearableItemsBuilder.build();
+        this.itemsByItemLocation = Objects.requireNonNull(itemsByItemLocation);
+        this.itemsByBodyPart = Objects.requireNonNull(itemsByBodyPart);
+        this.itemsByItemType = Objects.requireNonNull(itemsByItemType);
+        this.itemsByCraftbook = Objects.requireNonNull(itemsByCraftbook);
+        this.craftableItems = Objects.requireNonNull(craftableItems);
+        this.wearableItems = Objects.requireNonNull(wearableItems);
+        this.craftableItemsByRecipe = Objects.requireNonNull(craftableItemsByRecipe);
     }
 
     public Map<String, Item> getAllItems() {
@@ -121,6 +84,10 @@ public class Assets {
         return wearableItems;
     }
 
+    public Map<String, Set<CraftableItem>> getCraftableItemsByRecipe() {
+        return craftableItemsByRecipe;
+    }
+
     @Override
     public String toString() {
         return "Assets{" +
@@ -132,21 +99,85 @@ public class Assets {
         return new Builder();
     }
 
-    private static <K extends Enum<K>, V, T extends Map.Entry<K, ImmutableSet.Builder<V>>>
-    Collector<T, ?, ImmutableMap<K, Set<V>>> createImmutableMapCollector() {
-        return toImmutableEnumMap(Map.Entry::getKey, entry -> entry.getValue().build());
-    }
-
     public static class Builder {
-        private final ImmutableMap.Builder<String, Item> itemsBuilder = ImmutableMap.builder();
+        private Collection<? extends Item> allItemList;
 
-        public Builder putItem(Item item) {
-            itemsBuilder.put(item.getId(), item);
+        public Builder setAllItemList(Collection<? extends Item> items) {
+            allItemList = items;
             return this;
         }
 
         public Assets build() {
-            return new Assets(itemsBuilder.build());
+            Map<String, Item> allItems = allItemList.stream()
+                .collect(toImmutableMap(Item::getId, item -> item));
+            Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder = new EnumMap<>(ItemLocation.class);
+            Map<BodyPart, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder = new EnumMap<>(BodyPart.class);
+            Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder = new EnumMap<>(ItemType.class);
+            Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder = new EnumMap<>(Craftbook.class);
+            ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder = ImmutableMap.builder();
+            ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder = ImmutableMap.builder();
+            allItems.forEach((id, item) -> item.apply(new Item.Visitor() {
+                @Override
+                public void visit(Item item) {
+                    itemsByItemLocationBuilder.computeIfAbsent(
+                        item.getItemLocation(),
+                        itemLocation -> ImmutableSet.builder()
+                    ).add(item);
+                }
+
+                @Override
+                public void visit(CraftableItem craftableItem) {
+                    visit((Item) craftableItem);
+
+                    itemsByCraftbookBuilder.computeIfAbsent(
+                        craftableItem.getCraftbook(),
+                        craftbook -> ImmutableSet.builder()
+                    ).add(craftableItem);
+                    craftableItemsBuilder.put(id, craftableItem);
+                }
+
+                @Override
+                public void visit(WearableItem wearableItem) {
+                    visit((CraftableItem) wearableItem);
+
+                    itemsByBodyPartBuilder.computeIfAbsent(
+                        wearableItem.getBodyPart(),
+                        bodyPart -> ImmutableSet.builder()
+                    ).add(wearableItem);
+                    itemsByItemTypeBuilder.computeIfAbsent(
+                        wearableItem.getItemType(),
+                        itemType -> ImmutableSet.builder()
+                    ).add(wearableItem);
+                    wearableItemsBuilder.put(id, wearableItem);
+                }
+            }));
+            Map<String, CraftableItem> craftableItems = craftableItemsBuilder.build();
+            Map<String, Set<CraftableItem>> craftableItemsByRecipe = ImmutableMap.copyOf(craftableItems.values().stream()
+                .flatMap(craftableItem -> craftableItem.getRecipe().keySet().stream()
+                    .map(recipePart -> new AbstractMap.SimpleImmutableEntry<>(recipePart, craftableItem))
+                ).collect(groupingBy(
+                    Map.Entry::getKey,
+                    mapping(Map.Entry::getValue, toImmutableSet())
+                ))
+            );
+            return new Assets(
+                allItems,
+                itemsByItemLocationBuilder.entrySet().stream()
+                    .collect(createImmutableMapCollector()),
+                itemsByBodyPartBuilder.entrySet().stream()
+                    .collect(createImmutableMapCollector()),
+                itemsByItemTypeBuilder.entrySet().stream()
+                    .collect(createImmutableMapCollector()),
+                itemsByCraftbookBuilder.entrySet().stream()
+                    .collect(createImmutableMapCollector()),
+                craftableItems,
+                wearableItemsBuilder.build(),
+                craftableItemsByRecipe);
+        }
+
+        private static <K extends Enum<K>, V, T extends Map.Entry<K, ImmutableSet.Builder<V>>>
+        Collector<T, ?, ImmutableMap<K, Set<V>>> createImmutableMapCollector() {
+            return toImmutableEnumMap(Map.Entry::getKey, entry -> entry.getValue().build());
         }
     }
 }

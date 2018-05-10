@@ -15,9 +15,10 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
+import name.maratik.cw.eu.cwshopbot.model.ShopState;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.parser.MessageType;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
-import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.MessageEntity;
@@ -28,6 +29,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.GOLD;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.GOLD_LEN;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA_LEN;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
@@ -37,9 +43,16 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
     private static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
         Comparator.comparing(MessageEntity::getOffset);
 
+    private final ItemSearchService itemSearchService;
+
+    public ShopInfoParser(ItemSearchService itemSearchService) {
+        this.itemSearchService = itemSearchService;
+    }
+
     @Override
     public Optional<ParsedShopInfo> parse(Message message) {
-        if (!message.getText().startsWith("Welcome, to the ")) {
+        String messageText = message.getText();
+        if (messageText == null || !messageText.startsWith("Welcome, to the ")) {
             return Optional.empty();
         }
 
@@ -56,16 +69,21 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
             return Optional.empty();
         }
 
+        ParsedShopInfo.Builder parsedShopInfoBuilder = ParsedShopInfo.builder()
+            .setShopName(shopName.get());
+
         Optional<String> charName = extractBoldText(messageEntityIterator).map(MessageEntity::getText);
         if (!charName.isPresent()) {
             return Optional.empty();
         }
+        parsedShopInfoBuilder.setCharName(charName.get());
 
         Optional<ValueWithNextPointer<ShopState>> shopState = extractBoldText(messageEntityIterator)
             .flatMap(messageEntity -> ValueWithNextPointer.of(messageEntity, ShopState::findByCode));
         if (!shopState.isPresent()) {
             return Optional.empty();
         }
+        parsedShopInfoBuilder.setShopState(shopState.get().getValue());
 
         Optional<String> shopCommand = messageEntities.stream()
             .max(MESSAGE_ENTITY_OFFSET_COMPARATOR)
@@ -76,34 +94,92 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
         if (!shopCommand.isPresent()) {
             return Optional.empty();
         }
+        parsedShopInfoBuilder.setShopCommand(shopCommand.get());
 
-        Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> optionalShopLine;
         int nextPointer = shopState.get().getNextPointer();
-        boolean anyShopLineExists = false;
-        do {
-            optionalShopLine = parseShopLine(message, nextPointer);
-            if (optionalShopLine.isPresent()) {
-                ValueWithNextPointer<ParsedShopInfo.ShopLine> shopLine = optionalShopLine.get();
-                nextPointer = shopLine.getNextPointer();
-                anyShopLineExists = true;
-            }
-        } while (optionalShopLine.isPresent());
-        if (!anyShopLineExists) {
+        nextPointer = indexOfNth(messageText, '\n', nextPointer, 2) + 1;
+        if (nextPointer == 0) {
             return Optional.empty();
         }
+        Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> optionalShopLine = parseShopLine(message, messageEntityIterator, nextPointer);
+        if (!optionalShopLine.isPresent()) {
+            return Optional.empty();
+        }
+        do {
+            ValueWithNextPointer<ParsedShopInfo.ShopLine> shopLine = optionalShopLine.get();
+            if (!shopLine.getValue().getCraftCommand().startsWith(shopCommand.get())) {
+                return Optional.empty();
+            }
+            parsedShopInfoBuilder.addShopLine(shopLine.getValue());
+            nextPointer = shopLine.getNextPointer();
+            optionalShopLine = parseShopLine(message, messageEntityIterator, nextPointer);
+        } while (optionalShopLine.isPresent());
 
-        return shopCommand
-            .map(s -> ParsedShopInfo.builder()
-                .setShopName(shopName.get())
-                .setCharName(charName.get())
-                .setShopCommand(s)
-                .setShopState(shopState.get().getValue())
-                .build()
-            );
+        return Optional.of(parsedShopInfoBuilder.build());
     }
 
-    private static Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> parseShopLine(Message message, int nextPointer) {
-        return Optional.empty();
+    private Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> parseShopLine(Message message, Iterator<MessageEntity> messageEntityIterator, int nextPointer) {
+        String messageText = message.getText();
+        int commaAfterName = messageText.indexOf(',', nextPointer);
+        if (commaAfterName == -1) {
+            return Optional.empty();
+        }
+        String itemName = messageText.substring(nextPointer, commaAfterName);
+        List<Item> foundItems = itemSearchService.findItemByNameList(itemName, false);
+        if (foundItems.size() != 1) {
+            return Optional.empty();
+        }
+        int manaChar = messageText.indexOf(MANA, commaAfterName);
+        if (manaChar == -1) {
+            return Optional.empty();
+        }
+        int mana;
+        try {
+            mana = Integer.parseInt(messageText.substring(commaAfterName + 1, manaChar).trim());
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+        int goldChar = messageText.indexOf(GOLD, manaChar + MANA_LEN);
+        if (goldChar == -1) {
+            return Optional.empty();
+        }
+        int gold;
+        try {
+            gold = Integer.parseInt(messageText.substring(manaChar + MANA_LEN, goldChar).trim());
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+        return extractBotCommand(messageEntityIterator)
+            .filter(messageEntity -> messageEntity.getOffset() >= goldChar + GOLD_LEN)
+            .flatMap(commandEntity -> Optional.of(
+                    messageText.indexOf('\n', commandEntity.getOffset() + commandEntity.getLength())
+                )
+                .filter(nextNewLine -> nextNewLine != -1)
+                .map(nextNewLine -> new ValueWithNextPointer<>(nextNewLine + 1,
+                    ParsedShopInfo.ShopLine.builder()
+                        .setItem(foundItems.get(0))
+                        .setMana(mana)
+                        .setPrice(gold)
+                        .setCraftCommand(commandEntity.getText())
+                        .build()
+                )));
+    }
+
+    private static int indexOfNth(String str, int ch, int startFrom, int n) {
+        if (n <= 0) {
+            return -1;
+        }
+        while (true) {
+            startFrom = str.indexOf(ch, startFrom);
+            if (startFrom == -1) {
+                return -1;
+            }
+            --n;
+            if (n <= 0) {
+                return startFrom;
+            }
+            ++startFrom;
+        }
     }
 
     private static Optional<MessageEntity> extractFromIterator(Iterator<MessageEntity> it,

@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
@@ -53,17 +54,28 @@ public class ItemSearchService {
         if (result.isPresent()) {
             return result;
         }
-        return findByName(search);
+        return findItemByName(search);
     }
 
-    public Optional<String> findByName(String name) {
-        String lowerName = name.toLowerCase();
-        List<Item> items = assets.getAllItems().values().stream()
-            .filter(item -> item.getName().toLowerCase().contains(lowerName))
+    public List<Item> findItemByNameList(String name, boolean ignoreCase) {
+        final String searchName;
+        final Function<Item, String> nameExtractor;
+        if (ignoreCase) {
+            searchName = name.toLowerCase();
+            nameExtractor = Item::getLowerName;
+        } else {
+            searchName = name;
+            nameExtractor = Item::getName;
+        }
+        return assets.getAllItems().values().stream()
+            .filter(item -> nameExtractor.apply(item).contains(searchName))
             .sorted(ITEM_NAME_COMPARATOR)
             .limit(LIST_LIMIT)
             .collect(toImmutableList());
+    }
 
+    public Optional<String> findItemByName(String name) {
+        List<Item> items = findItemByNameList(name, true);
         switch (items.size()) {
             case 0:
                 return Optional.empty();
@@ -208,10 +220,9 @@ public class ItemSearchService {
 
         private ListOutput(List<? extends Item> items) {
             StringBuilder sb = new StringBuilder();
-            items.forEach(item -> {
-                putCommandLink(sb, "/t_" + item.getId())
-                    .append(' ').append(item.getName()).append('\n');
-            });
+            items.forEach(item -> putCommandLink(sb, "/t_" + item.getId())
+                .append(' ').append(item.getName()).append('\n')
+            );
             message = sb.toString();
         }
 

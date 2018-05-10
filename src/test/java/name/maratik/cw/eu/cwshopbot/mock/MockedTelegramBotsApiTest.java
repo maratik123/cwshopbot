@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.mock;
 
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.telegram.telegrambots.TelegramBotsApi;
 
@@ -24,6 +25,12 @@ import org.telegram.telegrambots.TelegramBotsApi;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @RunWith(SpringRunner.class)
+@TestPropertySource(properties = {
+    "name.maratik.cw.eu.cwshopbot.username=testUsername",
+    "name.maratik.cw.eu.cwshopbot.token=testToken",
+    "name.maratik.cw.eu.cwshopbot.admin=123456789",
+    "cwuserid=987654321"
+})
 public abstract class MockedTelegramBotsApiTest {
     @MockBean
     protected TelegramBotsApi telegramBotsApi;

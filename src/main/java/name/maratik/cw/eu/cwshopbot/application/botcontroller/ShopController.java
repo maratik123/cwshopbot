@@ -17,11 +17,11 @@ package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
 import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
+import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.MessageType;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
-import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
-import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
@@ -38,7 +38,6 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -178,9 +177,10 @@ public class ShopController {
             .setText(shopInfo
                 .map(s -> "You've sent shop with name='" + s.getShopName() + "'\n" +
                     "for char='" + s.getCharName() + "'\n" +
-                    "with command='" + s.getShopCommand() + '\'' +
-                    "shop state is: " + s.getShopState().getCode())
-                .orElse("Unknown forward")
+                    "with command='" + s.getShopCommand() + "'\n" +
+                    "shop state is: " + s.getShopState().getCode() + '\n' +
+                    "shop lines is: " + s.getShopLines()
+                ).orElse("Unknown forward")
             );
     }
 

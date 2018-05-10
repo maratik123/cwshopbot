@@ -27,10 +27,8 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @Configuration
-@PropertySource({
-    "file:${HOME}/cwshopbotconfig/auth.properties",
-    "classpath:cwshopbot.properties"
-})
+@PropertySource("classpath:cwshopbot.properties")
+@PropertySource(value = "file:${HOME}/cwshopbotconfig/auth.properties", ignoreResourceNotFound = true)
 @Import({
     InternalConfig.class,
     ExternalConfig.class
