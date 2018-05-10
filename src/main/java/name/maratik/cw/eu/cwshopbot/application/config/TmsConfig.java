@@ -13,15 +13,15 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.httpcontroller;
+package name.maratik.cw.eu.cwshopbot.application.config;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@RestController
-public class HealthController {
-    @GetMapping("/ping")
-    public String ping() {
-        return "OK";
-    }
+/**
+ * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
+ */
+@Configuration
+@EnableScheduling
+public class TmsConfig {
 }

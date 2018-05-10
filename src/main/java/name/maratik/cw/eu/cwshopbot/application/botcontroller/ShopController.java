@@ -13,14 +13,15 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.botcontroller;
+package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
 import com.google.common.cache.Cache;
-import name.maratik.cw.eu.cwshopbot.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
-import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
-import name.maratik.cw.eu.cwshopbot.service.CWParser;
-import name.maratik.cw.eu.cwshopbot.service.ItemSearchService;
+import name.maratik.cw.eu.cwshopbot.model.parser.MessageType;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
+import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
@@ -30,6 +31,8 @@ import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.telegram.telegrambots.api.methods.BotApiMethod;
+import org.telegram.telegrambots.api.methods.ForwardMessage;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
@@ -37,6 +40,7 @@ import org.telegram.telegrambots.api.objects.User;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
@@ -50,25 +54,36 @@ public class ShopController {
     private final Clock clock;
     private final int forwardStaleSec;
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
-    private final CWParser<ShopInfo> shopInfoParser;
+    private final CWParser<ParsedShopInfo> shopInfoParser;
     private final ItemSearchService itemSearchService;
+    private final long adminUserId;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
-                          CWParser<ShopInfo> shopInfoParser, ItemSearchService itemSearchService) {
+                          CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
+                          @Value("${name.maratik.cw.eu.cwshopbot.admin}") long adminUserId) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
         this.itemSearchService = itemSearchService;
+        this.adminUserId = adminUserId;
     }
 
     @TelegramMessage
-    public SendMessage message(long userId, String message) {
+    public BotApiMethod<Message> message(long userId, Message message) {
+        if (Optional.ofNullable(message.getEntities())
+            .map(Collection::stream)
+            .filter(stream -> stream.anyMatch(messageEntity ->
+                MessageType.findByCode(messageEntity.getType()).filter(MessageType.HASHTAG::equals).isPresent() &&
+                    "#bug".equals(messageEntity.getText())
+            )).isPresent()) {
+            return new ForwardMessage(adminUserId, userId, message.getMessageId()).disableNotification();
+        }
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findByCodeThenByName(message)));
+            .setText(getMessage(itemSearchService.findByCodeThenByName(message.getText())));
     }
 
     @SuppressWarnings("MethodMayBeStatic")
@@ -89,7 +104,7 @@ public class ShopController {
 
     @TelegramCommand(
         commands = { "/craftbook_1", "/craftbook_2", "/craftbook_3" },
-        description = "Show craftbook"
+        description = "Show specified craftbook"
     )
     public SendMessage showCraftbook(long userId, TelegramMessageCommand command) {
         Optional<String> result = command.getCommand()
@@ -138,14 +153,15 @@ public class ShopController {
                 );
         }
 
-        Optional<ShopInfo> shopInfo = shopInfoParser.parse(message);
+        Optional<ParsedShopInfo> shopInfo = shopInfoParser.parse(message);
 
         return new SendMessage()
             .setChatId(userId)
             .setText(shopInfo
                 .map(s -> "You've sent shop with name='" + s.getShopName() + "'\n" +
                     "for char='" + s.getCharName() + "'\n" +
-                    "with command='" + s.getShopCommand() + '\'')
+                    "with command='" + s.getShopCommand() + '\'' +
+                    "shop state is: " + s.getShopState().getCode())
                 .orElse("Unknown forward")
             );
     }

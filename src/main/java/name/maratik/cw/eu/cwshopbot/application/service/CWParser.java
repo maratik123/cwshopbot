@@ -13,15 +13,15 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.config;
+package name.maratik.cw.eu.cwshopbot.application.service;
 
-import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
-import org.springframework.context.annotation.Configuration;
+import org.telegram.telegrambots.api.objects.Message;
+
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Configuration
-@EnableTelegramBot
-public class ExternalConfig {
+public interface CWParser<T> {
+    Optional<T> parse(Message message);
 }

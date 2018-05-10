@@ -13,24 +13,15 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.config;
+package name.maratik.cw.eu.cwshopbot.application.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import name.maratik.cw.eu.spring.annotation.EnableTelegramBot;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Documented
-@Qualifier
-public @interface ForwardUser {
+@Configuration
+@EnableTelegramBot
+public class ExternalConfig {
 }

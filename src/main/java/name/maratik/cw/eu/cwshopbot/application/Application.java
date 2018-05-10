@@ -13,10 +13,10 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot;
+package name.maratik.cw.eu.cwshopbot.application;
 
-import name.maratik.cw.eu.cwshopbot.config.ExternalConfig;
-import name.maratik.cw.eu.cwshopbot.config.InternalConfig;
+import name.maratik.cw.eu.cwshopbot.application.config.ExternalConfig;
+import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;

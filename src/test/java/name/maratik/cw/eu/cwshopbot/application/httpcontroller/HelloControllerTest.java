@@ -13,7 +13,7 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.httpcontroller;
+package name.maratik.cw.eu.cwshopbot.application.httpcontroller;
 
 import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
 import org.junit.Test;
@@ -26,17 +26,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(HealthController.class)
-public class HealthControllerTest extends MockedTelegramBotsApiTest {
+@WebMvcTest(HelloController.class)
+public class HelloControllerTest extends MockedTelegramBotsApiTest {
 
     @Autowired
     private MockMvc mvc;
 
     @Test
-    public void testPing() throws Exception {
-        mvc.perform(get("/ping"))
+    public void testIndex() throws Exception {
+        mvc.perform(get("/"))
                 .andDo(log())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string("OK"));
+                .andExpect(content().string("Hello world!"));
     }
 }

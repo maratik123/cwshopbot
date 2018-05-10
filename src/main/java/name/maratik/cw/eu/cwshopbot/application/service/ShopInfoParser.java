@@ -13,9 +13,10 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.service;
+package name.maratik.cw.eu.cwshopbot.application.service;
 
-import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
+import name.maratik.cw.eu.cwshopbot.model.parser.MessageType;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.objects.Message;
@@ -31,20 +32,22 @@ import java.util.function.Function;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Component
-public class ShopInfoParser implements CWParser<ShopInfo> {
+public class ShopInfoParser implements CWParser<ParsedShopInfo> {
 
     private static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
         Comparator.comparing(MessageEntity::getOffset);
 
     @Override
-    public Optional<ShopInfo> parse(Message message) {
+    public Optional<ParsedShopInfo> parse(Message message) {
         if (!message.getText().startsWith("Welcome, to the ")) {
             return Optional.empty();
         }
+
         List<MessageEntity> messageEntities = message.getEntities();
         if (messageEntities == null) {
             return Optional.empty();
         }
+
         Iterator<MessageEntity> messageEntityIterator = messageEntities.stream()
             .sorted(MESSAGE_ENTITY_OFFSET_COMPARATOR)
             .iterator();
@@ -52,23 +55,55 @@ public class ShopInfoParser implements CWParser<ShopInfo> {
         if (!shopName.isPresent()) {
             return Optional.empty();
         }
+
         Optional<String> charName = extractBoldText(messageEntityIterator).map(MessageEntity::getText);
         if (!charName.isPresent()) {
             return Optional.empty();
         }
+
         Optional<ValueWithNextPointer<ShopState>> shopState = extractBoldText(messageEntityIterator)
             .flatMap(messageEntity -> ValueWithNextPointer.of(messageEntity, ShopState::findByCode));
+        if (!shopState.isPresent()) {
+            return Optional.empty();
+        }
+
         Optional<String> shopCommand = messageEntities.stream()
             .max(MESSAGE_ENTITY_OFFSET_COMPARATOR)
-            .map(MessageEntity::getText);
+            .filter(messageEntity ->
+                MessageType.findByCode(messageEntity.getType()).filter(MessageType.BOT_COMMAND::equals).isPresent()
+            ).map(MessageEntity::getText)
+            .filter(s -> s.startsWith("/ws_"));
+        if (!shopCommand.isPresent()) {
+            return Optional.empty();
+        }
+
+        Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> optionalShopLine;
+        int nextPointer = shopState.get().getNextPointer();
+        boolean anyShopLineExists = false;
+        do {
+            optionalShopLine = parseShopLine(message, nextPointer);
+            if (optionalShopLine.isPresent()) {
+                ValueWithNextPointer<ParsedShopInfo.ShopLine> shopLine = optionalShopLine.get();
+                nextPointer = shopLine.getNextPointer();
+                anyShopLineExists = true;
+            }
+        } while (optionalShopLine.isPresent());
+        if (!anyShopLineExists) {
+            return Optional.empty();
+        }
+
         return shopCommand
-            .filter(s -> s.startsWith("/ws_"))
-            .map(s -> ShopInfo.builder()
-                    .setShopName(shopName.get())
-                    .setCharName(charName.get())
-                    .setShopCommand(s)
-                    .build()
+            .map(s -> ParsedShopInfo.builder()
+                .setShopName(shopName.get())
+                .setCharName(charName.get())
+                .setShopCommand(s)
+                .setShopState(shopState.get().getValue())
+                .build()
             );
+    }
+
+    private static Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> parseShopLine(Message message, int nextPointer) {
+        return Optional.empty();
     }
 
     private static Optional<MessageEntity> extractFromIterator(Iterator<MessageEntity> it,
@@ -79,9 +114,9 @@ public class ShopInfoParser implements CWParser<ShopInfo> {
             .flatMap(extractor);
     }
 
-    private static Optional<MessageEntity> extractByType(String type, Iterator<MessageEntity> it) {
+    private static Optional<MessageEntity> extractByType(MessageType messageType, Iterator<MessageEntity> it) {
         return extractFromIterator(it, messageEntity -> {
-            if (type.equals(messageEntity.getType())) {
+            if (MessageType.findByCode(messageEntity.getType()).filter(messageType::equals).isPresent()) {
                 return Optional.of(messageEntity);
             }
             return Optional.empty();
@@ -89,11 +124,11 @@ public class ShopInfoParser implements CWParser<ShopInfo> {
     }
 
     private static Optional<MessageEntity> extractBoldText(Iterator<MessageEntity> it) {
-        return extractByType("bold", it);
+        return extractByType(MessageType.BOLD, it);
     }
 
     private static Optional<MessageEntity> extractBotCommand(Iterator<MessageEntity> it) {
-        return extractByType("bot_command", it).filter(cmd -> cmd.getText().startsWith("/"));
+        return extractByType(MessageType.BOT_COMMAND, it).filter(cmd -> cmd.getText().startsWith("/"));
     }
 
     private static class ValueWithNextPointer<T> {

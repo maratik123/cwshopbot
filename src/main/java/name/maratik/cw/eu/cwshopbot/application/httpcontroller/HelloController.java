@@ -13,15 +13,20 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.config;
+package name.maratik.cw.eu.cwshopbot.application.httpcontroller;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
- */
-@Configuration
-@EnableScheduling
-public class TmsConfig {
+@RestController
+public class HelloController {
+    private static final Logger logger = LogManager.getLogger(HelloController.class);
+
+    @GetMapping("/")
+    public String index() {
+        logger.info("Index is called");
+        return "Hello world!";
+    }
 }

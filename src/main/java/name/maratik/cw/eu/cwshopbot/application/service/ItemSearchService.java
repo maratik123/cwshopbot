@@ -13,7 +13,7 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.service;
+package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;

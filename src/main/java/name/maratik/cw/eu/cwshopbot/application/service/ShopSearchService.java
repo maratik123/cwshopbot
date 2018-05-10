@@ -13,10 +13,10 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.service;
+package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.SearchDescriptor;
-import name.maratik.cw.eu.cwshopbot.model.ShopInfo;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -30,12 +30,12 @@ import static java.util.stream.Collectors.toList;
  */
 @Service
 public class ShopSearchService {
-    private static final Comparator<ShopInfo> NOT_A_MOON_KING_DRIVEN_SORT_ORDER =
-        Comparator.comparing((ShopInfo shopInfo) -> !shopInfo.getShopCommand().equals("/ws_pj3q1"))
-            .thenComparing(ShopInfo::getShopCommand);
+    private static final Comparator<ParsedShopInfo> NOT_A_MOON_KING_DRIVEN_SORT_ORDER =
+        Comparator.comparing((ParsedShopInfo parsedShopInfo) -> !parsedShopInfo.getShopCommand().equals("/ws_pj3q1"))
+            .thenComparing(ParsedShopInfo::getShopCommand);
 
-    public List<ShopInfo> findShop(SearchDescriptor searchDescriptor) {
-        List<ShopInfo> stub = Collections.emptyList();
+    public List<ParsedShopInfo> findShop(SearchDescriptor searchDescriptor) {
+        List<ParsedShopInfo> stub = Collections.emptyList();
         return stub.stream()
             .sorted(NOT_A_MOON_KING_DRIVEN_SORT_ORDER)
             .collect(toList());

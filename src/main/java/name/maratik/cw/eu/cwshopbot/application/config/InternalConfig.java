@@ -13,12 +13,12 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.config;
+package name.maratik.cw.eu.cwshopbot.application.config;
 
 import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import name.maratik.cw.eu.cwshopbot.dao.AssetsDao;
+import name.maratik.cw.eu.cwshopbot.application.dao.AssetsDao;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
