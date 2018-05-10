@@ -80,14 +80,17 @@ public class ShopController {
                 MessageType.findByCode(messageEntity.getType()).filter(MessageType.HASHTAG::equals).isPresent() &&
                     "#bug".equals(messageEntity.getText())
             )).isPresent()) {
-            int messageId = message.getMessageId();
+            Integer messageId = message.getMessageId();
             try {
+                if (messageId == null) {
+                    throw new Exception("Unsupported message with null messageId");
+                }
                 client.execute(new ForwardMessage(adminUserId, userId, messageId).disableNotification());
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)
                     .setText("This message was sent to devs");
-            } catch (TelegramApiException e) {
+            } catch (Exception e) {
                 logger.error("Error on send #bug forward", e);
                 return new SendMessage()
                     .setChatId(userId)
