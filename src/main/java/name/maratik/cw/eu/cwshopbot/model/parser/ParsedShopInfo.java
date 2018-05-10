@@ -80,7 +80,7 @@ public class ParsedShopInfo {
         private String shopName;
         private String shopCommand;
         private ShopState shopState;
-        private ImmutableList.Builder<ShopLine> shopLines;
+        private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
         public Builder setCharName(String charName) {
             this.charName = charName;
