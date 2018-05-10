@@ -204,7 +204,7 @@ public class ItemSearchService {
                 visit((Item) craftableItem);
 
                 sb.append('\n')
-                    .append("To view recipe click: ");
+                    .append("View item recipe: ");
                 putCommandLink(sb, "/view_" + craftableItem.getId()).append('\n')
                     .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
                     .append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n')
