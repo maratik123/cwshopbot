@@ -101,7 +101,8 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
         if (nextPointer == 0) {
             return Optional.empty();
         }
-        Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> optionalShopLine = parseShopLine(message, messageEntityIterator, nextPointer);
+        Optional<ValueWithNextPointer<ParsedShopInfo.ShopLine>> optionalShopLine =
+            parseShopLine(message, messageEntityIterator, nextPointer);
         if (!optionalShopLine.isPresent()) {
             return Optional.empty();
         }
@@ -191,12 +192,9 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
     }
 
     private static Optional<MessageEntity> extractByType(MessageType messageType, Iterator<MessageEntity> it) {
-        return extractFromIterator(it, messageEntity -> {
-            if (MessageType.findByCode(messageEntity.getType()).filter(messageType::equals).isPresent()) {
-                return Optional.of(messageEntity);
-            }
-            return Optional.empty();
-        });
+        return extractFromIterator(it, messageEntity -> Optional.of(messageEntity)
+            .filter(msgEntity -> MessageType.findByCode(msgEntity.getType()).filter(messageType::equals).isPresent())
+        );
     }
 
     private static Optional<MessageEntity> extractBoldText(Iterator<MessageEntity> it) {

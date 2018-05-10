@@ -23,10 +23,13 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -111,6 +114,22 @@ public class ItemSearchService {
             .map(SearchOutput::getMessage);
     }
 
+    public Optional<String> findRecipeByIncludedItem(String code) {
+        Set<CraftableItem> items = Optional.ofNullable(assets.getCraftableItemsByRecipe().get(code))
+            .orElseGet(Collections::emptySet);
+        switch (items.size()) {
+            case 0:
+                return Optional.empty();
+            case 1:
+                return items.stream()
+                    .findAny()
+                    .map(RecipeOutput::new)
+                    .map(SearchOutput::getMessage);
+            default:
+                return Optional.of(new ListRecipes(items).getMessage());
+        }
+    }
+
     private interface SearchOutput {
         String getMessage();
     }
@@ -144,7 +163,7 @@ public class ItemSearchService {
         }
     }
 
-    private static class ItemOutput implements SearchOutput {
+    private class ItemOutput implements SearchOutput {
         private final String message;
 
         private ItemOutput(Item item) {
@@ -158,7 +177,7 @@ public class ItemSearchService {
             return message;
         }
 
-        private static class MessageConstructor implements Item.Visitor {
+        private class MessageConstructor implements Item.Visitor {
             private final StringBuilder sb;
 
             private MessageConstructor(StringBuilder sb) {
@@ -173,6 +192,10 @@ public class ItemSearchService {
                 if (item.isTradeable()) {
                     sb.append("Can be exchanged using ");
                     putCommandLink(sb, "/t_" + item.getId()).append(" command\n");
+                }
+                if (assets.getCraftableItemsByRecipe().containsKey(item.getId())) {
+                    sb.append("View recipes with item: ");
+                    putCommandLink(sb, "/rview_" + item.getId()).append('\n');
                 }
             }
 
@@ -223,6 +246,25 @@ public class ItemSearchService {
             items.forEach(item -> putCommandLink(sb, "/t_" + item.getId())
                 .append(' ').append(item.getName()).append('\n')
             );
+            message = sb.toString();
+        }
+
+        @Override
+        public String getMessage() {
+            return message;
+        }
+    }
+
+    private static class ListRecipes implements SearchOutput {
+        private final String message;
+
+        public ListRecipes(Collection<CraftableItem> items) {
+            StringBuilder sb = new StringBuilder();
+            items.stream()
+                .sorted(ITEM_NAME_COMPARATOR)
+                .forEach(item -> putCommandLink(sb, "/view_" + item.getId())
+                    .append(' ').append(item.getName()).append('\n')
+                );
             message = sb.toString();
         }
 

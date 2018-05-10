@@ -82,7 +82,7 @@ public class ShopController {
             Integer messageId = message.getMessageId();
             try {
                 if (messageId == null) {
-                    throw new Exception("Unsupported message with null messageId");
+                    throw new Exception("Unsupported message");
                 }
                 client.execute(new ForwardMessage(adminUserId, userId, messageId).disableNotification());
                 return new SendMessage()
@@ -146,6 +146,14 @@ public class ShopController {
             .setText(getMessage(itemSearchService.findRecipeByCode(message.getText().substring(6))));
     }
 
+    @TelegramCommand(commands = "/rview_*", description = "Find recipes for item included")
+    public SendMessage reverseRecipeSearch(long userId, Message message) {
+        return new SendMessage()
+            .setChatId(userId)
+            .enableMarkdown(true)
+            .setText(getMessage(itemSearchService.findRecipeByIncludedItem(message.getText().substring(7))));
+    }
+
     @TelegramForward("${cwuserid}")
     public SendMessage forward(Update update, String messageText, User user, long userId, Instant forwardTime,
                                Message message) {
@@ -180,7 +188,7 @@ public class ShopController {
                     "with command='" + s.getShopCommand() + "'\n" +
                     "shop state is: " + s.getShopState().getCode() + '\n' +
                     "shop lines is: " + s.getShopLines()
-                ).orElse("Unknown forward")
+                ).orElse("Unsupported forward")
             );
     }
 
