@@ -140,7 +140,8 @@ public class ItemSearchService {
         private RecipeOutput(CraftableItem craftableItem) {
             Map<String, Integer> recipe = craftableItem.getRecipe();
             StringBuilder sb = new StringBuilder("Recipe for: *")
-                .append(craftableItem.getName()).append("*\n")
+                .append(craftableItem.getName()).append("* (");
+            putCommandLink(sb, "/t_" + craftableItem.getId()).append(")\n")
                 .append(MANA + " cost: ").append(craftableItem.getMana()).append("\n\n");
             recipe.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
