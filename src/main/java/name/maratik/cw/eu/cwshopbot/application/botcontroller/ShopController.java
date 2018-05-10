@@ -71,7 +71,7 @@ public class ShopController {
     }
 
     @TelegramMessage
-    public BotApiMethod<Message> message(long userId, Message message) {
+    public BotApiMethod<?> message(long userId, Message message) {
         if (Optional.ofNullable(message.getEntities())
             .map(Collection::stream)
             .filter(stream -> stream.anyMatch(messageEntity ->

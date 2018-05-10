@@ -126,17 +126,15 @@ public abstract class TelegramBotService implements AutoCloseable {
                 if (commandHandler.getTelegramCommand().filter(TelegramCommand::isHelp).isPresent()) {
                     sendHelpList(update);
                 } else {
-                    Type methodGenericReturnType = method.getGenericReturnType();
-                    logger.debug("Derived method return type: {}", methodGenericReturnType);
-                    if (methodGenericReturnType == void.class) {
+                    Type methodReturnType = method.getReturnType();
+                    logger.debug("Derived method return type: {}", methodReturnType);
+                    if (methodReturnType == void.class) {
                         method.invoke(commandHandler.getBean(), arguments);
-                    } else if (methodGenericReturnType instanceof Class<?> &&
-                        BotApiMethod.class.isAssignableFrom((Class<?>) methodGenericReturnType)) {
+                    } else if (methodReturnType != null &&
+                        BotApiMethod.class.isAssignableFrom((Class<?>) methodReturnType)) {
                         return Optional.ofNullable((BotApiMethod<?>) method.invoke(commandHandler.getBean(), arguments));
                     } else {
-                        logger.error("Unsupported handler '{}' return type: {}",
-                            commandHandler, methodGenericReturnType
-                        );
+                        logger.error("Unsupported handler '{}'", commandHandler);
                     }
                 }
             } catch (Exception e) {
