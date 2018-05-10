@@ -207,7 +207,9 @@ public class ItemSearchService {
                     .append("To view recipe click: ");
                 putCommandLink(sb, "/view_" + craftableItem.getId()).append('\n')
                     .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
-                    .append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n');
+                    .append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n')
+                    .append("Find shops with item: ");
+                putCommandLink(sb, "/shop_" + craftableItem.getId()).append('\n');
             }
 
             @Override
