@@ -261,12 +261,14 @@ public class ItemSearchService {
     private static class ListRecipes implements SearchOutput {
         private final String message;
 
-        public ListRecipes(Collection<CraftableItem> items) {
-            StringBuilder sb = new StringBuilder();
+        public ListRecipes(Item item, Collection<CraftableItem> items) {
+            StringBuilder sb = new StringBuilder()
+                .append("Recipe list for *").append(item.getName()).append("* (");
+            putCommandLink(sb, "/t_" + item.getId()).append(")\n\n");
             items.stream()
                 .sorted(ITEM_NAME_COMPARATOR)
-                .forEach(item -> putCommandLink(sb, "/view_" + item.getId())
-                    .append(' ').append(item.getName()).append('\n')
+                .forEach(craftableItem -> putCommandLink(sb, "/view_" + craftableItem.getId())
+                    .append(' ').append(craftableItem.getName()).append('\n')
                 );
             message = sb.toString();
         }
