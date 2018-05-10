@@ -37,6 +37,8 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
+import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -71,14 +73,27 @@ public class ShopController {
     }
 
     @TelegramMessage
-    public BotApiMethod<?> message(long userId, Message message) {
+    public BotApiMethod<?> message(long userId, Message message, DefaultAbsSender client) {
         if (Optional.ofNullable(message.getEntities())
             .map(Collection::stream)
             .filter(stream -> stream.anyMatch(messageEntity ->
                 MessageType.findByCode(messageEntity.getType()).filter(MessageType.HASHTAG::equals).isPresent() &&
                     "#bug".equals(messageEntity.getText())
             )).isPresent()) {
-            return new ForwardMessage(adminUserId, userId, message.getMessageId()).disableNotification();
+            int messageId = message.getMessageId();
+            try {
+                client.execute(new ForwardMessage(adminUserId, userId, messageId).disableNotification());
+                return new SendMessage()
+                    .setChatId(userId)
+                    .setReplyToMessageId(messageId)
+                    .setText("This message was sent to devs");
+            } catch (TelegramApiException e) {
+                logger.error("Error on send #bug forward", e);
+                return new SendMessage()
+                    .setChatId(userId)
+                    .setReplyToMessageId(messageId)
+                    .setText("Something gets wrong");
+            }
         }
         return new SendMessage()
             .setChatId(userId)
