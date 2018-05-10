@@ -237,7 +237,7 @@ equipment:
       k06: 3
       31: 12
       15: 3
-      27: 3
+      28: 3
       16: 5
   a28:
     name: Order Helmet
@@ -252,7 +252,7 @@ equipment:
       r07: 1
       31: 9
       15: 1
-      27: 2
+      28: 2
       16: 3
   a29:
     name: Order Boots
@@ -266,7 +266,7 @@ equipment:
       k08: 3
       r08: 1
       31: 7
-      27: 1
+      28: 1
       16: 1
   a30:
     name: Order Gauntlets
@@ -280,7 +280,7 @@ equipment:
       k09: 3
       r09: 1
       31: 7
-      27: 1
+      28: 1
       16: 1
   a31:
     name: Order Shield
@@ -293,7 +293,7 @@ equipment:
       k10: 3
       r10: 1
       25: 15
-      27: 1
+      28: 1
   a32:
     name: Hunter Armor
     type: light armor
@@ -307,7 +307,7 @@ equipment:
       20: 24
       31: 12
       15: 3
-      27: 3
+      28: 3
       16: 5
   a33:
     name: Hunter Helmet
@@ -322,7 +322,7 @@ equipment:
       20: 18
       31: 9
       15: 1
-      27: 2
+      28: 2
       16: 3
   a34:
     name: Hunter Boots
@@ -336,7 +336,7 @@ equipment:
       r13: 1
       20: 12
       31: 7
-      27: 1
+      28: 1
       16: 1
   a35:
     name: Hunter Gloves
@@ -350,7 +350,7 @@ equipment:
       r14: 1
       20: 12
       31: 7
-      27: 1
+      28: 1
       16: 1
   a36:
     name: Clarity Robe
@@ -366,7 +366,7 @@ equipment:
       20: 15
       31: 12
       15: 5
-      27: 1
+      28: 1
       16: 7
   a37:
     name: Clarity Circlet
@@ -382,7 +382,7 @@ equipment:
       20: 9
       31: 9
       15: 3
-      27: 2
+      28: 2
       16: 5
   a38:
     name: Clarity Shoes
@@ -398,7 +398,7 @@ equipment:
       20: 7
       31: 5
       15: 1
-      27: 1
+      28: 1
       16: 3
   a39:
     name: Clarity Bracers
@@ -414,7 +414,7 @@ equipment:
       20: 7
       31: 5
       15: 1
-      27: 1
+      28: 1
       16: 3
   w28:
     name: Champion Sword
