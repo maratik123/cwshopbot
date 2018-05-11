@@ -207,7 +207,7 @@ equipment:
     wear: secondary hand
     recipe:
       23: 1
-      05: 5
+      02: 5
   505:
     name: Wooden arrows pack
     mana: 80
