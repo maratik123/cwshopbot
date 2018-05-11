@@ -19,7 +19,11 @@ package name.maratik.cw.eu.cwshopbot.util;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class Utils {
-    public static StringBuilder putCommandLink(StringBuilder sb, String command) {
-        return sb.append('[').append(command).append("](").append(command).append(')');
+    public static StringBuilder putCommandLink(StringBuilder sb, String commandPrefix, String id, boolean prefixInDesc) {
+        sb.append('[');
+        if (prefixInDesc) {
+            sb.append(commandPrefix);
+        }
+        return sb.append(id).append("](").append(commandPrefix).append(id).append(')');
     }
 }

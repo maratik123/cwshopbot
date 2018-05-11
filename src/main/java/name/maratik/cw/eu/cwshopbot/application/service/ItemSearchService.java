@@ -126,7 +126,8 @@ public class ItemSearchService {
                     .map(RecipeOutput::new)
                     .map(SearchOutput::getMessage);
             default:
-                return Optional.of(new ListRecipes(items).getMessage());
+                Optional<Item> item = Optional.ofNullable(assets.getAllItems().get(code));
+                return Optional.of(new ListRecipes(item, items).getMessage());
         }
     }
 
@@ -141,7 +142,7 @@ public class ItemSearchService {
             Map<String, Integer> recipe = craftableItem.getRecipe();
             StringBuilder sb = new StringBuilder("Recipe for: *")
                 .append(craftableItem.getName()).append("* (");
-            putCommandLink(sb, "/t_" + craftableItem.getId()).append(")\n")
+            putCommandLink(sb, "/t_", craftableItem.getId(), true).append(")\n")
                 .append(MANA + " cost: ").append(craftableItem.getMana()).append("\n\n");
             recipe.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
@@ -152,7 +153,7 @@ public class ItemSearchService {
                 .forEach(entry -> {
                     Item item = entry.getKey();
                     sb.append(item.getName()).append(" (");
-                    putCommandLink(sb, "/a_" + item.getId())
+                    putCommandLink(sb, "/a_", item.getId(), true)
                         .append(") x ").append(entry.getValue()).append('\n');
                 });
             message = sb.toString();
@@ -192,11 +193,11 @@ public class ItemSearchService {
                     .append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
                 if (item.isTradeable()) {
                     sb.append("Can be exchanged using ");
-                    putCommandLink(sb, "/t_" + item.getId()).append(" command\n");
+                    putCommandLink(sb, "/t_", item.getId(), true).append(" command\n");
                 }
                 if (assets.getCraftableItemsByRecipe().containsKey(item.getId())) {
                     sb.append("View recipes with item: ");
-                    putCommandLink(sb, "/rview_" + item.getId()).append('\n');
+                    putCommandLink(sb, "/rview_", item.getId(), true).append('\n');
                 }
             }
 
@@ -206,11 +207,13 @@ public class ItemSearchService {
 
                 sb.append('\n')
                     .append("View item recipe: ");
-                putCommandLink(sb, "/view_" + craftableItem.getId()).append('\n')
+                putCommandLink(sb, "/view_", craftableItem.getId(), true).append('\n')
                     .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
-                    .append("Craftbook: ").append(craftableItem.getCraftbook().getCode()).append('\n')
+                    .append("Craftbook: ");
+                putCommandLink(sb, "/craftbook_", craftableItem.getCraftbook().getCode(), false)
+                    .append('\n')
                     .append("Find shops with item: ");
-                putCommandLink(sb, "/shop_" + craftableItem.getId()).append('\n');
+                putCommandLink(sb, "/shop_", craftableItem.getId(), true).append('\n');
             }
 
             @Override
@@ -246,7 +249,7 @@ public class ItemSearchService {
 
         private ListOutput(List<? extends Item> items) {
             StringBuilder sb = new StringBuilder();
-            items.forEach(item -> putCommandLink(sb, "/t_" + item.getId())
+            items.forEach(item -> putCommandLink(sb, "/t_", item.getId(), true)
                 .append(' ').append(item.getName()).append('\n')
             );
             message = sb.toString();
@@ -261,13 +264,15 @@ public class ItemSearchService {
     private static class ListRecipes implements SearchOutput {
         private final String message;
 
-        public ListRecipes(Item item, Collection<CraftableItem> items) {
-            StringBuilder sb = new StringBuilder()
-                .append("Recipe list for *").append(item.getName()).append("* (");
-            putCommandLink(sb, "/t_" + item.getId()).append(")\n\n");
+        public ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
+            StringBuilder sb = new StringBuilder();
+            optionalItem.ifPresent(item -> {
+                sb.append("Recipe list for *").append(item.getName()).append("* (");
+                putCommandLink(sb, "/t_", item.getId(), true).append(")\n\n");
+            });
             items.stream()
                 .sorted(ITEM_NAME_COMPARATOR)
-                .forEach(craftableItem -> putCommandLink(sb, "/view_" + craftableItem.getId())
+                .forEach(craftableItem -> putCommandLink(sb, "/view_", craftableItem.getId(), true)
                     .append(' ').append(craftableItem.getName()).append('\n')
                 );
             message = sb.toString();
