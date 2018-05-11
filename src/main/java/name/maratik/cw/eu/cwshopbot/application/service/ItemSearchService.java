@@ -140,7 +140,7 @@ public class ItemSearchService {
 
         private RecipeOutput(CraftableItem craftableItem) {
             Map<String, Integer> recipe = craftableItem.getRecipe();
-            StringBuilder sb = new StringBuilder("Recipe for: *")
+            StringBuilder sb = new StringBuilder("Recipe for *")
                 .append(craftableItem.getName()).append("* (");
             putCommandLink(sb, "/t_", craftableItem.getId()).append(")\n")
                 .append(MANA + " cost: ").append(craftableItem.getMana()).append("\n\n");
@@ -267,7 +267,7 @@ public class ItemSearchService {
         public ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
             StringBuilder sb = new StringBuilder();
             optionalItem.ifPresent(item -> {
-                sb.append("Recipe list for *").append(item.getName()).append("* (");
+                sb.append("Recipe list with *").append(item.getName()).append("* (");
                 putCommandLink(sb, "/t_", item.getId()).append(")\n\n");
             });
             items.stream()
