@@ -77,7 +77,7 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
 
     @Test
     public void shouldAllItemsHaveConsistentId() {
-        BiConsumer<String, Item> checker = (id, item) -> assertEquals(id, item.getId());
+        BiConsumer<String, Item> checker = (id, item) -> assertEquals("id=" + id + ", item=" + item, id, item.getId());
         assets.getAllItems().forEach(checker);
         assets.getCraftableItems().forEach(checker);
         assets.getWearableItems().forEach(checker);
@@ -132,13 +132,13 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
     public void shouldAllRecipeQuantityPositive() {
         assets.getCraftableItems().values().stream()
             .flatMap(craftableItem -> craftableItem.getRecipe().values().stream())
-            .forEach(quantity -> assertTrue(quantity > 0));
+            .forEach(quantity -> assertTrue(quantity + " failed", quantity > 0));
     }
 
     @Test
     public void shouldAllWearableConsistentWithItemClass() {
         assets.getWearableItems().values()
-            .forEach(wearableItem -> assertEquals(
+            .forEach(wearableItem -> assertEquals(wearableItem + " failed",
                 wearableItem.getItemType().getItemClass(),
                 wearableItem.getBodyPart().getItemClass()
             ));
@@ -148,7 +148,7 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
     public void shouldAllManaPositive() {
         assets.getCraftableItems().values().stream()
             .map(CraftableItem::getMana)
-            .forEach(mana -> assertTrue(mana > 0));
+            .forEach(mana -> assertTrue(mana + " failed",mana > 0));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
                 wearableItem.getDefence(),
                 wearableItem.getManaboost()
             ))
-            .forEach(param -> assertTrue(param >= 0));
+            .forEach(param -> assertTrue(param + " failed", param >= 0));
     }
 
     @Test
@@ -168,10 +168,21 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
         assets.getWearableItems().values().stream()
             .filter(wearableItem -> wearableItem.getItemLocation() == ItemLocation.EQUIPMENT)
             .filter(wearableItem -> !arrowsPackAndTool.contains(wearableItem.getItemType()))
-            .forEach(wearableItem -> assertTrue(
+            .forEach(wearableItem -> assertTrue(wearableItem + " failed",
                 wearableItem.getAttack() > 0 ||
                 wearableItem.getDefence() > 0 ||
                 wearableItem.getManaboost() > 0
             ));
+    }
+
+    @Test
+    public void shouldAllStockAndCraftingItemsInRecipes() {
+        Stream.of(ItemLocation.STOCK, ItemLocation.CRAFTING)
+            .map(assets.getItemsByItemLocation()::get)
+            .flatMap(Collection::stream)
+            .map(Item::getId)
+            .forEach(id ->
+                assertTrue(id + " not in recpies", assets.getCraftableItemsByRecipe().containsKey(id))
+            );
     }
 }
