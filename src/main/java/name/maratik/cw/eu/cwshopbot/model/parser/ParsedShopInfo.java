@@ -32,7 +32,8 @@ public class ParsedShopInfo {
     private final ShopState shopState;
     private final List<ShopLine> shopLines;
 
-    public ParsedShopInfo(String shopName, String charName, String shopCommand, ShopState shopState, List<ShopLine> shopLines) {
+    private ParsedShopInfo(String shopName, String charName, String shopCommand, ShopState shopState,
+                           List<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName);
         this.charName = Objects.requireNonNull(charName);
         this.shopCommand = Objects.requireNonNull(shopCommand);
@@ -82,6 +83,7 @@ public class ParsedShopInfo {
         private ShopState shopState;
         private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
+        @SuppressWarnings("UnusedReturnValue")
         public Builder setCharName(String charName) {
             this.charName = charName;
             return this;
@@ -92,16 +94,19 @@ public class ParsedShopInfo {
             return this;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         public Builder setShopCommand(String shopCommand) {
             this.shopCommand = shopCommand;
             return this;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         public Builder setShopState(ShopState shopState) {
             this.shopState = shopState;
             return this;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         public Builder addShopLine(ShopLine shopLine) {
             shopLines.add(shopLine);
             return this;
@@ -118,6 +123,7 @@ public class ParsedShopInfo {
         private final int price;
         private final String craftCommand;
 
+        @SuppressWarnings("WeakerAccess")
         public ShopLine(Item item, int mana, int price, String craftCommand) {
             this.item = Objects.requireNonNull(item);
             this.mana = mana;

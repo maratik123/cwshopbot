@@ -20,7 +20,7 @@ package name.maratik.cw.eu.spring.config;
  */
 public class TelegramBotBuilder {
 
-    public static final int DEFAULT_MAX_THREADS = 30;
+    private static final int DEFAULT_MAX_THREADS = 30;
 
     private String username;
     private String token;
@@ -45,11 +45,13 @@ public class TelegramBotBuilder {
         return this;
     }
 
+    @SuppressWarnings("unused")
     public TelegramBotBuilder path(String path) {
         this.path = path;
         return this;
     }
 
+    @SuppressWarnings("unused")
     public TelegramBotBuilder maxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         return this;

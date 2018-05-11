@@ -202,6 +202,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             .toArray();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void addHandler(Object bean, Method method) {
         TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(method, TelegramCommand.class);
         if (command != null) {
@@ -217,10 +218,12 @@ public abstract class TelegramBotService implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void addDefaultMessageHandler(Object bean, Method method) {
         defaultMessageHandler = new TelegramHandler(bean, method, null);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void addForwardMessageHandler(Object bean, Method method) {
         TelegramForward forward = AnnotatedElementUtils.findMergedAnnotation(method, TelegramForward.class);
         if (forward != null) {
@@ -265,6 +268,7 @@ public abstract class TelegramBotService implements AutoCloseable {
     public void close() {
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void addHelpPrefixMethod(Object bean, Method method) {
         try {
             prefixHelpMessage = (String) method.invoke(bean);

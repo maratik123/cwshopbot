@@ -28,9 +28,10 @@ public class WearableItem extends CraftableItem {
     private final int defence;
     private final int manaboost;
 
-    public WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<String, Integer> recipe,
-                        int mana, Craftbook craftbook, ItemType itemType, BodyPart bodyPart, int attack, int defence,
-                        int manaboost) {
+    @SuppressWarnings("WeakerAccess")
+    protected WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<String, Integer> recipe,
+                           int mana, Craftbook craftbook, ItemType itemType, BodyPart bodyPart, int attack, int defence,
+                           int manaboost) {
         super(id, name, itemLocation, tradeable, recipe, mana, craftbook);
         this.itemType = Objects.requireNonNull(itemType);
         this.bodyPart = Objects.requireNonNull(bodyPart);
@@ -105,10 +106,15 @@ public class WearableItem extends CraftableItem {
 
     public abstract static class AbstractWearableItemBuilder<T extends AbstractWearableItemBuilder<T, R>, R extends WearableItem>
         extends AbstractCraftableItemBuilder<T, R> {
+        @SuppressWarnings("WeakerAccess")
         protected ItemType itemType;
+        @SuppressWarnings("WeakerAccess")
         protected BodyPart bodyPart;
+        @SuppressWarnings("WeakerAccess")
         protected int attack;
+        @SuppressWarnings("WeakerAccess")
         protected int defence;
+        @SuppressWarnings("WeakerAccess")
         protected int manaboost;
 
         public T setItemType(ItemType itemType) {

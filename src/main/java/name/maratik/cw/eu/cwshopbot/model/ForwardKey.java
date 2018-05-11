@@ -26,7 +26,7 @@ public class ForwardKey {
     private final Instant timestamp;
     private final String message;
 
-    public ForwardKey(Instant timestamp, String message) {
+    private ForwardKey(Instant timestamp, String message) {
         this.timestamp = timestamp;
         this.message = message;
     }

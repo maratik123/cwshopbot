@@ -19,7 +19,5 @@ package name.maratik.cw.eu.cwshopbot.model.cwasset;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public enum ItemClass {
-    PRIMARY_WEAPON,
-    SECONDARY_WEAPON,
-    ARMOR;
+    PRIMARY_WEAPON, SECONDARY_WEAPON, ARMOR
 }

@@ -64,6 +64,7 @@ public class AssetsDao {
         );
     }
 
+    @SuppressWarnings("WeakerAccess")
     public AssetsDto getAssetsDto() {
         return assetsDto;
     }
@@ -162,6 +163,7 @@ public class AssetsDao {
             this.craftbook = craftbook;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public Map<String, AssetsPartDto> getAssetsPartMap() {
             return assetsPartMap;
         }
@@ -185,6 +187,7 @@ public class AssetsDao {
         private boolean tradeable;
         private final Map<String, ResourceItem> items = new HashMap<>();
 
+        @SuppressWarnings("WeakerAccess")
         public boolean isTradeable() {
             return tradeable;
         }
@@ -193,6 +196,7 @@ public class AssetsDao {
             this.tradeable = tradeable;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public Map<String, ResourceItem> getItems() {
             return items;
         }
@@ -225,6 +229,7 @@ public class AssetsDao {
             this.mana = mana;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public Set<String> getItems() {
             return items;
         }
@@ -245,21 +250,21 @@ public class AssetsDao {
     public static class ResourceItem {
         @JsonProperty(required = true)
         private String name;
-        @JsonProperty(required = false)
+        @JsonProperty
         private Boolean tradeable;
-        @JsonProperty(required = false)
+        @JsonProperty
         private Map<String, Integer> recipe;
-        @JsonProperty(required = false)
+        @JsonProperty
         private Integer mana;
-        @JsonProperty(required = false)
+        @JsonProperty
         private ItemType type;
-        @JsonProperty(required = false)
+        @JsonProperty
         private BodyPart wear;
-        @JsonProperty(required = false, defaultValue = "0")
+        @JsonProperty(defaultValue = "0")
         private int att;
-        @JsonProperty(required = false, defaultValue = "0")
+        @JsonProperty(defaultValue = "0")
         private int def;
-        @JsonProperty(required = false, defaultValue = "0")
+        @JsonProperty(defaultValue = "0")
         private int manaboost;
 
         public String getName() {
@@ -270,6 +275,7 @@ public class AssetsDao {
             this.name = name;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public Boolean getTradeable() {
             return tradeable;
         }
@@ -278,6 +284,7 @@ public class AssetsDao {
             this.tradeable = tradeable;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public Map<String, Integer> getRecipe() {
             return recipe;
         }
@@ -302,6 +309,7 @@ public class AssetsDao {
             this.type = type;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public BodyPart getWear() {
             return wear;
         }
@@ -310,6 +318,7 @@ public class AssetsDao {
             this.wear = wear;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public int getAtt() {
             return att;
         }
@@ -318,6 +327,7 @@ public class AssetsDao {
             this.att = att;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public int getDef() {
             return def;
         }
@@ -326,6 +336,7 @@ public class AssetsDao {
             this.def = def;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public int getManaboost() {
             return manaboost;
         }

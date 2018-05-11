@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Configuration
+@PropertySource("classpath:cwshopbot.properties")
 public class InternalConfig {
     private static final Logger logger = LogManager.getLogger(InternalConfig.class);
 

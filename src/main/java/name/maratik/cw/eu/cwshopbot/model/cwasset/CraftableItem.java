@@ -28,8 +28,9 @@ public class CraftableItem extends Item {
     private final int mana;
     private final Craftbook craftbook;
 
-    public CraftableItem(String id, String name, ItemLocation itemLocation, boolean tradeable,
-                         Map<String, Integer> recipe, int mana, Craftbook craftbook) {
+    @SuppressWarnings("WeakerAccess")
+    protected CraftableItem(String id, String name, ItemLocation itemLocation, boolean tradeable,
+                            Map<String, Integer> recipe, int mana, Craftbook craftbook) {
         super(id, name, itemLocation, tradeable);
         this.recipe = Objects.requireNonNull(recipe);
         this.mana = mana;
@@ -90,10 +91,12 @@ public class CraftableItem extends Item {
 
     public abstract static class AbstractCraftableItemBuilder<T extends AbstractCraftableItemBuilder<T, R>, R extends CraftableItem>
         extends AbstractItemBuilder<T, R> {
+        @SuppressWarnings("WeakerAccess")
         protected final ImmutableMap.Builder<String, Integer> recipeBuilder = ImmutableMap.builder();
         protected int mana;
         protected Craftbook craftbook;
 
+        @SuppressWarnings("unused")
         public T putRecipeItem(String id, int quantity) {
             recipeBuilder.put(id, quantity);
             return getThis();

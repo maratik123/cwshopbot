@@ -17,22 +17,25 @@ package name.maratik.cw.eu.cwshopbot.application;
 
 import name.maratik.cw.eu.cwshopbot.application.config.ExternalConfig;
 import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
+import name.maratik.cw.eu.cwshopbot.application.config.TmsConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @Configuration
-@PropertySource("classpath:cwshopbot.properties")
 @PropertySource(value = "file:${HOME}/cwshopbotconfig/auth.properties", ignoreResourceNotFound = true)
 @Import({
     InternalConfig.class,
-    ExternalConfig.class
+    ExternalConfig.class,
+    TmsConfig.class
 })
+@ComponentScan(excludeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application {
     private static final Logger logger = LogManager.getLogger(Application.class);
 

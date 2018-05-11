@@ -60,6 +60,7 @@ public class ItemSearchService {
         return findItemByName(search);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<Item> findItemByNameList(String name, boolean ignoreCase) {
         final String searchName;
         final Function<Item, String> nameExtractor;
@@ -77,6 +78,7 @@ public class ItemSearchService {
             .collect(toImmutableList());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Optional<String> findItemByName(String name) {
         List<Item> items = findItemByNameList(name, true);
         switch (items.size()) {
@@ -180,6 +182,7 @@ public class ItemSearchService {
         }
 
         private class MessageConstructor implements Item.Visitor {
+            @SuppressWarnings("StringBufferField")
             private final StringBuilder sb;
 
             private MessageConstructor(StringBuilder sb) {

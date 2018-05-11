@@ -15,29 +15,11 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
-import name.maratik.cw.eu.cwshopbot.model.SearchDescriptor;
-import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Service
 public class ShopSearchService {
-    private static final Comparator<ParsedShopInfo> NOT_A_MOON_KING_DRIVEN_SORT_ORDER =
-        Comparator.comparing((ParsedShopInfo parsedShopInfo) -> !parsedShopInfo.getShopCommand().equals("/ws_pj3q1"))
-            .thenComparing(ParsedShopInfo::getShopCommand);
-
-    public List<ParsedShopInfo> findShop(SearchDescriptor searchDescriptor) {
-        List<ParsedShopInfo> stub = Collections.emptyList();
-        return stub.stream()
-            .sorted(NOT_A_MOON_KING_DRIVEN_SORT_ORDER)
-            .collect(toList());
-    }
 }

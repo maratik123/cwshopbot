@@ -166,7 +166,8 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
                 )));
     }
 
-    private static int indexOfNth(String str, int ch, int startFrom, int n) {
+    private static int indexOfNth(String str, @SuppressWarnings("SameParameterValue") int ch, int startFrom,
+                                  @SuppressWarnings("SameParameterValue") int n) {
         if (n <= 0) {
             return -1;
         }
@@ -226,11 +227,11 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
                 ));
         }
 
-        public int getNextPointer() {
+        private int getNextPointer() {
             return nextPointer;
         }
 
-        public T getValue() {
+        private T getValue() {
             return value;
         }
 

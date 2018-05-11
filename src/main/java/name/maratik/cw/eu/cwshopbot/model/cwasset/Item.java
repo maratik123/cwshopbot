@@ -27,7 +27,7 @@ public class Item {
     private final boolean tradeable;
     private final String lowerName;
 
-    public Item(String id, String name, ItemLocation itemLocation, boolean tradeable) {
+    protected Item(String id, String name, ItemLocation itemLocation, boolean tradeable) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.itemLocation = Objects.requireNonNull(itemLocation);
@@ -105,9 +105,12 @@ public class Item {
     }
 
     public abstract static class AbstractItemBuilder<T extends AbstractItemBuilder<T, R>, R extends Item> {
+        @SuppressWarnings("WeakerAccess")
         protected String id;
         protected String name;
+        @SuppressWarnings("WeakerAccess")
         protected ItemLocation itemLocation;
+        @SuppressWarnings("WeakerAccess")
         protected boolean tradeable;
 
         public abstract T getThis();
