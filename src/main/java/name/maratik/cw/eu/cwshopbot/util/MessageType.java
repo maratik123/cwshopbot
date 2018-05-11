@@ -13,11 +13,10 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model.parser;
+package name.maratik.cw.eu.cwshopbot.util;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
 import java.util.Map;
 import java.util.Optional;

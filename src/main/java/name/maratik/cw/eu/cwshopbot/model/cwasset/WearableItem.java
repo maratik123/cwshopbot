@@ -65,6 +65,16 @@ public class WearableItem extends CraftableItem {
     }
 
     @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public String toString() {
         return "WearableItem{" +
             "itemType=" + itemType +
@@ -93,7 +103,7 @@ public class WearableItem extends CraftableItem {
         }
     }
 
-    public abstract static class AbstractWearableItemBuilder<T extends AbstractWearableItemBuilder<T, R>, R>
+    public abstract static class AbstractWearableItemBuilder<T extends AbstractWearableItemBuilder<T, R>, R extends WearableItem>
         extends AbstractCraftableItemBuilder<T, R> {
         protected ItemType itemType;
         protected BodyPart bodyPart;

@@ -66,14 +66,8 @@ public class InternalConfig {
     @Bean
     @ForwardUser
     public Cache<ForwardKey, Long> forwardUserCache(@Value("${forwardStaleSec}") int forwardStaleSec, Clock clock) {
-        Instant zero = Instant.ofEpochSecond(0);
         return CacheBuilder.newBuilder()
-            .ticker(new Ticker() {
-                @Override
-                public long read() {
-                    return zero.until(clock.instant(), ChronoUnit.NANOS);
-                }
-            })
+            .ticker(new CacheTicker(clock))
             .expireAfterWrite(forwardStaleSec, TimeUnit.SECONDS)
             .removalListener(notification -> logger.debug(
                 "Removed forward {} from cache due to {}, evicted = {}",
@@ -87,5 +81,19 @@ public class InternalConfig {
     @Bean
     public Assets assets(ResourceLoader resourceLoader) throws IOException {
         return new AssetsDao(resourceLoader.getResource("classpath:assets/resources.yaml")).createAssets();
+    }
+
+    private static class CacheTicker extends Ticker {
+        private final Instant ZERO = Instant.ofEpochSecond(0);
+        private final Clock clock;
+
+        CacheTicker(Clock clock) {
+            this.clock = clock;
+        }
+
+        @Override
+        public long read() {
+            return ZERO.until(clock.instant(), ChronoUnit.NANOS);
+        }
     }
 }

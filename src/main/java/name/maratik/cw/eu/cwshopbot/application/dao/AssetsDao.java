@@ -111,7 +111,7 @@ public class AssetsDao {
         return result;
     }
 
-    private static <T extends Item.AbstractItemBuilder<T, R>, R>
+    private static <T extends Item.AbstractItemBuilder<T, R>, R extends Item>
     T fillItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation,
                     AssetsPartDto assetsPartDto) {
         return builder
@@ -123,7 +123,7 @@ public class AssetsDao {
             );
     }
 
-    private static <T extends CraftableItem.AbstractCraftableItemBuilder<T, R>, R>
+    private static <T extends CraftableItem.AbstractCraftableItemBuilder<T, R>, R extends CraftableItem>
     T fillCraftableItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation,
                              AssetsPartDto assetsPartDto, Craftbook craftbook, AssetsDto assetsDto,
                              Map<String, Integer> recipe) {
@@ -135,7 +135,7 @@ public class AssetsDao {
             .putAllRecipeItems(recipe);
     }
 
-    private static <T extends WearableItem.AbstractWearableItemBuilder<T, R>, R>
+    private static <T extends WearableItem.AbstractWearableItemBuilder<T, R>, R extends WearableItem>
     T fillWearableItemProps(T builder, String id, ResourceItem resourceItem, ItemLocation itemLocation,
                             AssetsPartDto assetsPartDto, Craftbook craftbook, AssetsDto assetsDto,
                             Map<String, Integer> recipe, ItemType itemType) {

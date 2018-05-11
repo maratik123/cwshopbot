@@ -43,7 +43,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -230,7 +229,11 @@ public abstract class TelegramBotService implements AutoCloseable {
                 defaultForwardHandler = new TelegramHandler(bean, method, null);
             } else {
                 for (String from : fromArr) {
-                    Long parsedFrom = Long.valueOf(Objects.requireNonNull(beanFactory.resolveEmbeddedValue(from)));
+                    String parsedFromStr = beanFactory.resolveEmbeddedValue(from);
+                    if (parsedFromStr == null) {
+                        throw new RuntimeException("NPE in " + from);
+                    }
+                    Long parsedFrom = Long.valueOf(parsedFromStr);
                     //noinspection ObjectAllocationInLoop
                     forwardHandlerList.put(parsedFrom, new TelegramHandler(bean, method, null));
                 }

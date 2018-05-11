@@ -21,11 +21,11 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class Utils {
-    public static StringBuilder putCommandLink(StringBuilder sb, String commandPrefix, Item item) {
-        return putCommandLink(sb, commandPrefix, item.getId());
+    public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, Item item) {
+        return appendCommandLink(sb, commandPrefix, item.getId());
     }
 
-    public static StringBuilder putCommandLink(StringBuilder sb, String commandPrefix, String id) {
+    public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, String id) {
         return sb.append('[').append(commandPrefix).append(id).append("](")
             .append(commandPrefix).append(id).append(')');
     }

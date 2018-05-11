@@ -54,6 +54,16 @@ public class CraftableItem extends Item {
     }
 
     @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public String toString() {
         return "CraftableItem{" +
             "recipe=" + recipe +
@@ -78,7 +88,7 @@ public class CraftableItem extends Item {
         }
     }
 
-    public abstract static class AbstractCraftableItemBuilder<T extends AbstractCraftableItemBuilder<T, R>, R>
+    public abstract static class AbstractCraftableItemBuilder<T extends AbstractCraftableItemBuilder<T, R>, R extends CraftableItem>
         extends AbstractItemBuilder<T, R> {
         protected final ImmutableMap.Builder<String, Integer> recipeBuilder = ImmutableMap.builder();
         protected int mana;

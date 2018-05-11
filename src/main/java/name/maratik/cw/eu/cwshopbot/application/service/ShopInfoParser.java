@@ -17,7 +17,7 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.eu.cwshopbot.model.parser.MessageType;
+import name.maratik.cw.eu.cwshopbot.util.MessageType;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.objects.Message;
@@ -170,16 +170,18 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
         if (n <= 0) {
             return -1;
         }
+        int curPos = startFrom;
+        int i = n;
         while (true) {
-            startFrom = str.indexOf(ch, startFrom);
-            if (startFrom == -1) {
+            curPos = str.indexOf(ch, curPos);
+            if (curPos == -1) {
                 return -1;
             }
-            --n;
-            if (n <= 0) {
-                return startFrom;
+            --i;
+            if (i <= 0) {
+                return curPos;
             }
-            ++startFrom;
+            ++curPos;
         }
     }
 

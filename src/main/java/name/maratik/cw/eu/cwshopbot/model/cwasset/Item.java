@@ -104,7 +104,7 @@ public class Item {
         }
     }
 
-    public abstract static class AbstractItemBuilder<T extends AbstractItemBuilder<T, R>, R> {
+    public abstract static class AbstractItemBuilder<T extends AbstractItemBuilder<T, R>, R extends Item> {
         protected String id;
         protected String name;
         protected ItemLocation itemLocation;
