@@ -16,6 +16,7 @@
 package name.maratik.cw.eu.spring;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.model.TelegramBotCommand;
@@ -44,6 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
@@ -126,12 +128,12 @@ public abstract class TelegramBotService implements AutoCloseable {
                 if (commandHandler.getTelegramCommand().filter(TelegramCommand::isHelp).isPresent()) {
                     sendHelpList(update);
                 } else {
-                    Type methodReturnType = method.getReturnType();
+                    Class<?> methodReturnType = method.getReturnType();
                     logger.debug("Derived method return type: {}", methodReturnType);
-                    if (methodReturnType == void.class) {
+                    if (methodReturnType == void.class || methodReturnType == Void.class) {
                         method.invoke(commandHandler.getBean(), arguments);
                     } else if (methodReturnType != null &&
-                        BotApiMethod.class.isAssignableFrom((Class<?>) methodReturnType)) {
+                        BotApiMethod.class.isAssignableFrom(methodReturnType)) {
                         return Optional.ofNullable((BotApiMethod<?>) method.invoke(commandHandler.getBean(), arguments));
                     } else {
                         logger.error("Unsupported handler '{}'", commandHandler);
@@ -151,16 +153,20 @@ public abstract class TelegramBotService implements AutoCloseable {
         );
     }
 
+    private static final Set<String> LAST_COMMANDS_IN_HELP = ImmutableSet.of("/license", "/help");
+
     private String buildHelpMessage() {
         StringBuilder sb = new StringBuilder();
         if (prefixHelpMessage != null) {
             sb.append(prefixHelpMessage);
         }
         getCommandList()
-            .sorted(Comparator.comparing(
-                (TelegramBotCommand command) -> command.getCommand().equals("/license") ||
-                    command.getCommand().equals("/help")
-                ).thenComparing(TelegramBotCommand::getCommand))
+            .sorted(
+                Comparator.comparing(
+                    TelegramBotCommand::getCommand,
+                    Comparator.comparing(LAST_COMMANDS_IN_HELP::contains)
+                ).thenComparing(TelegramBotCommand::getCommand)
+            )
             .forEach(method -> sb
                 .append(method.getCommand())
                 .append(' ')

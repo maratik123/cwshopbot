@@ -182,7 +182,7 @@ public class AssetsTest extends MockedTelegramBotsApiTest {
             .flatMap(Collection::stream)
             .map(Item::getId)
             .forEach(id ->
-                assertTrue(id + " not in recpies", assets.getCraftableItemsByRecipe().containsKey(id))
+                assertTrue(id + " not in recipes", assets.getCraftableItemsByRecipe().containsKey(id))
             );
     }
 }

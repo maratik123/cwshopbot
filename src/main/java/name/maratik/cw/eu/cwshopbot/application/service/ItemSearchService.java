@@ -149,7 +149,7 @@ public class ItemSearchService {
                     assets.getAllItems().get(entry.getKey()),
                     entry.getValue()
                 ))
-                .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
+                .sorted(Comparator.comparing(Map.Entry::getKey, ITEM_NAME_COMPARATOR))
                 .forEach(entry -> {
                     Item item = entry.getKey();
                     sb.append(item.getName()).append(" (");
@@ -264,7 +264,7 @@ public class ItemSearchService {
     private static class ListRecipes implements SearchOutput {
         private final String message;
 
-        public ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
+        private ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
             StringBuilder sb = new StringBuilder();
             optionalItem.ifPresent(item -> {
                 sb.append("Recipe list with *").append(item.getName()).append("* (");
