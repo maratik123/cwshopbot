@@ -15,10 +15,16 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.util;
 
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class Utils {
+    public static StringBuilder putCommandLink(StringBuilder sb, String commandPrefix, Item item) {
+        return putCommandLink(sb, commandPrefix, item.getId());
+    }
+
     public static StringBuilder putCommandLink(StringBuilder sb, String commandPrefix, String id) {
         return sb.append('[').append(commandPrefix).append(id).append("](")
             .append(commandPrefix).append(id).append(')');
