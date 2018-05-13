@@ -41,7 +41,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -57,13 +56,8 @@ import static name.maratik.cw.eu.cwshopbot.util.Utils.optionalOf;
 public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
 
-    private final Map<OptionalLong, Map<String, TelegramHandler>> commandList = new HashMap<>();
-    private final Map<OptionalLong, Map<String, TelegramHandler>> patternCommandList = new HashMap<>();
-    private final Map<OptionalLong, Map<Long, TelegramHandler>> forwardHandlerList = new HashMap<>();
+    private final Map<OptionalLong, Handlers> handlers = new HashMap<>();
     private final ConfigurableBeanFactory beanFactory;
-    private Map<OptionalLong, TelegramHandler> defaultMessageHandler = new HashMap<>();
-    private Map<OptionalLong, TelegramHandler> defaultForwardHandler = new HashMap<>();
-    private Map<OptionalLong, String> prefixHelpMessage = new HashMap<>();
 
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
 
@@ -100,24 +94,25 @@ public abstract class TelegramBotService implements AutoCloseable {
         TelegramMessageCommand command = new TelegramMessageCommand(update);
         Optional<TelegramHandler> optionalCommandHandler;
         OptionalLong userKey = optionalOf(update.getMessage().getChatId());
+        Handlers handlers = getOrDefault(userKey);
+
         if (command.getForwardedFrom().isPresent()) {
             optionalCommandHandler = Optional.ofNullable(
-                getOrDefault(forwardHandlerList, userKey)
-                    .getOrDefault(command.getForwardedFrom().getAsLong(),
-                        getOrDefault(defaultForwardHandler, userKey)
-                    )
+                handlers.getForwardHandlerList().getOrDefault(command.getForwardedFrom().getAsLong(),
+                    handlers.getDefaultForwardHandler()
+                )
             );
         } else {
-            optionalCommandHandler = command.getCommand().map(cmd -> getOrDefault(commandList, userKey).get(cmd));
+            optionalCommandHandler = command.getCommand().map(cmd -> handlers.getCommandList().get(cmd));
             if (!optionalCommandHandler.isPresent()) {
                 if (command.getCommand().isPresent()) {
-                    optionalCommandHandler = getOrDefault(patternCommandList, userKey).entrySet().stream()
+                    optionalCommandHandler = handlers.getPatternCommandList().entrySet().stream()
                         .filter(entry -> command.getCommand().get().startsWith(entry.getKey()))
                         .map(Map.Entry::getValue)
                         .findFirst();
                 }
                 if (!optionalCommandHandler.isPresent()) {
-                    optionalCommandHandler = Optional.ofNullable(getOrDefault(defaultMessageHandler, userKey));
+                    optionalCommandHandler = Optional.ofNullable(handlers.getDefaultMessageHandler());
                 }
             }
         }
@@ -161,7 +156,7 @@ public abstract class TelegramBotService implements AutoCloseable {
 
     private String buildHelpMessage(OptionalLong userKey) {
         StringBuilder sb = new StringBuilder();
-        String prefixHelpMessage = getOrDefault(this.prefixHelpMessage, userKey);
+        String prefixHelpMessage = getOrDefault(userKey).getPrefixHelpMessage();
         if (prefixHelpMessage != null) {
             sb.append(prefixHelpMessage);
         }
@@ -184,13 +179,13 @@ public abstract class TelegramBotService implements AutoCloseable {
     @SuppressWarnings("WeakerAccess")
     public Stream<TelegramBotCommand> getCommandList(OptionalLong userKey) {
         return Stream.concat(
-            getOrDefault(commandList, userKey).entrySet().stream()
+            getOrDefault(userKey).getCommandList().entrySet().stream()
                 .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
                 .map(entry -> new TelegramBotCommand(
                     entry.getKey(),
                     entry.getValue().getTelegramCommand().map(TelegramCommand::description).orElse("")
                 )),
-            getOrDefault(patternCommandList, userKey).entrySet().stream()
+            getOrDefault(userKey).getPatternCommandList().entrySet().stream()
                 .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
                 .map(entry -> new TelegramBotCommand(
                     entry.getKey() + '*',
@@ -215,11 +210,10 @@ public abstract class TelegramBotService implements AutoCloseable {
             for (String cmd : command.commands()) {
                 TelegramHandler telegramHandler = new TelegramHandler(bean, method, command);
                 if (cmd.endsWith("*")) {
-                    patternCommandList.computeIfAbsent(userId, key -> new LinkedHashMap<>())
+                    createOrGet(userId).getPatternCommandList()
                         .put(cmd.substring(0, cmd.length() - 1), telegramHandler);
                 } else {
-                    commandList.computeIfAbsent(userId, key -> new LinkedHashMap<>())
-                        .put(cmd, telegramHandler);
+                    createOrGet(userId).getCommandList().put(cmd, telegramHandler);
                 }
             }
         }
@@ -227,7 +221,7 @@ public abstract class TelegramBotService implements AutoCloseable {
 
     @SuppressWarnings("WeakerAccess")
     public void addDefaultMessageHandler(Object bean, Method method, OptionalLong userId) {
-        defaultMessageHandler.put(userId, new TelegramHandler(bean, method, null));
+        createOrGet(userId).setDefaultMessageHandler(new TelegramHandler(bean, method, null));
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -236,7 +230,7 @@ public abstract class TelegramBotService implements AutoCloseable {
         if (forward != null) {
             String[] fromArr = forward.from();
             if (fromArr.length == 0) {
-                defaultForwardHandler.put(userId, new TelegramHandler(bean, method, null));
+                createOrGet(userId).setDefaultForwardHandler(new TelegramHandler(bean, method, null));
             } else {
                 for (String from : fromArr) {
                     String parsedFromStr = beanFactory.resolveEmbeddedValue(from);
@@ -245,7 +239,7 @@ public abstract class TelegramBotService implements AutoCloseable {
                     }
                     for (String fromValue : parsedFromStr.split(",")) {
                         Long parsedFrom = Long.valueOf(fromValue);
-                        forwardHandlerList.computeIfAbsent(userId, key -> new LinkedHashMap<>())
+                        createOrGet(userId).getForwardHandlerList()
                             .put(parsedFrom, new TelegramHandler(bean, method, null));
                     }
                 }
@@ -260,7 +254,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(helpMethod, TelegramCommand.class);
             if (command != null) {
                 for (String cmd : command.commands()) {
-                    commandList.computeIfAbsent(userKey, key -> new LinkedHashMap<>())
+                    createOrGet(userKey).getCommandList()
                         .put(cmd, new TelegramHandler(this, helpMethod, command));
                 }
             }
@@ -281,16 +275,69 @@ public abstract class TelegramBotService implements AutoCloseable {
     @SuppressWarnings("WeakerAccess")
     public void addHelpPrefixMethod(Object bean, Method method, OptionalLong userId) {
         try {
-            prefixHelpMessage.put(userId, (String) method.invoke(bean));
+            createOrGet(userId).setPrefixHelpMessage((String) method.invoke(bean));
         } catch (Exception e) {
             logger.error("Can not get help prefix", e);
         }
     }
 
-    private static <T> T getOrDefault(Map<OptionalLong, T> map, OptionalLong key) {
-        if (!map.containsKey(key)) {
-            return map.get(OptionalLong.empty());
+    private Handlers getOrDefault(OptionalLong key) {
+        if (!handlers.containsKey(key)) {
+            return handlers.get(OptionalLong.empty());
         }
-        return map.get(key);
+        return handlers.get(key);
+    }
+
+    private Handlers createOrGet(OptionalLong key) {
+        return handlers.computeIfAbsent(key, Handlers::create);
+    }
+
+    private static class Handlers {
+        private final Map<String, TelegramHandler> commandList = new HashMap<>();
+        private final Map<String, TelegramHandler> patternCommandList = new HashMap<>();
+        private final Map<Long, TelegramHandler> forwardHandlerList = new HashMap<>();
+        private TelegramHandler defaultMessageHandler;
+        private TelegramHandler defaultForwardHandler;
+        private String prefixHelpMessage;
+
+        private static Handlers create(@SuppressWarnings("unused") OptionalLong key) {
+            return new Handlers();
+        }
+
+        private Map<String, TelegramHandler> getCommandList() {
+            return commandList;
+        }
+
+        private Map<String, TelegramHandler> getPatternCommandList() {
+            return patternCommandList;
+        }
+
+        private Map<Long, TelegramHandler> getForwardHandlerList() {
+            return forwardHandlerList;
+        }
+
+        private TelegramHandler getDefaultMessageHandler() {
+            return defaultMessageHandler;
+        }
+
+        private void setDefaultMessageHandler(TelegramHandler defaultMessageHandler) {
+            this.defaultMessageHandler = defaultMessageHandler;
+        }
+
+        private TelegramHandler getDefaultForwardHandler() {
+            return defaultForwardHandler;
+        }
+
+        private void setDefaultForwardHandler(TelegramHandler defaultForwardHandler) {
+            this.defaultForwardHandler = defaultForwardHandler;
+        }
+
+        private String getPrefixHelpMessage() {
+            return prefixHelpMessage;
+        }
+
+        private void setPrefixHelpMessage(String prefixHelpMessage) {
+            this.prefixHelpMessage = prefixHelpMessage;
+        }
     }
 }
