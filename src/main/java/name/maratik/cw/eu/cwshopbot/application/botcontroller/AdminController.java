@@ -19,6 +19,7 @@ import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
+import name.maratik.cw.eu.cwshopbot.application.service.StatsService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
@@ -34,22 +35,24 @@ import java.time.Clock;
  */
 @TelegramBot("${name.maratik.cw.eu.cwshopbot.admin}")
 public class AdminController extends ShopController {
-    private final Cache<ForwardKey, Long> forwardUserCache;
+    private final StatsService statsService;
 
     public AdminController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                            @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                            CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
-                           @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName) {
-        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, devUserId, devUserName);
-        this.forwardUserCache = forwardUserCache;
+                           @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
+                           StatsService statsService) {
+        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, devUserId, devUserName,
+            statsService);
+        this.statsService = statsService;
     }
 
     @TelegramCommand(commands = "/stats", description = "Get statistics")
     public SendMessage getStat(long userId) {
         return new SendMessage()
             .setChatId(userId)
-            .setText("User cache = " + forwardUserCache.stats());
+            .setText(statsService.getMessage());
     }
 
     @SuppressWarnings("MethodMayBeStatic")
