@@ -50,11 +50,11 @@ public class StatsService {
         long freeMemory = runtime.freeMemory();
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
-            "Total memory is " + totalMemory + '\n' +
-            "Free memory is " + freeMemory + '\n' +
-            "Used memory is " + (totalMemory - freeMemory) + '\n' +
+            "Total memory is " + totalMemory + " bytes\n" +
+            "Free memory is " + freeMemory + " bytes\n" +
+            "Used memory is " + (totalMemory - freeMemory) + " bytes\n" +
             "GC count is " + this.gcCount + '\n' +
-            "GC time is " + this.gcTime + '\n';
+            "GC time is " + this.gcTime + " ms\n";
     }
 
     public void setGCCount(long gcCount) {
