@@ -87,10 +87,10 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
 
     private void bindControllers(@NonNull Object bean, String beanName, Class<?> original, OptionalLong userId) {
         if (original != null) {
-            logger.info("Processing class {} as bean for user {}",
+            logger.info("Processing class {} as bean {} for user {}",
                 bean::getClass,  () -> beanName, () -> userId
             );
-            for (Method method : original.getDeclaredMethods()) {
+            for (Method method : original.getMethods()) {
                 logger.info("Found method {}", method::getName);
                 if (AnnotatedElementUtils.hasAnnotation(method, TelegramCommand.class)) {
                     bindCommandController(bean, method, userId);
