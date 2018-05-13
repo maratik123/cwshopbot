@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -44,7 +44,10 @@ public class StatsService {
     }
 
     public String getMessage() {
-        Duration workTime = Duration.between(LocalDate.from(startTime), LocalDate.now(clock));
+        Duration workTime = Duration.between(
+            startTime.atOffset(ZoneOffset.UTC),
+            clock.instant().atOffset(ZoneOffset.UTC)
+        );
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
             "Total memory is " + Runtime.getRuntime().totalMemory() + '\n' +
