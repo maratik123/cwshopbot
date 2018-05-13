@@ -15,9 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
-import com.google.common.cache.Cache;
-import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
-import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -25,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -32,15 +30,14 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class StatsService {
     private final Instant startTime;
-    private final Cache<ForwardKey, Long> forwardUserCache;
     private final Clock clock;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final AtomicLong gcCount = new AtomicLong(0L);
+    private final AtomicLong gcTime = new AtomicLong(0L);
 
-
-    public StatsService(Clock clock, @ForwardUser Cache<ForwardKey, Long> forwardUserCache) {
+    public StatsService(Clock clock) {
         this.clock = clock;
         startTime = clock.instant();
-        this.forwardUserCache = forwardUserCache;
     }
 
     public String getMessage() {
@@ -56,6 +53,15 @@ public class StatsService {
             "Total memory is " + totalMemory + '\n' +
             "Free memory is " + freeMemory + '\n' +
             "Used memory is " + (totalMemory - freeMemory) + '\n' +
-            "Forward user cache stats: " + forwardUserCache.stats() + '\n';
+            "GC count is " + this.gcCount + '\n' +
+            "GC time is " + this.gcTime + '\n';
+    }
+
+    public void setGCCount(long gcCount) {
+        this.gcCount.set(gcCount);
+    }
+
+    public void setGCTime(long gcTime) {
+        this.gcTime.set(gcTime);
     }
 }

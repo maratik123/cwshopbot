@@ -76,7 +76,6 @@ public class InternalConfig {
                 notification::toString, notification::getCause, notification::wasEvicted
             ))
             .maximumSize(1000)
-            .recordStats()
             .build();
     }
 

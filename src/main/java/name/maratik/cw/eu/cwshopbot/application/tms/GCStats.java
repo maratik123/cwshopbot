@@ -15,32 +15,39 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.tms;
 
-import com.google.common.cache.Cache;
-import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import name.maratik.cw.eu.cwshopbot.application.service.StatsService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Component
-public class CacheMaintenance {
-    private static final Logger logger = LogManager.getLogger(CacheMaintenance.class);
+public class GCStats {
+    private final StatsService statsService;
 
-    private final Cache<ForwardKey, Long> forwardUserCache;
-
-    public CacheMaintenance(Cache<ForwardKey, Long> forwardUserCache) {
-        this.forwardUserCache = forwardUserCache;
+    public GCStats(StatsService statsService) {
+        this.statsService = statsService;
     }
 
-    @Scheduled(fixedRate = 60 * 60 * 1000L)
-    public void cleanupForwardUserCache() {
-        try {
-            forwardUserCache.cleanUp();
-        } catch (Exception e) {
-            logger.error("Failed with cleanupForwardUserCache", e);
+    @Scheduled(fixedRate = 60 * 1000L)
+    public void readStats() {
+        long gcCount = 0;
+        long gcTime = 0;
+        for (GarbageCollectorMXBean garbageCollectorMXBean : ManagementFactory.getGarbageCollectorMXBeans()) {
+            long count = garbageCollectorMXBean.getCollectionCount();
+            if (count >= 0) {
+                gcCount += count;
+            }
+            long time = garbageCollectorMXBean.getCollectionTime();
+            if (time >= 0) {
+                gcTime += time;
+            }
         }
+        statsService.setGCCount(gcCount);
+        statsService.setGCTime(gcTime);
     }
 }
