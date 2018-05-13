@@ -17,12 +17,13 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 
 import org.springframework.stereotype.Service;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -32,8 +33,6 @@ public class StatsService {
     private final Instant startTime;
     private final Clock clock;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
-    private final AtomicLong gcCount = new AtomicLong(0L);
-    private final AtomicLong gcTime = new AtomicLong(0L);
 
     public StatsService(Clock clock) {
         this.clock = clock;
@@ -48,20 +47,47 @@ public class StatsService {
         Runtime runtime = Runtime.getRuntime();
         long totalMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
+        GCStats gcStats = getGCStats();
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
             "Total memory is " + totalMemory + " bytes\n" +
             "Free memory is " + freeMemory + " bytes\n" +
             "Used memory is " + (totalMemory - freeMemory) + " bytes\n" +
-            "GC count is " + this.gcCount + '\n' +
-            "GC time is " + this.gcTime + " ms\n";
+            "GC count is " + gcStats.getCount() + '\n' +
+            "GC time is " + gcStats.getTime() + " ms\n";
     }
 
-    public void setGCCount(long gcCount) {
-        this.gcCount.set(gcCount);
+    private static GCStats getGCStats() {
+        long gcCount = 0;
+        long gcTime = 0;
+        for (GarbageCollectorMXBean garbageCollectorMXBean : ManagementFactory.getGarbageCollectorMXBeans()) {
+            long count = garbageCollectorMXBean.getCollectionCount();
+            if (count >= 0) {
+                gcCount += count;
+            }
+            long time = garbageCollectorMXBean.getCollectionTime();
+            if (time >= 0) {
+                gcTime += time;
+            }
+        }
+        return new GCStats(gcCount, gcTime);
     }
 
-    public void setGCTime(long gcTime) {
-        this.gcTime.set(gcTime);
+    private static class GCStats {
+        private final long count;
+        private final long time;
+
+        private GCStats(long count, long time) {
+            this.count = count;
+            this.time = time;
+        }
+
+        private long getCount() {
+            return count;
+        }
+
+        private long getTime() {
+            return time;
+        }
     }
 }
