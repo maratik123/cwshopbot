@@ -64,7 +64,7 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
                     }
                     for (String evaluatedUserId : evalUserId.split(",")) {
                         logger.info("Init TelegramBot controller: {} for userId: {}", beanClass, userId);
-                        botControllerMapByUserId.computeIfAbsent(OptionalLong.of(Long.valueOf(evaluatedUserId)), key -> new HashMap<>())
+                        botControllerMapByUserId.computeIfAbsent(OptionalLong.of(Long.parseLong(evaluatedUserId)), key -> new HashMap<>())
                             .put(beanName, beanClass);
                     }
                 }
