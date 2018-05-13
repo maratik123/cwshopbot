@@ -13,27 +13,22 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.mock;
+package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.telegram.telegrambots.TelegramBotsApi;
+import name.maratik.cw.eu.spring.annotation.TelegramBot;
+import name.maratik.cw.eu.spring.annotation.TelegramForward;
+import name.maratik.cw.eu.spring.annotation.TelegramMessage;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@RunWith(SpringRunner.class)
-@TestPropertySource(properties = {
-    "name.maratik.cw.eu.cwshopbot.username=testUsername",
-    "name.maratik.cw.eu.cwshopbot.token=testToken",
-    "name.maratik.cw.eu.cwshopbot.admin=123456789",
-    "name.maratik.cw.eu.cwshopbot.dev=123321",
-    "name.maratik.cw.eu.cwshopbot.ban=1233211",
-    "cwuserid=987654321"
-})
-public abstract class MockedTelegramBotsApiTest {
-    @MockBean
-    protected TelegramBotsApi telegramBotsApi;
+@TelegramBot("${name.maratik.cw.eu.cwshopbot.ban}")
+public class BannedController {
+    @TelegramMessage
+    public void message() {
+    }
+
+    @TelegramForward
+    public void forward() {
+    }
 }
