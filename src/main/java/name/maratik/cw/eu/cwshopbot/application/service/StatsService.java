@@ -48,9 +48,14 @@ public class StatsService {
             startTime.atOffset(ZoneOffset.UTC),
             clock.instant().atOffset(ZoneOffset.UTC)
         );
+        Runtime runtime = Runtime.getRuntime();
+        long totalMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
-            "Total memory is " + Runtime.getRuntime().totalMemory() + '\n' +
+            "Total memory is " + totalMemory + '\n' +
+            "Free memory is " + freeMemory + '\n' +
+            "Used memory is " + (totalMemory - freeMemory) + '\n' +
             "Forward user cache stats: " + forwardUserCache.stats() + '\n';
     }
 }
