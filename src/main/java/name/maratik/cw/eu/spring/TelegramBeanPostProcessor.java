@@ -24,14 +24,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 
 import javax.annotation.Priority;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalLong;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -42,62 +43,97 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
 
     private final TelegramBotService telegramBotService;
     private final Map<String, Class<?>> botControllerMap = new HashMap<>();
+    private final Map<OptionalLong, Map<String, Class<?>>> botControllerMapByUserId = new HashMap<>();
+    private final ConfigurableBeanFactory configurableBeanFactory;
 
-    public TelegramBeanPostProcessor(TelegramBotService telegramBotService) {
+    public TelegramBeanPostProcessor(TelegramBotService telegramBotService, ConfigurableBeanFactory configurableBeanFactory) {
         this.telegramBotService = telegramBotService;
+        this.configurableBeanFactory = configurableBeanFactory;
     }
 
     @Override
     public Object postProcessBeforeInitialization(@NonNull Object bean, String beanName) throws BeansException {
         Class<?> beanClass = bean.getClass();
-        if (AnnotationUtils.findAnnotation(beanClass, TelegramBot.class) != null) {
-            logger.info("Init TelegramBot controller: {}", beanClass);
-            botControllerMap.put(beanName, beanClass);
+        TelegramBot telegramBot = AnnotatedElementUtils.findMergedAnnotation(beanClass, TelegramBot.class);
+        if (telegramBot != null) {
+            if (telegramBot.userId().length != 0) {
+                for (String userId : telegramBot.userId()) {
+                    String evalUserId = configurableBeanFactory.resolveEmbeddedValue(userId);
+                    if (evalUserId == null) {
+                        throw new RuntimeException("NPE at beanClass: " + beanClass + " on userId: " + userId);
+                    }
+                    for (String evaluatedUserId : evalUserId.split(",")) {
+                        logger.info("Init TelegramBot controller: {} for userId: {}", beanClass, userId);
+                        botControllerMapByUserId.computeIfAbsent(OptionalLong.of(Long.valueOf(evaluatedUserId)), key -> new HashMap<>())
+                            .put(beanName, beanClass);
+                    }
+                }
+            } else {
+                logger.info("Init TelegramBot controller: {}", beanClass);
+                botControllerMap.put(beanName, beanClass);
+            }
         }
         return bean;
     }
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, String beanName) throws BeansException {
-        Class<?> original = botControllerMap.get(beanName);
-        if (original != null) {
-            logger.info("Processing class {} as bean", bean::getClass,  () -> beanName);
-            for (Method method : original.getDeclaredMethods()) {
-                logger.info("Found method {}", method::getName);
-                if (AnnotatedElementUtils.hasAnnotation(method, TelegramCommand.class)) {
-                    bindCommandController(bean, method);
-                }
-                if (AnnotatedElementUtils.hasAnnotation(method, TelegramMessage.class)) {
-                    bindMessageController(bean, method);
-                }
-                if (AnnotatedElementUtils.hasAnnotation(method, TelegramForward.class)) {
-                    bindForwardController(bean, method);
-                }
-                if (AnnotatedElementUtils.hasAnnotation(method, TelegramHelp.class)) {
-                    bindHelpPrefix(bean, method);
-                }
-            }
-        }
+        bindControllers(bean, beanName, botControllerMap.get(beanName), OptionalLong.empty());
+        botControllerMapByUserId.forEach((userId, original) ->
+            bindControllers(bean, beanName, original.get(beanName), userId)
+        );
         return bean;
     }
 
-    private void bindMessageController(Object bean, Method method) {
-        logger.info("Init TelegramBot message controller: {}:{}", bean::getClass, method::getName);
-        telegramBotService.addDefaultMessageHandler(bean, method);
+    private void bindControllers(@NonNull Object bean, String beanName, Class<?> original, OptionalLong userId) {
+        if (original != null) {
+            logger.info("Processing class {} as bean for user {}",
+                bean::getClass,  () -> beanName, () -> userId
+            );
+            for (Method method : original.getDeclaredMethods()) {
+                logger.info("Found method {}", method::getName);
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramCommand.class)) {
+                    bindCommandController(bean, method, userId);
+                }
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramMessage.class)) {
+                    bindMessageController(bean, method, userId);
+                }
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramForward.class)) {
+                    bindForwardController(bean, method, userId);
+                }
+                if (AnnotatedElementUtils.hasAnnotation(method, TelegramHelp.class)) {
+                    bindHelpPrefix(bean, method, userId);
+                }
+            }
+        }
+        telegramBotService.addHelpMethod(userId);
     }
 
-    private void bindCommandController(Object bean, Method method) {
-        logger.info("Init TelegramBot command controller: {}:{}", bean::getClass, method::getName);
-        telegramBotService.addHandler(bean, method);
+    private void bindMessageController(Object bean, Method method, OptionalLong userId) {
+        logger.info("Init TelegramBot message controller: {}:{} for {}",
+            bean::getClass, method::getName, () -> userId
+        );
+        telegramBotService.addDefaultMessageHandler(bean, method, userId);
     }
 
-    private void bindForwardController(Object bean, Method method) {
-        logger.info("Init TelegramBot forward controller: {}:{}", bean::getClass, method::getName);
-        telegramBotService.addForwardMessageHandler(bean, method);
+    private void bindCommandController(Object bean, Method method, OptionalLong userId) {
+        logger.info("Init TelegramBot command controller: {}:{} for {}",
+            bean::getClass, method::getName, () -> userId
+        );
+        telegramBotService.addHandler(bean, method, userId);
     }
 
-    private void bindHelpPrefix(Object bean, Method method) {
-        logger.info("Init TelegramBot help prefix method: {}:{}", bean::getClass, method::getName);
-        telegramBotService.addHelpPrefixMethod(bean, method);
+    private void bindForwardController(Object bean, Method method, OptionalLong userId) {
+        logger.info("Init TelegramBot forward controller: {}:{} for {}",
+            bean::getClass, method::getName, () -> userId
+        );
+        telegramBotService.addForwardMessageHandler(bean, method, userId);
+    }
+
+    private void bindHelpPrefix(Object bean, Method method, OptionalLong userId) {
+        logger.info("Init TelegramBot help prefix method: {}:{} for {}",
+            bean::getClass, method::getName, () -> userId
+        );
+        telegramBotService.addHelpPrefixMethod(bean, method, userId);
     }
 }

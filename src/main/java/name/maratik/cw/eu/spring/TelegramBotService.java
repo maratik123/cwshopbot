@@ -44,9 +44,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
+
+import static name.maratik.cw.eu.cwshopbot.util.Utils.optionalOf;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -54,13 +57,13 @@ import java.util.stream.Stream;
 public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
 
-    private final Map<String, TelegramHandler> commandList = new LinkedHashMap<>();
-    private final Map<String, TelegramHandler> patternCommandList = new LinkedHashMap<>();
-    private final Map<Long, TelegramHandler> forwardHandlerList = new HashMap<>();
+    private final Map<OptionalLong, Map<String, TelegramHandler>> commandList = new HashMap<>();
+    private final Map<OptionalLong, Map<String, TelegramHandler>> patternCommandList = new HashMap<>();
+    private final Map<OptionalLong, Map<Long, TelegramHandler>> forwardHandlerList = new HashMap<>();
     private final ConfigurableBeanFactory beanFactory;
-    private TelegramHandler defaultMessageHandler;
-    private TelegramHandler defaultForwardHandler;
-    private String prefixHelpMessage;
+    private Map<OptionalLong, TelegramHandler> defaultMessageHandler = new HashMap<>();
+    private Map<OptionalLong, TelegramHandler> defaultForwardHandler = new HashMap<>();
+    private Map<OptionalLong, String> prefixHelpMessage = new HashMap<>();
 
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
 
@@ -86,8 +89,6 @@ public abstract class TelegramBotService implements AutoCloseable {
                 return Instant.ofEpochSecond(Optional.ofNullable(message.getForwardDate()).orElse(message.getDate()));
             }))
             .build();
-
-        addHelpMethod();
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -98,21 +99,25 @@ public abstract class TelegramBotService implements AutoCloseable {
         }
         TelegramMessageCommand command = new TelegramMessageCommand(update);
         Optional<TelegramHandler> optionalCommandHandler;
+        OptionalLong userKey = optionalOf(update.getMessage().getChatId());
         if (command.getForwardedFrom().isPresent()) {
             optionalCommandHandler = Optional.ofNullable(
-                forwardHandlerList.getOrDefault(command.getForwardedFrom().get(), defaultForwardHandler)
+                getOrDefault(forwardHandlerList, userKey)
+                    .getOrDefault(command.getForwardedFrom().getAsLong(),
+                        getOrDefault(defaultForwardHandler, userKey)
+                    )
             );
         } else {
-            optionalCommandHandler = command.getCommand().map(commandList::get);
+            optionalCommandHandler = command.getCommand().map(cmd -> getOrDefault(commandList, userKey).get(cmd));
             if (!optionalCommandHandler.isPresent()) {
                 if (command.getCommand().isPresent()) {
-                    optionalCommandHandler = patternCommandList.entrySet().stream()
+                    optionalCommandHandler = getOrDefault(patternCommandList, userKey).entrySet().stream()
                         .filter(entry -> command.getCommand().get().startsWith(entry.getKey()))
                         .map(Map.Entry::getValue)
                         .findFirst();
                 }
                 if (!optionalCommandHandler.isPresent()) {
-                    optionalCommandHandler = Optional.ofNullable(defaultMessageHandler);
+                    optionalCommandHandler = Optional.ofNullable(getOrDefault(defaultMessageHandler, userKey));
                 }
             }
         }
@@ -125,7 +130,7 @@ public abstract class TelegramBotService implements AutoCloseable {
                 Object[] arguments = makeArgumentList(method, command, update);
 
                 if (commandHandler.getTelegramCommand().filter(TelegramCommand::isHelp).isPresent()) {
-                    sendHelpList(update);
+                    sendHelpList(update, userKey);
                 } else {
                     Class<?> methodReturnType = method.getReturnType();
                     logger.debug("Derived method return type: {}", methodReturnType);
@@ -145,21 +150,22 @@ public abstract class TelegramBotService implements AutoCloseable {
         });
     }
 
-    private void sendHelpList(Update update) throws TelegramApiException {
+    private void sendHelpList(Update update, OptionalLong userKey) throws TelegramApiException {
         getClient().execute(new SendMessage()
             .setChatId(update.getMessage().getChatId())
-            .setText(buildHelpMessage())
+            .setText(buildHelpMessage(userKey))
         );
     }
 
     private static final Set<String> LAST_COMMANDS_IN_HELP = ImmutableSet.of("/license", "/help");
 
-    private String buildHelpMessage() {
+    private String buildHelpMessage(OptionalLong userKey) {
         StringBuilder sb = new StringBuilder();
+        String prefixHelpMessage = getOrDefault(this.prefixHelpMessage, userKey);
         if (prefixHelpMessage != null) {
             sb.append(prefixHelpMessage);
         }
-        getCommandList()
+        getCommandList(userKey)
             .sorted(
                 Comparator.comparing(
                     TelegramBotCommand::getCommand,
@@ -176,15 +182,15 @@ public abstract class TelegramBotService implements AutoCloseable {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public Stream<TelegramBotCommand> getCommandList() {
+    public Stream<TelegramBotCommand> getCommandList(OptionalLong userKey) {
         return Stream.concat(
-            commandList.entrySet().stream()
+            getOrDefault(commandList, userKey).entrySet().stream()
                 .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
                 .map(entry -> new TelegramBotCommand(
                     entry.getKey(),
                     entry.getValue().getTelegramCommand().map(TelegramCommand::description).orElse("")
                 )),
-            patternCommandList.entrySet().stream()
+            getOrDefault(patternCommandList, userKey).entrySet().stream()
                 .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
                 .map(entry -> new TelegramBotCommand(
                     entry.getKey() + '*',
@@ -203,55 +209,59 @@ public abstract class TelegramBotService implements AutoCloseable {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void addHandler(Object bean, Method method) {
+    public void addHandler(Object bean, Method method, OptionalLong userId) {
         TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(method, TelegramCommand.class);
         if (command != null) {
             for (String cmd : command.commands()) {
-                //noinspection ObjectAllocationInLoop
                 TelegramHandler telegramHandler = new TelegramHandler(bean, method, command);
                 if (cmd.endsWith("*")) {
-                    patternCommandList.put(cmd.substring(0, cmd.length() - 1), telegramHandler);
+                    patternCommandList.computeIfAbsent(userId, key -> new LinkedHashMap<>())
+                        .put(cmd.substring(0, cmd.length() - 1), telegramHandler);
                 } else {
-                    commandList.put(cmd, telegramHandler);
+                    commandList.computeIfAbsent(userId, key -> new LinkedHashMap<>())
+                        .put(cmd, telegramHandler);
                 }
             }
         }
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void addDefaultMessageHandler(Object bean, Method method) {
-        defaultMessageHandler = new TelegramHandler(bean, method, null);
+    public void addDefaultMessageHandler(Object bean, Method method, OptionalLong userId) {
+        defaultMessageHandler.put(userId, new TelegramHandler(bean, method, null));
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void addForwardMessageHandler(Object bean, Method method) {
+    public void addForwardMessageHandler(Object bean, Method method, OptionalLong userId) {
         TelegramForward forward = AnnotatedElementUtils.findMergedAnnotation(method, TelegramForward.class);
         if (forward != null) {
             String[] fromArr = forward.from();
             if (fromArr.length == 0) {
-                defaultForwardHandler = new TelegramHandler(bean, method, null);
+                defaultForwardHandler.put(userId, new TelegramHandler(bean, method, null));
             } else {
                 for (String from : fromArr) {
                     String parsedFromStr = beanFactory.resolveEmbeddedValue(from);
                     if (parsedFromStr == null) {
                         throw new RuntimeException("NPE in " + from);
                     }
-                    Long parsedFrom = Long.valueOf(parsedFromStr);
-                    //noinspection ObjectAllocationInLoop
-                    forwardHandlerList.put(parsedFrom, new TelegramHandler(bean, method, null));
+                    for (String fromValue : parsedFromStr.split(",")) {
+                        Long parsedFrom = Long.valueOf(fromValue);
+                        forwardHandlerList.computeIfAbsent(userId, key -> new LinkedHashMap<>())
+                            .put(parsedFrom, new TelegramHandler(bean, method, null));
+                    }
                 }
             }
         }
     }
 
-    private void addHelpMethod() {
+    @SuppressWarnings("WeakerAccess")
+    public void addHelpMethod(OptionalLong userKey) {
         try {
             Method helpMethod = getClass().getMethod("helpMethod");
             TelegramCommand command = AnnotatedElementUtils.findMergedAnnotation(helpMethod, TelegramCommand.class);
             if (command != null) {
                 for (String cmd : command.commands()) {
-                    //noinspection ObjectAllocationInLoop
-                    commandList.put(cmd, new TelegramHandler(this, helpMethod, command));
+                    commandList.computeIfAbsent(userKey, key -> new LinkedHashMap<>())
+                        .put(cmd, new TelegramHandler(this, helpMethod, command));
                 }
             }
         } catch (Exception e) {
@@ -269,11 +279,18 @@ public abstract class TelegramBotService implements AutoCloseable {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void addHelpPrefixMethod(Object bean, Method method) {
+    public void addHelpPrefixMethod(Object bean, Method method, OptionalLong userId) {
         try {
-            prefixHelpMessage = (String) method.invoke(bean);
+            prefixHelpMessage.put(userId, (String) method.invoke(bean));
         } catch (Exception e) {
             logger.error("Can not get help prefix", e);
         }
+    }
+
+    private static <T> T getOrDefault(Map<OptionalLong, T> map, OptionalLong key) {
+        if (!map.containsKey(key)) {
+            return map.get(OptionalLong.empty());
+        }
+        return map.get(key);
     }
 }

@@ -29,6 +29,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
     "name.maratik.cw.eu.cwshopbot.username=testUsername",
     "name.maratik.cw.eu.cwshopbot.token=testToken",
     "name.maratik.cw.eu.cwshopbot.admin=123456789",
+    "name.maratik.cw.eu.cwshopbot.dev=123321",
     "cwuserid=987654321"
 })
 public abstract class MockedTelegramBotsApiTest {

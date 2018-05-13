@@ -20,8 +20,8 @@ import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
-import name.maratik.cw.eu.cwshopbot.util.MessageType;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.eu.cwshopbot.util.MessageType;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
@@ -57,18 +57,18 @@ public class ShopController {
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
     private final CWParser<ParsedShopInfo> shopInfoParser;
     private final ItemSearchService itemSearchService;
-    private final long adminUserId;
+    private final long devUserId;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                           CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
-                          @Value("${name.maratik.cw.eu.cwshopbot.admin}") long adminUserId) {
+                          @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
         this.itemSearchService = itemSearchService;
-        this.adminUserId = adminUserId;
+        this.devUserId = devUserId;
     }
 
     @TelegramMessage
@@ -84,7 +84,7 @@ public class ShopController {
                 if (messageId == null) {
                     throw new Exception("Unsupported message");
                 }
-                client.execute(new ForwardMessage(adminUserId, userId, messageId).disableNotification());
+                client.execute(new ForwardMessage(devUserId, userId, messageId).disableNotification());
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)

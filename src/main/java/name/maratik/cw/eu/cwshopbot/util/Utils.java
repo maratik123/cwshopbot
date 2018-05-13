@@ -16,11 +16,25 @@
 package name.maratik.cw.eu.cwshopbot.util;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+import org.telegram.telegrambots.api.objects.MessageEntity;
+
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class Utils {
+    public static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
+        Comparator.comparing(MessageEntity::getOffset);
+
+    public static int endOfEntity(MessageEntity messageEntity) {
+        return messageEntity.getOffset() + messageEntity.getLength();
+    }
+
     public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, Item item) {
         return appendCommandLink(sb, commandPrefix, item.getId());
     }
@@ -28,5 +42,50 @@ public class Utils {
     public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, String id) {
         return sb.append('[').append(commandPrefix).append(id).append("](")
             .append(commandPrefix).append(id).append(')');
+    }
+
+    public static int indexOfNth(String str, @SuppressWarnings("SameParameterValue") int ch, int startFrom,
+                                 @SuppressWarnings("SameParameterValue") int n) {
+        if (n <= 0) {
+            return -1;
+        }
+        for(int curPos = startFrom, i = n; true; ++curPos) {
+            curPos = str.indexOf(ch, curPos);
+            if (curPos == -1) {
+                return -1;
+            }
+            --i;
+            if (i <= 0) {
+                return curPos;
+            }
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static Optional<MessageEntity> extractFromIterator(Iterator<MessageEntity> it,
+                                                              Function<MessageEntity, Optional<MessageEntity>> extractor) {
+        return Optional.of(it)
+            .filter(Iterator::hasNext)
+            .map(Iterator::next)
+            .flatMap(extractor);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static Optional<MessageEntity> extractByType(MessageType messageType, Iterator<MessageEntity> it) {
+        return extractFromIterator(it, messageEntity -> Optional.of(messageEntity)
+            .filter(msgEntity -> MessageType.findByCode(msgEntity.getType()).filter(messageType::equals).isPresent())
+        );
+    }
+
+    public static Optional<MessageEntity> extractBoldText(Iterator<MessageEntity> it) {
+        return extractByType(MessageType.BOLD, it);
+    }
+
+    public static Optional<MessageEntity> extractBotCommand(Iterator<MessageEntity> it) {
+        return extractByType(MessageType.BOT_COMMAND, it).filter(cmd -> cmd.getText().startsWith("/"));
+    }
+
+    public static OptionalLong optionalOf(Long l) {
+        return l == null ? OptionalLong.empty() : OptionalLong.of(l);
     }
 }

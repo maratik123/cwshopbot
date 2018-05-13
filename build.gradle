@@ -59,6 +59,9 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-jcl'
     compile 'org.apache.logging.log4j:log4j-jul'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    compile "org.apache.lucene:lucene-core:${luceneVersion}"
+    compile "org.apache.lucene:lucene-analyzers-common:${luceneVersion}"
+    compile "org.apache.lucene:lucene-queryparser:${luceneVersion}"
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

@@ -34,12 +34,14 @@ public class TelegramBotConfiguration implements ImportAware {
     }
 
     @Bean
-    public TelegramBeanPostProcessor telegramBeanPostProcessor(TelegramBotService telegramBotService) {
-        return new TelegramBeanPostProcessor(telegramBotService);
+    public TelegramBeanPostProcessor telegramBeanPostProcessor(TelegramBotService telegramBotService,
+                                                               ConfigurableBeanFactory configurableBeanFactory) {
+        return new TelegramBeanPostProcessor(telegramBotService, configurableBeanFactory);
     }
 
     @Bean
-    public TelegramBotService telegramBotService(TelegramBotType telegramBotType, TelegramBotBuilder telegramBotBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
+    public TelegramBotService telegramBotService(TelegramBotType telegramBotType, TelegramBotBuilder telegramBotBuilder,
+                                                 TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
         return telegramBotType.createService(telegramBotBuilder, api, beanFactory);
     }
 

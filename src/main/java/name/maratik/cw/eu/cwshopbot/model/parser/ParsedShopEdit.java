@@ -15,6 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
+import com.google.common.collect.ImmutableList;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +32,7 @@ public class ParsedShopEdit {
     private final String shopCommand;
     private final List<ShopLine> shopLines;
 
-    public ParsedShopEdit(String shopName, String shopHelpCommand, int offerCount, int maxOfferCount, String shopCommand, List<ShopLine> shopLines) {
+    private ParsedShopEdit(String shopName, String shopHelpCommand, int offerCount, int maxOfferCount, String shopCommand, List<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName);
         this.shopHelpCommand = Objects.requireNonNull(shopHelpCommand);
         this.offerCount = offerCount;
@@ -74,6 +77,125 @@ public class ParsedShopEdit {
             '}';
     }
 
-    private static class ShopLine {
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String shopName;
+        private String shopHelpCommand;
+        private int offerCount;
+        private int maxOfferCount;
+        private String shopCommand;
+        private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
+
+        public Builder setShopName(String shopName) {
+            this.shopName = shopName;
+            return this;
+        }
+
+        public Builder setShopHelpCommand(String shopHelpCommand) {
+            this.shopHelpCommand = shopHelpCommand;
+            return this;
+        }
+
+        public Builder setOfferCount(int offerCount) {
+            this.offerCount = offerCount;
+            return this;
+        }
+
+        public Builder setMaxOfferCount(int maxOfferCount) {
+            this.maxOfferCount = maxOfferCount;
+            return this;
+        }
+
+        public Builder setShopCommand(String shopCommand) {
+            this.shopCommand = shopCommand;
+            return this;
+        }
+
+        public Builder addShopLine(ShopLine shopLine) {
+            shopLines.add(shopLine);
+            return this;
+        }
+
+        public ParsedShopEdit build() {
+            return new ParsedShopEdit(shopName, shopHelpCommand, offerCount, maxOfferCount, shopCommand, shopLines.build());
+        }
+    }
+
+    public static class ShopLine {
+        private final Item item;
+        private final int mana;
+        private final int price;
+        private final String deleteCommand;
+
+        private ShopLine(Item item, int mana, int price, String deleteCommand) {
+            this.item = Objects.requireNonNull(item);
+            this.mana = mana;
+            this.price = price;
+            this.deleteCommand = Objects.requireNonNull(deleteCommand);
+        }
+
+        public Item getItem() {
+            return item;
+        }
+
+        public int getMana() {
+            return mana;
+        }
+
+        public int getPrice() {
+            return price;
+        }
+
+        public String getDeleteCommand() {
+            return deleteCommand;
+        }
+
+        @Override
+        public String toString() {
+            return "ShopLine{" +
+                "item=" + item +
+                ", mana=" + mana +
+                ", price=" + price +
+                ", deleteCommand='" + deleteCommand + '\'' +
+                '}';
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static class Builder {
+            private Item item;
+            private int mana;
+            private int price;
+            private String deleteCommand;
+
+            public Builder setItem(Item item) {
+                this.item = item;
+                return this;
+            }
+
+            public Builder setMana(int mana) {
+                this.mana = mana;
+                return this;
+            }
+
+            public Builder setPrice(int price) {
+                this.price = price;
+                return this;
+            }
+
+            public Builder setDeleteCommand(String deleteCommand) {
+                this.deleteCommand = deleteCommand;
+                return this;
+            }
+
+            public ShopLine build() {
+                return new ShopLine(item, mana, price, deleteCommand);
+            }
+        }
     }
 }

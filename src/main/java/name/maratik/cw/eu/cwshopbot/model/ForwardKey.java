@@ -18,6 +18,7 @@ package name.maratik.cw.eu.cwshopbot.model;
 import org.telegram.telegrambots.api.objects.Message;
 
 import java.time.Instant;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -27,8 +28,8 @@ public class ForwardKey {
     private final String message;
 
     private ForwardKey(Instant timestamp, String message) {
-        this.timestamp = timestamp;
-        this.message = message;
+        this.timestamp = Objects.requireNonNull(timestamp);
+        this.message = Objects.requireNonNull(message);
     }
 
     public ForwardKey(Message message) {
@@ -48,22 +49,22 @@ public class ForwardKey {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof ForwardKey)) {
             return false;
         }
 
         ForwardKey that = (ForwardKey) o;
 
-        if (timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null) {
+        if (!getTimestamp().equals(that.getTimestamp())) {
             return false;
         }
-        return message != null ? message.equals(that.message) : that.message == null;
+        return getMessage().equals(that.getMessage());
     }
 
     @Override
     public int hashCode() {
-        int result = timestamp != null ? timestamp.hashCode() : 0;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
+        int result = getTimestamp().hashCode();
+        result = 31 * result + getMessage().hashCode();
         return result;
     }
 }

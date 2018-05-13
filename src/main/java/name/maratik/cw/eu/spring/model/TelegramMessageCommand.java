@@ -20,6 +20,9 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 
 import java.util.Optional;
+import java.util.OptionalLong;
+
+import static name.maratik.cw.eu.cwshopbot.util.Utils.optionalOf;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -66,8 +69,8 @@ public class TelegramMessageCommand {
         return isCommand;
     }
 
-    public Optional<Long> getForwardedFrom() {
-        return Optional.ofNullable(forwardedFrom);
+    public OptionalLong getForwardedFrom() {
+        return optionalOf(forwardedFrom);
     }
 
     @Override

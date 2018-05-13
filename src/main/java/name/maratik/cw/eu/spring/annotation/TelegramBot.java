@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.spring.annotation;
 
+import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Documented;
@@ -33,4 +34,8 @@ import java.lang.annotation.Target;
 @Component
 @Inherited
 public @interface TelegramBot {
+    @AliasFor("userId")
+    String[] value() default {};
+    @AliasFor("value")
+    String[] userId() default {};
 }
