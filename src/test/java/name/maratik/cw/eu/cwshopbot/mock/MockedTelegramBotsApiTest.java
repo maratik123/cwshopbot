@@ -27,9 +27,10 @@ import org.telegram.telegrambots.TelegramBotsApi;
 @RunWith(SpringRunner.class)
 @TestPropertySource(properties = {
     "name.maratik.cw.eu.cwshopbot.username=testUsername",
-    "name.maratik.cw.eu.cwshopbot.token=testToken",
+    "name.maratik.cw.eu.cwshopbot.token=test:Token",
     "name.maratik.cw.eu.cwshopbot.admin=123456789",
     "name.maratik.cw.eu.cwshopbot.dev=123321",
+    "name.maratik.cw.eu.cwshopbot.dev.username=dev_user_name",
     "name.maratik.cw.eu.cwshopbot.ban=1233211",
     "cwuserid=987654321"
 })

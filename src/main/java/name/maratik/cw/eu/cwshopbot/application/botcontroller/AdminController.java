@@ -23,6 +23,7 @@ import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
+import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 
@@ -38,8 +39,9 @@ public class AdminController extends ShopController {
     public AdminController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                            @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                            CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
-                           @Value("${name.maratik.cw.eu.cwshopbot.dev}") long adminUserId) {
-        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, adminUserId);
+                           @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
+                           @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName) {
+        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, devUserId, devUserName);
         this.forwardUserCache = forwardUserCache;
     }
 
@@ -48,5 +50,18 @@ public class AdminController extends ShopController {
         return new SendMessage()
             .setChatId(userId)
             .setText("User cache = " + forwardUserCache.stats());
+    }
+
+    @SuppressWarnings("MethodMayBeStatic")
+    @TelegramCommand(commands = "/send", description = "Send message")
+    public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId) {
+        String[] args = messageCommand.getArgument()
+            .map(arg -> arg.split(" ", 2))
+            .filter(arr -> arr.length == 2)
+            .orElseGet(() -> new String[] {Long.toString(userId), "Something wrong with your command"});
+
+        return new SendMessage()
+            .setChatId(args[0])
+            .setText(args[1]);
     }
 }

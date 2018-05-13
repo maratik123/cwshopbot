@@ -58,17 +58,20 @@ public class ShopController {
     private final CWParser<ParsedShopInfo> shopInfoParser;
     private final ItemSearchService itemSearchService;
     private final long devUserId;
+    private final String devUserName;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                           CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
-                          @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId) {
+                          @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
+                          @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
         this.itemSearchService = itemSearchService;
         this.devUserId = devUserId;
+        this.devUserName = devUserName;
     }
 
     @TelegramMessage
@@ -94,7 +97,7 @@ public class ShopController {
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)
-                    .setText("Something gets wrong");
+                    .setText("Something gets wrong, send it directly to @" + devUserName);
             }
         }
         return new SendMessage()
