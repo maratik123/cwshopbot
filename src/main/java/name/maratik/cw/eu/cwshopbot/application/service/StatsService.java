@@ -21,7 +21,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
@@ -30,20 +30,17 @@ import java.time.format.DateTimeFormatter;
  */
 @Service
 public class StatsService {
-    private final Instant startTime;
+    private final OffsetDateTime startTime;
     private final Clock clock;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
 
     public StatsService(Clock clock) {
         this.clock = clock;
-        startTime = clock.instant();
+        startTime = clock.instant().atOffset(ZoneOffset.UTC);
     }
 
     public String getMessage() {
-        Duration workTime = Duration.between(
-            startTime.atOffset(ZoneOffset.UTC),
-            clock.instant().atOffset(ZoneOffset.UTC)
-        );
+        Duration workTime = Duration.between(startTime, clock.instant().atOffset(ZoneOffset.UTC));
         Runtime runtime = Runtime.getRuntime();
         long totalMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
