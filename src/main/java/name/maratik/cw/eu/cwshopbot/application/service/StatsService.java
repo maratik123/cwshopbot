@@ -17,8 +17,10 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 
 import org.springframework.stereotype.Service;
 
+import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -45,13 +47,22 @@ public class StatsService {
         long totalMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
         GCStats gcStats = getGCStats();
+        ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
             "Total memory is " + totalMemory + " bytes\n" +
             "Free memory is " + freeMemory + " bytes\n" +
             "Used memory is " + (totalMemory - freeMemory) + " bytes\n" +
+            "Memory heap usage is " + memoryMXBean.getHeapMemoryUsage() + " bytes\n" +
+            "Memory non-heap usage is " + memoryMXBean.getNonHeapMemoryUsage() + " bytes\n" +
+            "Objects pending finalization is " + memoryMXBean.getObjectPendingFinalizationCount() + '\n' +
             "GC count is " + gcStats.getCount() + '\n' +
-            "GC time is " + gcStats.getTime() + " ms\n";
+            "GC time is " + gcStats.getTime() + " ms\n" +
+            "Classes loaded is " + classLoadingMXBean.getLoadedClassCount() + '\n' +
+            "Total classes loaded is " + classLoadingMXBean.getTotalLoadedClassCount() + '\n' +
+            "Unloaded classes is " + classLoadingMXBean.getUnloadedClassCount() + '\n' +
+            "System load average is " + ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage() + '\n';
     }
 
     private static GCStats getGCStats() {
