@@ -43,17 +43,11 @@ public class StatsService {
 
     public String getMessage() {
         Duration workTime = Duration.between(startTime, clock.instant().atOffset(ZoneOffset.UTC));
-        Runtime runtime = Runtime.getRuntime();
-        long totalMemory = runtime.totalMemory();
-        long freeMemory = runtime.freeMemory();
         GCStats gcStats = getGCStats();
         ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
-            "Total memory is " + totalMemory + " bytes\n" +
-            "Free memory is " + freeMemory + " bytes\n" +
-            "Used memory is " + (totalMemory - freeMemory) + " bytes\n" +
             "Memory heap usage is " + memoryMXBean.getHeapMemoryUsage() + " bytes\n" +
             "Memory non-heap usage is " + memoryMXBean.getNonHeapMemoryUsage() + " bytes\n" +
             "Objects pending finalization is " + memoryMXBean.getObjectPendingFinalizationCount() + '\n' +
