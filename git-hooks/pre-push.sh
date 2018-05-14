@@ -8,8 +8,8 @@
 # stash any unstaged changes
 git stash -q --keep-index
 
-# run the tests with the gradle wrapper
-./gradlew test -q
+# run the checks with the gradle wrapper
+./gradlew check
 # Another possibility could be to run an aggregate test report task and automatically open the generated html
 
 # store the last exit code in a variable
@@ -18,5 +18,5 @@ RESULT=$?
 # unstash the unstashed changes
 git stash pop -q
 
-# return the './gradlew test' exit code
+# return the './gradlew check' exit code
 exit $RESULT
