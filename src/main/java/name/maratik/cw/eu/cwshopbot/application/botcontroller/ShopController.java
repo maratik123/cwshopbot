@@ -28,7 +28,6 @@ import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.annotation.TelegramHelp;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
-import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,12 +45,27 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
+import static name.maratik.cw.eu.spring.TelegramBotService.PATTERN_COMMAND_SUFFIX;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @TelegramBot
 public class ShopController {
     private static final Logger logger = LogManager.getLogger(ShopController.class);
+
+    public static final String VIEW_PREFIX = "/view_";
+    private static final int VIEW_PREFIX_LEN = VIEW_PREFIX.length();
+    public static final String RVIEW_PREFIX = "/rview_";
+    private static final int RVIEW_PREFIX_LEN = RVIEW_PREFIX.length();
+    public static final String A_PREFIX = "/a_";
+    private static final int A_PREFIX_LEN = A_PREFIX.length();
+    public static final String T_PREFIX = "/t_";
+    private static final int T_PREFIX_LEN = T_PREFIX.length();
+    public static final String CRAFTBOOK_PREFIX = "/craftbook_";
+    private static final int CRAFTBOOK_PREFIX_LEN = CRAFTBOOK_PREFIX.length();
+    public static final String SHOP_PREFIX = "/shop_";
+    private static final int SHOP_PREFIX_LEN = SHOP_PREFIX.length();
 
     private final Clock clock;
     private final int forwardStaleSec;
@@ -98,7 +112,7 @@ public class ShopController {
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)
-                    .setText("Something gets wrong, send it directly to @" + devUserName);
+                    .setText("Something gets wrong. Please, send it directly to @" + devUserName);
             }
         }
         return new SendMessage()
@@ -115,47 +129,48 @@ public class ShopController {
             .setText("Now you can press /help to view help");
     }
 
-    @TelegramCommand(commands = "/t_*", description = "Info about item")
+    @TelegramCommand(commands = T_PREFIX + PATTERN_COMMAND_SUFFIX, description = "Info about item")
     public SendMessage itemInfo(long userId, Message message) {
-        return new SendMessage()
-            .setChatId(userId)
-            .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findByCode(message.getText().substring(3))));
+        return itemInfo(userId, message, T_PREFIX_LEN);
     }
 
     @TelegramCommand(
-        commands = { "/craftbook_1", "/craftbook_2", "/craftbook_3" },
+        commands = A_PREFIX + PATTERN_COMMAND_SUFFIX,
+        description = "Copy of " + T_PREFIX + PATTERN_COMMAND_SUFFIX,
+        hidden = true
+    )
+    public SendMessage itemInfoA(long userId, Message message) {
+        return itemInfo(userId, message, A_PREFIX_LEN);
+    }
+
+    @TelegramCommand(
+        commands = { CRAFTBOOK_PREFIX + '1', CRAFTBOOK_PREFIX + '2', CRAFTBOOK_PREFIX + '3' },
         description = "Show specified craftbook"
     )
-    public SendMessage showCraftbook(long userId, TelegramMessageCommand command) {
-        Optional<String> result = command.getCommand()
-            .map(cmd -> cmd.substring(11))
-            .flatMap(itemSearchService::getCraftbook);
+    public SendMessage showCraftbook(long userId, Message message) {
+        Optional<String> result = itemSearchService.getCraftbook(getCommandSuffix(message, CRAFTBOOK_PREFIX_LEN));
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
             .setText(getMessage(result));
     }
 
-    @TelegramCommand(commands = "/a_*", description = "Copy of /t_*", hidden = true)
-    public SendMessage itemInfoA(long userId, Message message) {
-        return itemInfo(userId, message);
-    }
-
-    @TelegramCommand(commands = "/view_*", description = "View recipe")
+    @TelegramCommand(commands = VIEW_PREFIX + PATTERN_COMMAND_SUFFIX, description = "View recipe")
     public SendMessage recipeView(long userId, Message message) {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findRecipeByCode(message.getText().substring(6))));
+            .setText(getMessage(itemSearchService.findRecipeByCode(getCommandSuffix(message, VIEW_PREFIX_LEN))));
     }
 
-    @TelegramCommand(commands = "/rview_*", description = "Find recipes for item included")
+    @TelegramCommand(commands = RVIEW_PREFIX + PATTERN_COMMAND_SUFFIX, description = "Find recipes for item included")
     public SendMessage reverseRecipeSearch(long userId, Message message) {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findRecipeByIncludedItem(message.getText().substring(7))));
+            .setText(getMessage(
+                itemSearchService.findRecipeByIncludedItem(getCommandSuffix(message, RVIEW_PREFIX_LEN))
+            ));
     }
 
     @TelegramForward("${cwuserid}")
@@ -240,7 +255,18 @@ public class ShopController {
         return clock.instant().minusSeconds(forwardStaleSec).isAfter(forwardTime);
     }
 
+    private SendMessage itemInfo(long userId, Message message, int prefixLen) {
+        return new SendMessage()
+            .setChatId(userId)
+            .enableMarkdown(true)
+            .setText(getMessage(itemSearchService.findByCode(getCommandSuffix(message, prefixLen))));
+    }
+
     private static String getMessage(Optional<String> message) {
         return message.orElse("404 not found");
+    }
+
+    private static String getCommandSuffix(Message message, int prefixLen) {
+        return message.getText().substring(prefixLen);
     }
 }

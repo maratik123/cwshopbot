@@ -30,6 +30,7 @@ import org.springframework.lang.NonNull;
 
 import javax.annotation.Priority;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalLong;
@@ -91,6 +92,9 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
                 bean::getClass,  () -> beanName, () -> userId
             );
             for (Method method : original.getMethods()) {
+                if (!Modifier.isPublic(method.getModifiers())) {
+                    continue;
+                }
                 logger.info("Found method {}", method::getName);
                 if (AnnotatedElementUtils.hasAnnotation(method, TelegramCommand.class)) {
                     bindCommandController(bean, method, userId);

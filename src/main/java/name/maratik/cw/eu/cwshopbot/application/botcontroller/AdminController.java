@@ -25,8 +25,12 @@ import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.time.Clock;
 
@@ -35,6 +39,8 @@ import java.time.Clock;
  */
 @TelegramBot("${name.maratik.cw.eu.cwshopbot.admin}")
 public class AdminController extends ShopController {
+    private static final Logger logger = LogManager.getLogger(AdminController.class);
+
     private final StatsService statsService;
 
     public AdminController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
@@ -57,14 +63,25 @@ public class AdminController extends ShopController {
 
     @SuppressWarnings("MethodMayBeStatic")
     @TelegramCommand(commands = "/send", description = "Send message")
-    public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId) {
+    public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client) {
         String[] args = messageCommand.getArgument()
             .map(arg -> arg.split(" ", 2))
             .filter(arr -> arr.length == 2)
             .orElseGet(() -> new String[] {Long.toString(userId), "Something wrong with your command"});
 
-        return new SendMessage()
-            .setChatId(args[0])
-            .setText(args[1]);
+        try {
+            client.execute(new SendMessage()
+                .setChatId(args[0])
+                .setText(args[1])
+            );
+            return new SendMessage()
+                .setChatId(userId)
+                .setText("Message sent");
+        } catch (TelegramApiException e) {
+            logger.error("Send message wrong", e);
+            return new SendMessage()
+                .setChatId(userId)
+                .setText("Message did not send. Reason: " + e.getMessage());
+        }
     }
 }

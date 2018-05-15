@@ -48,8 +48,8 @@ public class StatsService {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         return "Application started in " + dateTimeFormatter.format(startTime) + '\n' +
             "Work time is " + workTime + '\n' +
-            "Memory heap usage is " + memoryMXBean.getHeapMemoryUsage() + " bytes\n" +
-            "Memory non-heap usage is " + memoryMXBean.getNonHeapMemoryUsage() + " bytes\n" +
+            "Memory heap usage is " + memoryMXBean.getHeapMemoryUsage() + '\n' +
+            "Memory non-heap usage is " + memoryMXBean.getNonHeapMemoryUsage() + '\n' +
             "Objects pending finalization is " + memoryMXBean.getObjectPendingFinalizationCount() + '\n' +
             "GC count is " + gcStats.getCount() + '\n' +
             "GC time is " + gcStats.getTime() + " ms\n" +

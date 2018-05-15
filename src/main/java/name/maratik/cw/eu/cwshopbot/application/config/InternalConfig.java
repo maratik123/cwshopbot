@@ -15,6 +15,8 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.config;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -84,11 +86,16 @@ public class InternalConfig {
         return new AssetsDao(resourceLoader.getResource("classpath:assets/resources.yaml")).createAssets();
     }
 
+    @Bean
+    public DynamoDB dynamoDB(AmazonDynamoDB client) {
+            return new DynamoDB(client);
+        }
+
     private static class CacheTicker extends Ticker {
         private final Instant ZERO = Instant.ofEpochSecond(0);
         private final Clock clock;
 
-        CacheTicker(Clock clock) {
+        private CacheTicker(Clock clock) {
             this.clock = clock;
         }
 

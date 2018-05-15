@@ -33,6 +33,12 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.A_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.CRAFTBOOK_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.RVIEW_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.T_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.VIEW_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHIELD;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SWORDS;
@@ -144,7 +150,7 @@ public class ItemSearchService {
             Map<String, Integer> recipe = craftableItem.getRecipe();
             StringBuilder sb = new StringBuilder("Recipe for *")
                 .append(craftableItem.getName()).append("* (");
-            appendCommandLink(sb, "/t_", craftableItem).append(")\n")
+            appendCommandLink(sb, T_PREFIX, craftableItem).append(")\n")
                 .append(MANA + " cost: ").append(craftableItem.getMana()).append("\n\n");
             recipe.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
@@ -155,7 +161,7 @@ public class ItemSearchService {
                 .forEach(entry -> {
                     Item item = entry.getKey();
                     sb.append(item.getName()).append(" (");
-                    appendCommandLink(sb, "/a_", item)
+                    appendCommandLink(sb, A_PREFIX, item)
                         .append(") x ").append(entry.getValue()).append('\n');
                 });
             message = sb.toString();
@@ -196,11 +202,11 @@ public class ItemSearchService {
                     .append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
                 if (item.isTradeable()) {
                     sb.append("Can be exchanged using ");
-                    appendCommandLink(sb, "/t_", item).append(" command\n");
+                    appendCommandLink(sb, T_PREFIX, item).append(" command\n");
                 }
                 if (assets.getCraftableItemsByRecipe().containsKey(item.getId())) {
                     sb.append("View recipes with item: ");
-                    appendCommandLink(sb, "/rview_", item).append('\n');
+                    appendCommandLink(sb, RVIEW_PREFIX, item).append('\n');
                 }
             }
 
@@ -210,13 +216,13 @@ public class ItemSearchService {
 
                 sb.append('\n')
                     .append("View item recipe: ");
-                appendCommandLink(sb, "/view_", craftableItem).append('\n')
+                appendCommandLink(sb, VIEW_PREFIX, craftableItem).append('\n')
                     .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
                     .append("Craftbook: ");
-                appendCommandLink(sb, "/craftbook_", craftableItem.getCraftbook().getCode())
+                appendCommandLink(sb, CRAFTBOOK_PREFIX, craftableItem.getCraftbook().getCode())
                     .append('\n')
                     .append("Find shops with item: ");
-                appendCommandLink(sb, "/shop_", craftableItem).append('\n');
+                appendCommandLink(sb, SHOP_PREFIX, craftableItem).append('\n');
             }
 
             @Override
@@ -252,7 +258,7 @@ public class ItemSearchService {
 
         private ListOutput(List<? extends Item> items) {
             StringBuilder sb = new StringBuilder();
-            items.forEach(item -> appendCommandLink(sb, "/t_", item)
+            items.forEach(item -> appendCommandLink(sb, T_PREFIX, item)
                 .append(' ').append(item.getName()).append('\n')
             );
             message = sb.toString();
@@ -271,14 +277,14 @@ public class ItemSearchService {
             StringBuilder sb = new StringBuilder();
             optionalItem.ifPresent(item -> {
                 sb.append("Recipe list with *").append(item.getName()).append("* (");
-                appendCommandLink(sb, "/t_", item).append(")\n\n");
+                appendCommandLink(sb, T_PREFIX, item).append(")\n\n");
             });
             items.stream()
                 .sorted(ITEM_NAME_COMPARATOR)
                 .forEach(craftableItem -> {
-                    appendCommandLink(sb, "/view_", craftableItem)
+                    appendCommandLink(sb, VIEW_PREFIX, craftableItem)
                         .append(' ').append(craftableItem.getName()).append(" (");
-                    appendCommandLink(sb, "/t_", craftableItem).append(")\n");
+                    appendCommandLink(sb, T_PREFIX, craftableItem).append(")\n");
                 });
             message = sb.toString();
         }

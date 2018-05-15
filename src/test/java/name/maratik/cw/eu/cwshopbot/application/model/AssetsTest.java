@@ -27,7 +27,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -47,7 +46,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@SpringBootTest
 public class AssetsTest extends MockedTelegramBotsApiTest {
     private static final Logger logger = LogManager.getLogger(AssetsTest.class);
 

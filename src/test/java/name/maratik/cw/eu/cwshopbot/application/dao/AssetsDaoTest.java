@@ -39,7 +39,6 @@ import static org.junit.Assert.assertThat;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@SpringBootTest
 @Import(AssetsDaoTest.TestConfig.class)
 public class AssetsDaoTest extends MockedTelegramBotsApiTest {
     private static final Logger logger = LogManager.getLogger(AssetsDaoTest.class);

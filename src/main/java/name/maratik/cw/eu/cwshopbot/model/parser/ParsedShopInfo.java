@@ -31,14 +31,18 @@ public class ParsedShopInfo {
     private final String shopCommand;
     private final ShopState shopState;
     private final List<ShopLine> shopLines;
+    private final String shopCode;
+    private final int shopNumber;
 
     private ParsedShopInfo(String shopName, String charName, String shopCommand, ShopState shopState,
-                           List<ShopLine> shopLines) {
+                           List<ShopLine> shopLines, String shopCode, int shopNumber) {
         this.shopName = Objects.requireNonNull(shopName);
         this.charName = Objects.requireNonNull(charName);
         this.shopCommand = Objects.requireNonNull(shopCommand);
         this.shopState = Objects.requireNonNull(shopState);
         this.shopLines = Objects.requireNonNull(shopLines);
+        this.shopCode = Objects.requireNonNull(shopCode);
+        this.shopNumber = shopNumber;
     }
 
     public String getShopName() {
@@ -61,6 +65,14 @@ public class ParsedShopInfo {
         return shopLines;
     }
 
+    public String getShopCode() {
+        return shopCode;
+    }
+
+    public int getShopNumber() {
+        return shopNumber;
+    }
+
     @Override
     public String toString() {
         return "ParsedShopInfo{" +
@@ -69,6 +81,8 @@ public class ParsedShopInfo {
             ", shopCommand='" + shopCommand + '\'' +
             ", shopState=" + shopState +
             ", shopLines=" + shopLines +
+            ", shopCode='" + shopCode + '\'' +
+            ", shopNumber=" + shopNumber +
             '}';
     }
 
@@ -81,6 +95,8 @@ public class ParsedShopInfo {
         private String shopName;
         private String shopCommand;
         private ShopState shopState;
+        private String shopCode;
+        private int shopNumber;
         private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
         @SuppressWarnings("UnusedReturnValue")
@@ -112,8 +128,20 @@ public class ParsedShopInfo {
             return this;
         }
 
+        public Builder setShopCode(String shopCode) {
+            this.shopCode = shopCode;
+            return this;
+        }
+
+        public Builder setShopNumber(int shopNumber) {
+            this.shopNumber = shopNumber;
+            return this;
+        }
+
         public ParsedShopInfo build() {
-            return new ParsedShopInfo(shopName, charName, shopCommand, shopState, shopLines.build());
+            return new ParsedShopInfo(shopName, charName, shopCommand, shopState, shopLines.build(), shopCode,
+                shopNumber
+            );
         }
     }
 
@@ -193,4 +221,3 @@ public class ParsedShopInfo {
         }
     }
 }
-

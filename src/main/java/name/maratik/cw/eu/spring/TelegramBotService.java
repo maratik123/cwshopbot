@@ -55,6 +55,8 @@ import static name.maratik.cw.eu.cwshopbot.util.Utils.optionalOf;
  */
 public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
+    public static final String PATTERN_COMMAND_SUFFIX = "*";
+    private static final int PATTERN_COMMAND_SUFFIX_LEN = PATTERN_COMMAND_SUFFIX.length();
 
     private final Map<OptionalLong, Handlers> handlers = new HashMap<>();
     private final ConfigurableBeanFactory beanFactory;
@@ -188,7 +190,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             getOrDefault(userKey).getPatternCommandList().entrySet().stream()
                 .filter(entry -> !entry.getValue().getTelegramCommand().map(TelegramCommand::hidden).orElse(true))
                 .map(entry -> new TelegramBotCommand(
-                    entry.getKey() + '*',
+                    entry.getKey() + PATTERN_COMMAND_SUFFIX,
                     entry.getValue().getTelegramCommand().map(TelegramCommand::description).orElse("")
                 ))
         );
@@ -209,9 +211,9 @@ public abstract class TelegramBotService implements AutoCloseable {
         if (command != null) {
             for (String cmd : command.commands()) {
                 TelegramHandler telegramHandler = new TelegramHandler(bean, method, command);
-                if (cmd.endsWith("*")) {
+                if (cmd.endsWith(PATTERN_COMMAND_SUFFIX)) {
                     createOrGet(userId).getPatternCommandList()
-                        .put(cmd.substring(0, cmd.length() - 1), telegramHandler);
+                        .put(cmd.substring(0, cmd.length() - PATTERN_COMMAND_SUFFIX_LEN), telegramHandler);
                 } else {
                     createOrGet(userId).getCommandList().put(cmd, telegramHandler);
                 }

@@ -44,6 +44,8 @@ import static name.maratik.cw.eu.cwshopbot.util.Utils.indexOfNth;
 @Component
 public class ShopInfoParser implements CWParser<ParsedShopInfo> {
 
+    private static final String SHOP_COMMAND_PREFIX = "/ws_";
+    private static final int SHOP_COMMAND_PREFIX_LEN = SHOP_COMMAND_PREFIX.length();
     private final ItemSearchService itemSearchService;
 
     public ShopInfoParser(ItemSearchService itemSearchService) {
@@ -91,11 +93,12 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
             .filter(messageEntity ->
                 MessageType.findByCode(messageEntity.getType()).filter(MessageType.BOT_COMMAND::equals).isPresent()
             ).map(MessageEntity::getText)
-            .filter(s -> s.startsWith("/ws_"));
+            .filter(s -> s.startsWith(SHOP_COMMAND_PREFIX));
         if (!shopCommand.isPresent()) {
             return Optional.empty();
         }
-        parsedShopInfoBuilder.setShopCommand(shopCommand.get());
+        parsedShopInfoBuilder.setShopCommand(shopCommand.get())
+            .setShopCode(shopCommand.get().substring(SHOP_COMMAND_PREFIX_LEN));
 
         int nextPointer = shopState.get().getNextPointer();
         nextPointer = indexOfNth(messageText, '\n', nextPointer, 2) + 1;
@@ -145,9 +148,9 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
         if (goldChar == -1) {
             return Optional.empty();
         }
-        int gold;
+        int price;
         try {
-            gold = Integer.parseInt(messageText.substring(manaChar + MANA_LEN, goldChar).trim());
+            price = Integer.parseInt(messageText.substring(manaChar + MANA_LEN, goldChar).trim());
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -161,7 +164,7 @@ public class ShopInfoParser implements CWParser<ParsedShopInfo> {
                     ParsedShopInfo.ShopLine.builder()
                         .setItem(foundItems.get(0))
                         .setMana(mana)
-                        .setPrice(gold)
+                        .setPrice(price)
                         .setCraftCommand(commandEntity.getText())
                         .build()
                 )));

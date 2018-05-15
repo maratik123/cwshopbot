@@ -27,17 +27,22 @@ import java.util.Objects;
 public class ParsedShopEdit {
     private final String shopName;
     private final String shopHelpCommand;
-    private final int offerCount;
-    private final int maxOfferCount;
+    private final int offersCount;
+    private final int maxOffersCount;
     private final String shopCommand;
+    private final int shopNumber;
+    private final String shopCode;
     private final List<ShopLine> shopLines;
 
-    private ParsedShopEdit(String shopName, String shopHelpCommand, int offerCount, int maxOfferCount, String shopCommand, List<ShopLine> shopLines) {
+    private ParsedShopEdit(String shopName, String shopHelpCommand, int offersCount, int maxOffersCount,
+                           String shopCommand, int shopNumber, String shopCode, List<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName);
         this.shopHelpCommand = Objects.requireNonNull(shopHelpCommand);
-        this.offerCount = offerCount;
-        this.maxOfferCount = maxOfferCount;
+        this.offersCount = offersCount;
+        this.maxOffersCount = maxOffersCount;
         this.shopCommand = Objects.requireNonNull(shopCommand);
+        this.shopNumber = shopNumber;
+        this.shopCode = Objects.requireNonNull(shopCode);
         this.shopLines = Objects.requireNonNull(shopLines);
     }
 
@@ -49,16 +54,24 @@ public class ParsedShopEdit {
         return shopHelpCommand;
     }
 
-    public int getOfferCount() {
-        return offerCount;
+    public int getOffersCount() {
+        return offersCount;
     }
 
-    public int getMaxOfferCount() {
-        return maxOfferCount;
+    public int getMaxOffersCount() {
+        return maxOffersCount;
     }
 
     public String getShopCommand() {
         return shopCommand;
+    }
+
+    public int getShopNumber() {
+        return shopNumber;
+    }
+
+    public String getShopCode() {
+        return shopCode;
     }
 
     public List<ShopLine> getShopLines() {
@@ -70,9 +83,11 @@ public class ParsedShopEdit {
         return "ParsedShopEdit{" +
             "shopName='" + shopName + '\'' +
             ", shopHelpCommand='" + shopHelpCommand + '\'' +
-            ", offerCount=" + offerCount +
-            ", maxOfferCount=" + maxOfferCount +
+            ", offersCount=" + offersCount +
+            ", maxOffersCount=" + maxOffersCount +
             ", shopCommand='" + shopCommand + '\'' +
+            ", shopNumber=" + shopNumber +
+            ", shopCode='" + shopCode + '\'' +
             ", shopLines=" + shopLines +
             '}';
     }
@@ -84,9 +99,11 @@ public class ParsedShopEdit {
     public static class Builder {
         private String shopName;
         private String shopHelpCommand;
-        private int offerCount;
-        private int maxOfferCount;
+        private int offersCount;
+        private int maxOffersCount;
         private String shopCommand;
+        private int shopNumber;
+        private String shopCode;
         private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
         public Builder setShopName(String shopName) {
@@ -99,18 +116,28 @@ public class ParsedShopEdit {
             return this;
         }
 
-        public Builder setOfferCount(int offerCount) {
-            this.offerCount = offerCount;
+        public Builder setOffersCount(int offersCount) {
+            this.offersCount = offersCount;
             return this;
         }
 
-        public Builder setMaxOfferCount(int maxOfferCount) {
-            this.maxOfferCount = maxOfferCount;
+        public Builder setMaxOffersCount(int maxOffersCount) {
+            this.maxOffersCount = maxOffersCount;
             return this;
         }
 
         public Builder setShopCommand(String shopCommand) {
             this.shopCommand = shopCommand;
+            return this;
+        }
+
+        public Builder setShopNumber(int shopNumber) {
+            this.shopNumber = shopNumber;
+            return this;
+        }
+
+        public Builder setShopCode(String shopCode) {
+            this.shopCode = shopCode;
             return this;
         }
 
@@ -120,7 +147,9 @@ public class ParsedShopEdit {
         }
 
         public ParsedShopEdit build() {
-            return new ParsedShopEdit(shopName, shopHelpCommand, offerCount, maxOfferCount, shopCommand, shopLines.build());
+            return new ParsedShopEdit(shopName, shopHelpCommand, offersCount, maxOffersCount, shopCommand, shopNumber,
+                shopCode, shopLines.build()
+            );
         }
     }
 
