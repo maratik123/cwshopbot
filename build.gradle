@@ -13,9 +13,6 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-group 'name.maratik.cw.eu'
-version '1.0-SNAPSHOT'
-
 buildscript {
     repositories {
         mavenCentral()
@@ -26,6 +23,13 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.github.spotbugs' version '1.6.1'
+}
+
+group 'name.maratik.cw.eu'
+version '1.0-SNAPSHOT'
+
 repositories {
     mavenCentral()
     jcenter()
@@ -35,7 +39,7 @@ repositories {
 }
 
 apply plugin: 'java'
-apply plugin: 'findbugs'
+apply plugin: 'com.github.spotbugs'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -85,4 +89,8 @@ bootRun {
 
 test {
     systemProperty 'java.library.path', file('lib').absolutePath
+}
+
+spotbugs {
+    toolVersion = '3.1.3'
 }
