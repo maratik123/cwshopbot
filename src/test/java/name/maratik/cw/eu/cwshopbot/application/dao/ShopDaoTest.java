@@ -52,6 +52,16 @@ public class ShopDaoTest extends MockedTelegramBotsApiTest {
         assertThat(result, samePropertyValuesAs(shop));
     }
 
+    @Test
+    public void updateMaxOffersCountTest() throws DaoException {
+        Shop shop = createShop();
+        shopDao.putShop(shop);
+        shop = createShopBuilder(shop.getMaxOffersCount() + 5).build();
+        shopDao.putShop(shop);
+        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(RuntimeException::new).build();
+        assertThat(result, samePropertyValuesAs(shop));
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static Shop createShop(ShopLine... shopLines) {
         return createShopBuilder(shopLines).build();
@@ -59,12 +69,17 @@ public class ShopDaoTest extends MockedTelegramBotsApiTest {
 
     @SuppressWarnings("WeakerAccess")
     public static Shop.Builder createShopBuilder(ShopLine... shopLines) {
+        return createShopBuilder(5, shopLines);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static Shop.Builder createShopBuilder(int maxOffersCount, ShopLine... shopLines) {
         Shop.Builder builder = Shop.builder()
             .setShopCode(SHOP_CODE)
             .setShopName("shopName")
             .setShopCommand("/ws_shopCode")
             .setShopNumber(1)
-            .setMaxOffersCount(5)
+            .setMaxOffersCount(maxOffersCount)
             .setCharName("charName");
         Arrays.stream(shopLines).forEach(builder::addShopLine);
         return builder;
