@@ -16,7 +16,6 @@
 package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
@@ -37,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.objects.Message;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,7 +46,6 @@ import java.util.Optional;
 public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
     private static final Logger logger = LogManager.getLogger(ShopInfoParserService.class);
 
-    private final Assets assets;
     private static final Item.Visitor CRAFTABLE_ITEM_VERIFIER = new Item.Visitor() {
         @Override
         public void visit(Item item) {
@@ -62,8 +61,10 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         }
     };
 
-    public ShopInfoParserService(Assets assets) {
-        this.assets = assets;
+    private final ItemSearchService itemSearchService;
+
+    public ShopInfoParserService(ItemSearchService itemSearchService) {
+        this.itemSearchService = itemSearchService;
     }
 
     @Override
@@ -220,10 +221,11 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         @Override
         public void exitItemName(ShopInfoParser.ItemNameContext ctx) {
             String text = ctx.getText();
-            item = assets.getAllItems().get(text);
-            if (item == null) {
+            List<Item> items = itemSearchService.findItemByNameList(text, false);
+            if (items.size() != 1) {
                 throw new ParseException("Unknown item name: " + text);
             }
+            item = items.get(0);
             shopLineBuilder.setItem(item);
             item.apply(CRAFTABLE_ITEM_VERIFIER);
         }
