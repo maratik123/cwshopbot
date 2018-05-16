@@ -17,6 +17,7 @@ package name.maratik.cw.eu.spring.config;
 
 import name.maratik.cw.eu.spring.TelegramBeanPostProcessor;
 import name.maratik.cw.eu.spring.TelegramBotService;
+
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportAware;

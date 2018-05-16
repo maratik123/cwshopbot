@@ -15,9 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
-import com.google.common.collect.ImmutableList;
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Profession;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,21 +31,30 @@ import java.util.Objects;
 public class ParsedShopInfo {
     private final String shopName;
     private final String charName;
-    private final String shopCommand;
     private final ShopState shopState;
     private final List<ShopLine> shopLines;
     private final String shopCode;
     private final int shopNumber;
+    private final Castle castle;
+    private final int currentMana;
+    private final int maxMana;
+    private final Profession profession;
+    private final String shopType;
 
-    private ParsedShopInfo(String shopName, String charName, String shopCommand, ShopState shopState,
-                           List<ShopLine> shopLines, String shopCode, int shopNumber) {
+    private ParsedShopInfo(String shopName, String charName, ShopState shopState, List<ShopLine> shopLines,
+                           String shopCode, int shopNumber, Castle castle, int currentMana, int maxMana,
+                           Profession profession, String shopType) {
         this.shopName = Objects.requireNonNull(shopName);
         this.charName = Objects.requireNonNull(charName);
-        this.shopCommand = Objects.requireNonNull(shopCommand);
         this.shopState = Objects.requireNonNull(shopState);
         this.shopLines = Objects.requireNonNull(shopLines);
         this.shopCode = Objects.requireNonNull(shopCode);
         this.shopNumber = shopNumber;
+        this.castle = Objects.requireNonNull(castle);
+        this.currentMana = currentMana;
+        this.maxMana = maxMana;
+        this.profession = Objects.requireNonNull(profession);
+        this.shopType = Objects.requireNonNull(shopType);
     }
 
     public String getShopName() {
@@ -51,10 +63,6 @@ public class ParsedShopInfo {
 
     public String getCharName() {
         return charName;
-    }
-
-    public String getShopCommand() {
-        return shopCommand;
     }
 
     public ShopState getShopState() {
@@ -73,16 +81,40 @@ public class ParsedShopInfo {
         return shopNumber;
     }
 
+    public Castle getCastle() {
+        return castle;
+    }
+
+    public int getCurrentMana() {
+        return currentMana;
+    }
+
+    public int getMaxMana() {
+        return maxMana;
+    }
+
+    public Profession getProfession() {
+        return profession;
+    }
+
+    public String getShopType() {
+        return shopType;
+    }
+
     @Override
     public String toString() {
         return "ParsedShopInfo{" +
             "shopName='" + shopName + '\'' +
             ", charName='" + charName + '\'' +
-            ", shopCommand='" + shopCommand + '\'' +
             ", shopState=" + shopState +
             ", shopLines=" + shopLines +
             ", shopCode='" + shopCode + '\'' +
             ", shopNumber=" + shopNumber +
+            ", castle=" + castle +
+            ", currentMana=" + currentMana +
+            ", maxMana=" + maxMana +
+            ", profession=" + profession +
+            ", shopType='" + shopType + '\'' +
             '}';
     }
 
@@ -93,11 +125,15 @@ public class ParsedShopInfo {
     public static class Builder {
         private String charName;
         private String shopName;
-        private String shopCommand;
         private ShopState shopState;
         private String shopCode;
         private int shopNumber;
         private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
+        private Castle castle;
+        private int currentMana;
+        private int maxMana;
+        private Profession profession;
+        private String shopType;
 
         @SuppressWarnings("UnusedReturnValue")
         public Builder setCharName(String charName) {
@@ -111,12 +147,6 @@ public class ParsedShopInfo {
         }
 
         @SuppressWarnings("UnusedReturnValue")
-        public Builder setShopCommand(String shopCommand) {
-            this.shopCommand = shopCommand;
-            return this;
-        }
-
-        @SuppressWarnings("UnusedReturnValue")
         public Builder setShopState(ShopState shopState) {
             this.shopState = shopState;
             return this;
@@ -124,7 +154,7 @@ public class ParsedShopInfo {
 
         @SuppressWarnings("UnusedReturnValue")
         public Builder addShopLine(ShopLine shopLine) {
-            shopLines.add(shopLine);
+            shopLines.add(Objects.requireNonNull(shopLine));
             return this;
         }
 
@@ -138,9 +168,34 @@ public class ParsedShopInfo {
             return this;
         }
 
+        public Builder setCastle(Castle castle) {
+            this.castle = castle;
+            return this;
+        }
+
+        public Builder setCurrentMana(int currentMana) {
+            this.currentMana = currentMana;
+            return this;
+        }
+
+        public Builder setMaxMana(int maxMana) {
+            this.maxMana = maxMana;
+            return this;
+        }
+
+        public Builder setProfession(Profession profession) {
+            this.profession = profession;
+            return this;
+        }
+
+        public Builder setShopType(String shopType) {
+            this.shopType = shopType;
+            return this;
+        }
+
         public ParsedShopInfo build() {
-            return new ParsedShopInfo(shopName, charName, shopCommand, shopState, shopLines.build(), shopCode,
-                shopNumber
+            return new ParsedShopInfo(shopName, charName, shopState, shopLines.build(), shopCode, shopNumber, castle,
+                currentMana, maxMana, profession, shopType
             );
         }
     }

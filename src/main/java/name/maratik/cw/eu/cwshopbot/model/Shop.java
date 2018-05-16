@@ -128,7 +128,7 @@ public class Shop {
         }
 
         public Builder addShopLine(ShopLine shopLine) {
-            this.shopLines.add(shopLine);
+            this.shopLines.add(Objects.requireNonNull(shopLine));
             return this;
         }
 

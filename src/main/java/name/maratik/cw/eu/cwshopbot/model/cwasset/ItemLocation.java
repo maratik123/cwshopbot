@@ -15,9 +15,10 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
+import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
 import java.util.Map;
 import java.util.Optional;

@@ -18,6 +18,7 @@ package name.maratik.cw.eu.cwshopbot.application.dao;
 import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
 import name.maratik.cw.eu.cwshopbot.model.Shop;
 import name.maratik.cw.eu.cwshopbot.model.ShopLine;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

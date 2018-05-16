@@ -15,8 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
-import com.google.common.collect.ImmutableList;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,18 +30,16 @@ public class ParsedShopEdit {
     private final String shopHelpCommand;
     private final int offersCount;
     private final int maxOffersCount;
-    private final String shopCommand;
     private final int shopNumber;
     private final String shopCode;
     private final List<ShopLine> shopLines;
 
     private ParsedShopEdit(String shopName, String shopHelpCommand, int offersCount, int maxOffersCount,
-                           String shopCommand, int shopNumber, String shopCode, List<ShopLine> shopLines) {
+                           int shopNumber, String shopCode, List<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName);
         this.shopHelpCommand = Objects.requireNonNull(shopHelpCommand);
         this.offersCount = offersCount;
         this.maxOffersCount = maxOffersCount;
-        this.shopCommand = Objects.requireNonNull(shopCommand);
         this.shopNumber = shopNumber;
         this.shopCode = Objects.requireNonNull(shopCode);
         this.shopLines = Objects.requireNonNull(shopLines);
@@ -62,10 +61,6 @@ public class ParsedShopEdit {
         return maxOffersCount;
     }
 
-    public String getShopCommand() {
-        return shopCommand;
-    }
-
     public int getShopNumber() {
         return shopNumber;
     }
@@ -85,7 +80,6 @@ public class ParsedShopEdit {
             ", shopHelpCommand='" + shopHelpCommand + '\'' +
             ", offersCount=" + offersCount +
             ", maxOffersCount=" + maxOffersCount +
-            ", shopCommand='" + shopCommand + '\'' +
             ", shopNumber=" + shopNumber +
             ", shopCode='" + shopCode + '\'' +
             ", shopLines=" + shopLines +
@@ -101,7 +95,6 @@ public class ParsedShopEdit {
         private String shopHelpCommand;
         private int offersCount;
         private int maxOffersCount;
-        private String shopCommand;
         private int shopNumber;
         private String shopCode;
         private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
@@ -126,11 +119,6 @@ public class ParsedShopEdit {
             return this;
         }
 
-        public Builder setShopCommand(String shopCommand) {
-            this.shopCommand = shopCommand;
-            return this;
-        }
-
         public Builder setShopNumber(int shopNumber) {
             this.shopNumber = shopNumber;
             return this;
@@ -142,12 +130,12 @@ public class ParsedShopEdit {
         }
 
         public Builder addShopLine(ShopLine shopLine) {
-            shopLines.add(shopLine);
+            shopLines.add(Objects.requireNonNull(shopLine));
             return this;
         }
 
         public ParsedShopEdit build() {
-            return new ParsedShopEdit(shopName, shopHelpCommand, offersCount, maxOffersCount, shopCommand, shopNumber,
+            return new ParsedShopEdit(shopName, shopHelpCommand, offersCount, maxOffersCount, shopNumber,
                 shopCode, shopLines.build()
             );
         }

@@ -18,6 +18,7 @@ package name.maratik.cw.eu.spring.config;
 import name.maratik.cw.eu.spring.LongPollingTelegramBotService;
 import name.maratik.cw.eu.spring.TelegramBotService;
 import name.maratik.cw.eu.spring.WebhookTelegramBotService;
+
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.telegram.telegrambots.TelegramBotsApi;
 

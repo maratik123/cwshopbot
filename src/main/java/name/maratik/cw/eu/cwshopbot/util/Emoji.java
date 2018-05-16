@@ -29,4 +29,11 @@ public class Emoji {
     public static final String LABEL = "\uD83C\uDFF7";
     public static final String SWORDS = "\u2694\uFE0F";
     public static final String SHIELD = "\uD83D\uDEE1";
+    public static final String MOON = "\uD83C\uDF11";
+    public static final String WOLF = "\uD83D\uDC3A";
+    public static final String POTATO = "\uD83E\uDD54";
+    public static final String SHARK = "\uD83E\uDD88";
+    public static final String EAGLE = "\uD83E\uDD85";
+    public static final String DEER = "\uD83E\uDD8C";
+    public static final String DRAGON = "\uD83D\uDC09";
 }

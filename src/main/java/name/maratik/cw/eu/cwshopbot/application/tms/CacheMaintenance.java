@@ -15,8 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.tms;
 
-import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+
+import com.google.common.cache.Cache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;

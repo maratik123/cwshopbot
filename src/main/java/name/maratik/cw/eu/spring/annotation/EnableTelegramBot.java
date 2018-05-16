@@ -16,6 +16,7 @@
 package name.maratik.cw.eu.spring.annotation;
 
 import name.maratik.cw.eu.spring.config.TelegramBotConfiguration;
+
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;

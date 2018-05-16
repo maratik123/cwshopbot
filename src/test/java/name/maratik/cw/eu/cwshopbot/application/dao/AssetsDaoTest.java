@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.application.dao;
 
 import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;

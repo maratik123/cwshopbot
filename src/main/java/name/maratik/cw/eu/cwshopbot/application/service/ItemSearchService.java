@@ -20,6 +20,7 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Craftbook;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
+
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
@@ -32,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.A_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.CRAFTBOOK_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.RVIEW_PREFIX;
@@ -43,6 +43,8 @@ import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHIELD;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SWORDS;
 import static name.maratik.cw.eu.cwshopbot.util.Utils.appendCommandLink;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>

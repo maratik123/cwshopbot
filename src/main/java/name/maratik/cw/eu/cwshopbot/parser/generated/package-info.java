@@ -13,39 +13,10 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model.cwasset;
-
-import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum Craftbook implements EnumWithCode {
-    CRAFTBOOK_1("1"),
-    CRAFTBOOK_2("2"),
-    CRAFTBOOK_3("3");
+@SuppressFBWarnings
+package name.maratik.cw.eu.cwshopbot.parser.generated;
 
-    private final String code;
-    private static final Map<String, Craftbook> cache = Util.createCache(values());
-
-    Craftbook(String code) {
-        this.code = code;
-    }
-
-    @JsonValue
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @JsonCreator
-    public static Optional<Craftbook> findByCode(String code) {
-        return Optional.ofNullable(cache.get(code));
-    }
-}
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

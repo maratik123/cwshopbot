@@ -15,6 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.mock;
 
+import name.maratik.cw.eu.cwshopbot.application.Application;
+import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
+import name.maratik.cw.eu.cwshopbot.application.config.TestDynamoDBConfig;
+import name.maratik.cw.eu.cwshopbot.application.dao.ShopDao;
+import name.maratik.cw.eu.cwshopbot.application.dao.ShopLineDao;
+
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
@@ -22,11 +28,6 @@ import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.google.common.collect.ImmutableList;
-import name.maratik.cw.eu.cwshopbot.application.Application;
-import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
-import name.maratik.cw.eu.cwshopbot.application.config.TestDynamoDBConfig;
-import name.maratik.cw.eu.cwshopbot.application.dao.ShopDao;
-import name.maratik.cw.eu.cwshopbot.application.dao.ShopLineDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;

@@ -15,7 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
-import com.google.common.cache.Cache;
 import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
@@ -28,6 +27,8 @@ import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.annotation.TelegramForward;
 import name.maratik.cw.eu.spring.annotation.TelegramHelp;
 import name.maratik.cw.eu.spring.annotation.TelegramMessage;
+
+import com.google.common.cache.Cache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -202,11 +203,7 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .setText(shopInfo
-                .map(s -> "You've sent shop with name='" + s.getShopName() + "'\n" +
-                    "for char='" + s.getCharName() + "'\n" +
-                    "with command='" + s.getShopCommand() + "'\n" +
-                    "shop state is: " + s.getShopState().getCode() + '\n' +
-                    "shop lines is: " + s.getShopLines()
+                .map(s -> "You've sent the shop " + s
                 ).orElse("Unsupported forward")
             );
     }

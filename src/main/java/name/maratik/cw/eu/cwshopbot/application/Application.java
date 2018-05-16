@@ -18,6 +18,7 @@ package name.maratik.cw.eu.cwshopbot.application;
 import name.maratik.cw.eu.cwshopbot.application.config.ExternalConfig;
 import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
 import name.maratik.cw.eu.cwshopbot.application.config.TmsConfig;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
