@@ -15,33 +15,36 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model;
 
+import name.maratik.cw.eu.cwshopbot.util.MessageType;
+
+import com.google.common.collect.ImmutableSet;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.MessageEntity;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class ForwardKey {
     private final Instant timestamp;
-    private final String message;
-
-    private ForwardKey(Instant timestamp, String message) {
-        this.timestamp = Objects.requireNonNull(timestamp);
-        this.message = Objects.requireNonNull(message);
-    }
+    private final Set<MessageEntityKey> entities;
+    private final String text;
 
     public ForwardKey(Message message) {
-        this(Instant.ofEpochSecond(message.getForwardDate()), message.getText());
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public String getMessage() {
-        return message;
+        Objects.requireNonNull(message);
+        timestamp = Instant.ofEpochSecond(Objects.requireNonNull(message.getForwardDate()));
+        text = Objects.requireNonNull(message.getText());
+        this.entities = Optional.ofNullable(message.getEntities())
+            .map(entities -> entities.stream()
+                .map(MessageEntityKey::new)
+                .collect(toImmutableSet())
+            ).orElseGet(ImmutableSet::of);
     }
 
     @Override
@@ -55,16 +58,82 @@ public class ForwardKey {
 
         ForwardKey that = (ForwardKey) o;
 
-        if (!getTimestamp().equals(that.getTimestamp())) {
+        if (!timestamp.equals(that.timestamp)) {
             return false;
         }
-        return getMessage().equals(that.getMessage());
+        if (!entities.equals(that.entities)) {
+            return false;
+        }
+        return text.equals(that.text);
     }
 
     @Override
     public int hashCode() {
-        int result = getTimestamp().hashCode();
-        result = 31 * result + getMessage().hashCode();
+        int result = timestamp.hashCode();
+        result = 31 * result + entities.hashCode();
+        result = 31 * result + text.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ForwardKey{" +
+            "timestamp=" + timestamp +
+            ", text='" + text + '\'' +
+            ", entities=" + entities +
+            '}';
+    }
+
+    private static class MessageEntityKey {
+        private final int offset;
+        private final int length;
+        private final Optional<MessageType> messageType;
+
+        private MessageEntityKey(int offset, int length, Optional<MessageType> messageType) {
+            this.offset = offset;
+            this.length = length;
+            this.messageType = messageType;
+        }
+
+        public MessageEntityKey(MessageEntity messageEntity) {
+            this(messageEntity.getOffset(), messageEntity.getLength(), MessageType.findByCode(messageEntity.getType()));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof MessageEntityKey)) {
+                return false;
+            }
+
+            MessageEntityKey that = (MessageEntityKey) o;
+
+            if (offset != that.offset) {
+                return false;
+            }
+            if (length != that.length) {
+                return false;
+            }
+            return messageType.equals(that.messageType);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = offset;
+            result = 31 * result + length;
+            result = 31 * result + messageType.hashCode();
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "MessageKey{" +
+                "offset=" + offset +
+                ", length=" + length +
+                ", messageType=" + messageType +
+                '}';
+        }
     }
 }

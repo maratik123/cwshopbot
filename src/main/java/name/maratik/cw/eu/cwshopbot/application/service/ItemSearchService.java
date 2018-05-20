@@ -36,7 +36,7 @@ import java.util.function.Function;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.A_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.CRAFTBOOK_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.RVIEW_PREFIX;
-import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_SEARCH_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.T_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.VIEW_PREFIX;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
@@ -52,6 +52,8 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Service
 public class ItemSearchService {
     private static final Comparator<Item> ITEM_NAME_COMPARATOR = Comparator.comparing(Item::getName);
+    private static final Comparator<Map.Entry<Item, ?>> ITEM_NAME_IN_KEY_COMPARATOR =
+        Comparator.comparing(Map.Entry::getKey, ITEM_NAME_COMPARATOR);
     private static final int LIST_LIMIT = 30;
 
     private final Assets assets;
@@ -159,7 +161,7 @@ public class ItemSearchService {
                     assets.getAllItems().get(entry.getKey()),
                     entry.getValue()
                 ))
-                .sorted(Comparator.comparing(Map.Entry::getKey, ITEM_NAME_COMPARATOR))
+                .sorted(ITEM_NAME_IN_KEY_COMPARATOR)
                 .forEach(entry -> {
                     Item item = entry.getKey();
                     sb.append(item.getName()).append(" (");
@@ -224,7 +226,7 @@ public class ItemSearchService {
                 appendCommandLink(sb, CRAFTBOOK_PREFIX, craftableItem.getCraftbook().getCode())
                     .append('\n')
                     .append("Find shops with item: ");
-                appendCommandLink(sb, SHOP_PREFIX, craftableItem).append('\n');
+                appendCommandLink(sb, SHOP_SEARCH_PREFIX, craftableItem).append('\n');
             }
 
             @Override
@@ -272,7 +274,7 @@ public class ItemSearchService {
         }
     }
 
-    private static class ListRecipes implements SearchOutput {
+    private class ListRecipes implements SearchOutput {
         private final String message;
 
         private ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {

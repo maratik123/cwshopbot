@@ -38,9 +38,9 @@ import org.springframework.context.annotation.PropertySource;
 })
 @ComponentScan(excludeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application {
-    private static final Logger logger = LogManager.getLogger(Application.class);
 
     public static void main(String[] args) {
+        Logger logger = LogManager.getLogger(Application.class);
         logger.info("Starting main app");
         SpringApplication.run(Application.class, args);
         logger.info("Main app started. Exiting main thread");

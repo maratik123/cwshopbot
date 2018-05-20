@@ -30,24 +30,41 @@ public enum MessageType implements EnumWithCode {
     BOT_COMMAND("bot_command"),
     URL("url"),
     EMAIL("email"),
-    BOLD("bold"),
+    BOLD("bold", "*", "*"),
     ITALIC("italic"),
     CODE("code"),
     PRE("pre"),
     TEXT_LINK("text_link"),
-    TEXT_MENTION("text_mention");
+    TEXT_MENTION("text_mention"),
+    TEXT("text");
 
     private final String code;
+    private final String prefix;
+    private final String postfix;
     private static final Map<String, MessageType> cache = Util.createCache(values());
 
     MessageType(String code) {
+        this(code, null, null);
+    }
+
+    MessageType(String code, String prefix, String postfix) {
         this.code = code;
+        this.prefix = prefix;
+        this.postfix = postfix;
     }
 
     @Override
     @JsonValue
     public String getCode() {
         return code;
+    }
+
+    public Optional<String> getPrefix() {
+        return Optional.ofNullable(prefix);
+    }
+
+    public Optional<String> getPostfix() {
+        return Optional.ofNullable(postfix);
     }
 
     @JsonCreator

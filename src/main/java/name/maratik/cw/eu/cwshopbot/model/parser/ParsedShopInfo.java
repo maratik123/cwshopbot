@@ -19,11 +19,16 @@ import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Profession;
+import name.maratik.cw.eu.cwshopbot.parser.ParseException;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Objects;
+
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_COMMAND_PREFIX;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -40,21 +45,45 @@ public class ParsedShopInfo {
     private final int maxMana;
     private final Profession profession;
     private final String shopType;
+    private final String shopCommand;
 
     private ParsedShopInfo(String shopName, String charName, ShopState shopState, List<ShopLine> shopLines,
                            String shopCode, int shopNumber, Castle castle, int currentMana, int maxMana,
-                           Profession profession, String shopType) {
+                           Profession profession, String shopType, String shopCommand) {
         this.shopName = Objects.requireNonNull(shopName);
         this.charName = Objects.requireNonNull(charName);
         this.shopState = Objects.requireNonNull(shopState);
-        this.shopLines = Objects.requireNonNull(shopLines);
+        this.shopCommand = Objects.requireNonNull(shopCommand);
+        if (!shopCommand.startsWith(SHOP_COMMAND_PREFIX)) {
+            throw new ParseException("Shop command has unexpected format: " + shopCommand);
+        }
         this.shopCode = Objects.requireNonNull(shopCode);
+        if (!shopCommand.endsWith(shopCode)) {
+            throw new ParseException("Shop command '" + shopCommand + "' does not contain shop code: " + shopCode);
+        }
+        this.shopLines = Objects.requireNonNull(shopLines);
+        List<ShopLine> unknownLines = shopLines.stream()
+            .filter(shopLine -> !shopLine.getCraftCommand().startsWith(shopCommand))
+            .collect(toImmutableList());
+        if (!unknownLines.isEmpty()) {
+            StringBuilder sb = new StringBuilder("Next lines has unexpected command: ");
+            unknownLines.forEach(shopLine -> sb
+                .append("Item=")
+                .append(shopLine.getItem().getId())
+                .append(", command=")
+                .append(shopLine.getCraftCommand())
+                .append('\n'));
+            throw new ParseException(sb.toString());
+        }
         this.shopNumber = shopNumber;
         this.castle = Objects.requireNonNull(castle);
         this.currentMana = currentMana;
         this.maxMana = maxMana;
         this.profession = Objects.requireNonNull(profession);
         this.shopType = Objects.requireNonNull(shopType);
+        if (!shopName.startsWith(shopType) && !shopName.endsWith(shopType)) {
+            throw new ParseException("Shop name '" + shopName + "' does not contain shop type '" + shopType + '\'');
+        }
     }
 
     public String getShopName() {
@@ -101,6 +130,10 @@ public class ParsedShopInfo {
         return shopType;
     }
 
+    public String getShopCommand() {
+        return shopCommand;
+    }
+
     @Override
     public String toString() {
         return "ParsedShopInfo{" +
@@ -115,6 +148,7 @@ public class ParsedShopInfo {
             ", maxMana=" + maxMana +
             ", profession=" + profession +
             ", shopType='" + shopType + '\'' +
+            ", shopCommand='" + shopCommand + '\'' +
             '}';
     }
 
@@ -126,7 +160,6 @@ public class ParsedShopInfo {
         private String charName;
         private String shopName;
         private ShopState shopState;
-        private String shopCode;
         private int shopNumber;
         private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
         private Castle castle;
@@ -134,6 +167,7 @@ public class ParsedShopInfo {
         private int maxMana;
         private Profession profession;
         private String shopType;
+        private String shopCommand;
 
         @SuppressWarnings("UnusedReturnValue")
         public Builder setCharName(String charName) {
@@ -146,7 +180,6 @@ public class ParsedShopInfo {
             return this;
         }
 
-        @SuppressWarnings("UnusedReturnValue")
         public Builder setShopState(ShopState shopState) {
             this.shopState = shopState;
             return this;
@@ -155,11 +188,6 @@ public class ParsedShopInfo {
         @SuppressWarnings("UnusedReturnValue")
         public Builder addShopLine(ShopLine shopLine) {
             shopLines.add(Objects.requireNonNull(shopLine));
-            return this;
-        }
-
-        public Builder setShopCode(String shopCode) {
-            this.shopCode = shopCode;
             return this;
         }
 
@@ -193,10 +221,15 @@ public class ParsedShopInfo {
             return this;
         }
 
+        public Builder setShopCommand(String shopCommand) {
+            this.shopCommand = shopCommand;
+            return this;
+        }
+
         public ParsedShopInfo build() {
+            String shopCode = shopCommand.substring(SHOP_COMMAND_PREFIX.length());
             return new ParsedShopInfo(shopName, charName, shopState, shopLines.build(), shopCode, shopNumber, castle,
-                currentMana, maxMana, profession, shopType
-            );
+                currentMana, maxMana, profession, shopType, shopCommand);
         }
     }
 
@@ -206,8 +239,7 @@ public class ParsedShopInfo {
         private final int price;
         private final String craftCommand;
 
-        @SuppressWarnings("WeakerAccess")
-        public ShopLine(Item item, int mana, int price, String craftCommand) {
+        private ShopLine(Item item, int mana, int price, String craftCommand) {
             this.item = Objects.requireNonNull(item);
             this.mana = mana;
             this.price = price;

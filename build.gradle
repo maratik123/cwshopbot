@@ -85,8 +85,9 @@ bootJar {
 bootRun {
     jvmArgs = [
             '-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager',
-            '-Xms128M',
-            '-Xmx512M',
+            '-Xms128m',
+            '-Xmx512m',
+            '-XX:MaxMetaspaceSize=128m',
             '-server'
     ]
 }
@@ -101,7 +102,10 @@ spotbugs {
 
 generateGrammarSource {
     maxHeapSize = '64m'
-    arguments += [ '-long-messages' ]
+    arguments += [
+            '-long-messages',
+            '-lib', 'src/main/antlr/name/maratik/cw/eu/cwshopbot/parser/generated'
+    ]
 }
 
 idea {

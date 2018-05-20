@@ -59,11 +59,11 @@ public class ShopLineDaoTest extends MockedTelegramBotsApiTest {
         item = assets.getAllItems().values().iterator().next();
         craftableItem = assets.getCraftableItems().values().stream()
             .filter(itm -> !itm.equals(item))
-            .findAny().orElseThrow(RuntimeException::new);
+            .findAny().orElseThrow(AssertionError::new);
         wearableItem = assets.getWearableItems().values().stream()
             .filter(itm -> !itm.equals(item))
             .filter(itm -> !itm.equals(craftableItem))
-            .findAny().orElseThrow(RuntimeException::new);
+            .findAny().orElseThrow(AssertionError::new);
     }
 
     @Test

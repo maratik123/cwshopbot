@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @PropertySource("classpath:cwshopbot.properties")
 public class InternalConfig {
-    private static final Logger logger = LogManager.getLogger(InternalConfig.class);
+    private final Logger logger = LogManager.getLogger(InternalConfig.class);
 
     @Bean
     public TelegramBotType telegramBotType() {

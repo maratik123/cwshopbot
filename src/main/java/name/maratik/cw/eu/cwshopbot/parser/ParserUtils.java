@@ -15,15 +15,33 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.parser;
 
+import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class ParseException extends RuntimeException {
-    public ParseException(String message) {
-        super(message);
-    }
+public class ParserUtils {
+    private static final Logger logger = LogManager.getLogger(ParserUtils.class);
 
-    public ParseException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public static final Item.Visitor CRAFTABLE_ITEM_VERIFIER = new Item.Visitor() {
+
+        @Override
+        public void visit(Item item) {
+            logger.warn("Item {} is not craftable", item);
+        }
+
+        @Override
+        public void visit(CraftableItem craftableItem) {
+        }
+
+        @Override
+        public void visit(WearableItem wearableItem) {
+        }
+    };
+
 }

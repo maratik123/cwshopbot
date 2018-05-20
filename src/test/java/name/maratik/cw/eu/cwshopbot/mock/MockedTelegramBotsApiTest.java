@@ -61,7 +61,9 @@ import java.util.Collections;
     "name.maratik.cw.eu.cwshopbot.secretAccessKey=zzz",
     "name.maratik.cw.eu.cwshopbot.region=eee",
     "cwuserid=987654321"
-})
+},
+    locations = "classpath:test-application.properties"
+)
 @ContextConfiguration(classes = {
     InternalConfig.class,
     TestDynamoDBConfig.class

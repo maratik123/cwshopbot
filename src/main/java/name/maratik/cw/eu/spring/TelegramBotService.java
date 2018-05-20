@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
@@ -57,12 +56,18 @@ import static name.maratik.cw.eu.cwshopbot.util.Utils.optionalOf;
 public abstract class TelegramBotService implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TelegramBotService.class);
     public static final String PATTERN_COMMAND_SUFFIX = "*";
-    private static final int PATTERN_COMMAND_SUFFIX_LEN = PATTERN_COMMAND_SUFFIX.length();
+    private static final Comparator<Map.Entry<String, ?>> KEY_LENGTH_COMPARATOR =
+        Comparator.comparing(Map.Entry::getKey, Comparator.comparingInt(String::length));
 
     private final Map<OptionalLong, Handlers> handlers = new HashMap<>();
     private final ConfigurableBeanFactory beanFactory;
 
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
+    private static final Comparator<TelegramBotCommand> TELEGRAM_BOT_COMMAND_COMPARATOR =
+        Comparator.comparing(
+            TelegramBotCommand::getCommand,
+            Comparator.comparing(ImmutableSet.of("/license", "/help")::contains)
+        ).thenComparing(TelegramBotCommand::getCommand);
 
     public TelegramBotService(TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
@@ -106,13 +111,15 @@ public abstract class TelegramBotService implements AutoCloseable {
                 )
             );
         } else {
-            optionalCommandHandler = command.getCommand().map(cmd -> handlers.getCommandList().get(cmd));
+            Optional<String> commandCommandOpt = command.getCommand();
+            optionalCommandHandler = commandCommandOpt.map(cmd -> handlers.getCommandList().get(cmd));
             if (!optionalCommandHandler.isPresent()) {
-                if (command.getCommand().isPresent()) {
+                if (commandCommandOpt.isPresent()) {
+                    String commandCommand = commandCommandOpt.get();
                     optionalCommandHandler = handlers.getPatternCommandList().entrySet().stream()
-                        .filter(entry -> command.getCommand().get().startsWith(entry.getKey()))
-                        .map(Map.Entry::getValue)
-                        .findFirst();
+                        .filter(entry -> commandCommand.startsWith(entry.getKey()))
+                        .max(KEY_LENGTH_COMPARATOR)
+                        .map(Map.Entry::getValue);
                 }
                 if (!optionalCommandHandler.isPresent()) {
                     optionalCommandHandler = Optional.ofNullable(handlers.getDefaultMessageHandler());
@@ -155,8 +162,6 @@ public abstract class TelegramBotService implements AutoCloseable {
         );
     }
 
-    private static final Set<String> LAST_COMMANDS_IN_HELP = ImmutableSet.of("/license", "/help");
-
     private String buildHelpMessage(OptionalLong userKey) {
         StringBuilder sb = new StringBuilder();
         String prefixHelpMessage = getOrDefault(userKey).getPrefixHelpMessage();
@@ -164,12 +169,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             sb.append(prefixHelpMessage);
         }
         getCommandList(userKey)
-            .sorted(
-                Comparator.comparing(
-                    TelegramBotCommand::getCommand,
-                    Comparator.comparing(LAST_COMMANDS_IN_HELP::contains)
-                ).thenComparing(TelegramBotCommand::getCommand)
-            )
+            .sorted(TELEGRAM_BOT_COMMAND_COMPARATOR)
             .forEach(method -> sb
                 .append(method.getCommand())
                 .append(' ')
@@ -214,7 +214,7 @@ public abstract class TelegramBotService implements AutoCloseable {
                 TelegramHandler telegramHandler = new TelegramHandler(bean, method, command);
                 if (cmd.endsWith(PATTERN_COMMAND_SUFFIX)) {
                     createOrGet(userId).getPatternCommandList()
-                        .put(cmd.substring(0, cmd.length() - PATTERN_COMMAND_SUFFIX_LEN), telegramHandler);
+                        .put(cmd.substring(0, cmd.length() - PATTERN_COMMAND_SUFFIX.length()), telegramHandler);
                 } else {
                     createOrGet(userId).getCommandList().put(cmd, telegramHandler);
                 }

@@ -40,7 +40,7 @@ public class ShopDaoTest extends MockedTelegramBotsApiTest {
     public void putTest() throws DaoException {
         Shop shop = createShop();
         shopDao.putShop(shop);
-        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(RuntimeException::new).build();
+        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(AssertionError::new).build();
         assertThat(result, samePropertyValuesAs(shop));
     }
 
@@ -49,7 +49,7 @@ public class ShopDaoTest extends MockedTelegramBotsApiTest {
         Shop shop = createShop();
         shopDao.putShop(shop);
         shopDao.putShop(shop);
-        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(RuntimeException::new).build();
+        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(AssertionError::new).build();
         assertThat(result, samePropertyValuesAs(shop));
     }
 
@@ -59,7 +59,7 @@ public class ShopDaoTest extends MockedTelegramBotsApiTest {
         shopDao.putShop(shop);
         shop = createShopBuilder(shop.getMaxOffersCount() + 5).build();
         shopDao.putShop(shop);
-        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(RuntimeException::new).build();
+        Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(AssertionError::new).build();
         assertThat(result, samePropertyValuesAs(shop));
     }
 

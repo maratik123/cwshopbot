@@ -48,7 +48,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class AssetsDao {
-    private static final Logger logger = LogManager.getLogger(AssetsDao.class);
+    private final Logger logger = LogManager.getLogger(AssetsDao.class);
 
     private final AssetsDto assetsDto;
 

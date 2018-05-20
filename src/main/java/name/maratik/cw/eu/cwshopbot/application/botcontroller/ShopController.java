@@ -56,17 +56,12 @@ public class ShopController {
     private static final Logger logger = LogManager.getLogger(ShopController.class);
 
     public static final String VIEW_PREFIX = "/view_";
-    private static final int VIEW_PREFIX_LEN = VIEW_PREFIX.length();
     public static final String RVIEW_PREFIX = "/rview_";
-    private static final int RVIEW_PREFIX_LEN = RVIEW_PREFIX.length();
     public static final String A_PREFIX = "/a_";
-    private static final int A_PREFIX_LEN = A_PREFIX.length();
     public static final String T_PREFIX = "/t_";
-    private static final int T_PREFIX_LEN = T_PREFIX.length();
     public static final String CRAFTBOOK_PREFIX = "/craftbook_";
-    private static final int CRAFTBOOK_PREFIX_LEN = CRAFTBOOK_PREFIX.length();
-    public static final String SHOP_PREFIX = "/shop_";
-    private static final int SHOP_PREFIX_LEN = SHOP_PREFIX.length();
+    public static final String SHOP_SEARCH_PREFIX = "/shop_";
+    public static final String SHOP_COMMAND_PREFIX = "/ws_";
 
     private final Clock clock;
     private final int forwardStaleSec;
@@ -132,7 +127,7 @@ public class ShopController {
 
     @TelegramCommand(commands = T_PREFIX + PATTERN_COMMAND_SUFFIX, description = "Info about item")
     public SendMessage itemInfo(long userId, Message message) {
-        return itemInfo(userId, message, T_PREFIX_LEN);
+        return itemInfo(userId, message, T_PREFIX.length());
     }
 
     @TelegramCommand(
@@ -141,7 +136,7 @@ public class ShopController {
         hidden = true
     )
     public SendMessage itemInfoA(long userId, Message message) {
-        return itemInfo(userId, message, A_PREFIX_LEN);
+        return itemInfo(userId, message, A_PREFIX.length());
     }
 
     @TelegramCommand(
@@ -149,7 +144,7 @@ public class ShopController {
         description = "Show specified craftbook"
     )
     public SendMessage showCraftbook(long userId, Message message) {
-        Optional<String> result = itemSearchService.getCraftbook(getCommandSuffix(message, CRAFTBOOK_PREFIX_LEN));
+        Optional<String> result = itemSearchService.getCraftbook(getCommandSuffix(message, CRAFTBOOK_PREFIX.length()));
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
@@ -161,7 +156,7 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
-            .setText(getMessage(itemSearchService.findRecipeByCode(getCommandSuffix(message, VIEW_PREFIX_LEN))));
+            .setText(getMessage(itemSearchService.findRecipeByCode(getCommandSuffix(message, VIEW_PREFIX.length()))));
     }
 
     @TelegramCommand(commands = RVIEW_PREFIX + PATTERN_COMMAND_SUFFIX, description = "Find recipes for item included")
@@ -170,7 +165,7 @@ public class ShopController {
             .setChatId(userId)
             .enableMarkdown(true)
             .setText(getMessage(
-                itemSearchService.findRecipeByIncludedItem(getCommandSuffix(message, RVIEW_PREFIX_LEN))
+                itemSearchService.findRecipeByIncludedItem(getCommandSuffix(message, RVIEW_PREFIX.length()))
             ));
     }
 

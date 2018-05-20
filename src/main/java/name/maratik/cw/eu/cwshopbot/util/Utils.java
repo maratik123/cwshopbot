@@ -17,20 +17,26 @@ package name.maratik.cw.eu.cwshopbot.util;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 
+import com.google.common.collect.ImmutableList;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.MessageEntity;
+import org.telegram.telegrambots.api.objects.User;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Function;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class Utils {
     public static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
-        Comparator.comparing(MessageEntity::getOffset);
+        Comparator.comparingInt(MessageEntity::getOffset);
 
     public static int endOfEntity(MessageEntity messageEntity) {
         return messageEntity.getOffset() + messageEntity.getLength();
@@ -88,5 +94,92 @@ public class Utils {
 
     public static OptionalLong optionalOf(Long l) {
         return l == null ? OptionalLong.empty() : OptionalLong.of(l);
+    }
+
+    public static String reformatMessage(Message message) {
+        StringBuilder sb = new StringBuilder();
+        for (MessageEntity messageEntity : generateTextMessageEntities(message)) {
+            Optional<MessageType> messageTypeOpt = MessageType.findByCode(messageEntity.getType());
+            if (messageTypeOpt.isPresent()) {
+                MessageType messageType = messageTypeOpt.get();
+                messageType.getPrefix().ifPresent(sb::append);
+                sb.append(messageEntity.getText());
+                messageType.getPostfix().ifPresent(sb::append);
+            } else {
+                sb.append(messageEntity.getText());
+            }
+        }
+        return sb.toString();
+    }
+
+    private static List<MessageEntity> generateTextMessageEntities(Message message) {
+        List<MessageEntity> entities = message.getEntities().stream()
+            .sorted(MESSAGE_ENTITY_OFFSET_COMPARATOR)
+            .collect(toImmutableList());
+        String text = message.getText();
+        int currPos = 0;
+        ImmutableList.Builder<MessageEntity> builder = ImmutableList.builder();
+        for (MessageEntity entity : entities) {
+            int entityOffset = entity.getOffset();
+            if (entityOffset > currPos) {
+                builder.add(new TextMessageEntity(text.substring(currPos, entityOffset), currPos));
+            }
+            builder.add(entity);
+            currPos = endOfEntity(entity);
+        }
+        if (currPos < text.length()) {
+            builder.add(new TextMessageEntity(text.substring(currPos), currPos));
+        }
+        return builder.build();
+    }
+
+    @SuppressWarnings("ReturnOfNull")
+    private static class TextMessageEntity extends MessageEntity {
+        private static final String type = MessageType.TEXT.getCode();
+        private final String text;
+        private final int offset;
+
+        private TextMessageEntity(String text, int offset) {
+            this.text = text;
+            this.offset = offset;
+        }
+
+        @Override
+        public String getType() {
+            return type;
+        }
+
+        @Override
+        public Integer getOffset() {
+            return offset;
+        }
+
+        @Override
+        public Integer getLength() {
+            return text.length();
+        }
+
+        @Override
+        public String getUrl() {
+            return null;
+        }
+
+        @Override
+        public String getText() {
+            return text;
+        }
+
+        @Override
+        public User getUser() {
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return "TextMessageEntity{" +
+                "text='" + text + '\'' +
+                ", offset=" + offset +
+                '}';
+        }
     }
 }

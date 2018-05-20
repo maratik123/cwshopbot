@@ -20,9 +20,7 @@ package name.maratik.cw.eu.cwshopbot.util;
  */
 public class Emoji {
     public static final String GOLD = "\uD83D\uDCB0";
-    public static final int GOLD_LEN = GOLD.length();
     public static final String MANA = "\uD83D\uDCA7";
-    public static final int MANA_LEN = MANA.length();
     public static final String BOX = "\uD83D\uDCE6";
     public static final String HAMMERS = "\u2692";
     public static final String CHEST = "\uD83D\uDDC3";

@@ -17,19 +17,21 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Profession;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;
 import name.maratik.cw.eu.cwshopbot.parser.ParseException;
-import name.maratik.cw.eu.cwshopbot.parser.generated.ShopInfoBaseListener;
 import name.maratik.cw.eu.cwshopbot.parser.generated.ShopInfoLexer;
 import name.maratik.cw.eu.cwshopbot.parser.generated.ShopInfoParser;
+import name.maratik.cw.eu.cwshopbot.parser.generated.ShopInfoParserBaseListener;
 
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,27 +41,14 @@ import org.telegram.telegrambots.api.objects.Message;
 import java.util.List;
 import java.util.Optional;
 
+import static name.maratik.cw.eu.cwshopbot.util.Utils.reformatMessage;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Component
 public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
     private static final Logger logger = LogManager.getLogger(ShopInfoParserService.class);
-
-    private static final Item.Visitor CRAFTABLE_ITEM_VERIFIER = new Item.Visitor() {
-        @Override
-        public void visit(Item item) {
-            logger.warn("Item {} is not craftable", item);
-        }
-
-        @Override
-        public void visit(CraftableItem craftableItem) {
-        }
-
-        @Override
-        public void visit(WearableItem wearableItem) {
-        }
-    };
 
     private final ItemSearchService itemSearchService;
 
@@ -69,29 +58,36 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
     @Override
     public Optional<ParsedShopInfo> parse(Message message) {
-        CodePointCharStream messageCharStream = CharStreams.fromString(message.getText());
+        String formattedMessage = reformatMessage(message);
+        CodePointCharStream messageCharStream = CharStreams.fromString(formattedMessage);
         ShopInfoLexer lexer = new ShopInfoLexer(messageCharStream);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(new LoggingErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ShopInfoParser parser = new ShopInfoParser(tokens);
+        parser.setErrorHandler(new BailErrorStrategy());
         ParsedShopInfo.Builder builder = ParsedShopInfo.builder();
         try {
             ParseTreeWalker.DEFAULT.walk(new ShopInfoListenerImpl(builder), parser.shopInfo());
+            return Optional.of(builder.build());
+        } catch (ParseCancellationException e) {
+            logger.error("Failed to parse message {}", message, e);
+            if (e.getCause() instanceof RecognitionException) {
+                RecognitionException recognitionException = (RecognitionException) e.getCause();
+                logger.error("Expected tokens: {}, offended one: {}",
+                    recognitionException.getExpectedTokens(), recognitionException.getOffendingToken()
+                );
+            }
+            return Optional.empty();
         } catch (Exception e) {
             logger.error("Failed to parse message {}", message, e);
             return Optional.empty();
         }
-        return Optional.of(builder.build());
     }
 
-    private class ShopInfoListenerImpl extends ShopInfoBaseListener {
+    private class ShopInfoListenerImpl extends ShopInfoParserBaseListener {
         private final ParsedShopInfo.Builder builder;
-        private boolean inComplexShopName = false;
-        private boolean inCraftCommand = false;
-        private String shopType = "";
-        private String shopCode = "";
         private ParsedShopInfo.ShopLine.Builder shopLineBuilder;
-        private Item item;
-        private boolean isShopCodeSet = false;
 
         private ShopInfoListenerImpl(ParsedShopInfo.Builder builder) {
             this.builder = builder;
@@ -102,27 +98,31 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         }
 
         @Override
-        public void enterComplexShopName(ShopInfoParser.ComplexShopNameContext ctx) {
-            inComplexShopName = true;
-        }
-
-        @Override
-        public void exitComplexShopName(ShopInfoParser.ComplexShopNameContext ctx) {
-            inComplexShopName = false;
-        }
-
-        @Override
         public void exitShopName(ShopInfoParser.ShopNameContext ctx) {
+            logger.trace("exitShopName: {}", ctx::getText);
             builder.setShopName(ctx.getText());
         }
 
         @Override
+        public void exitShopNumber(ShopInfoParser.ShopNumberContext ctx) {
+            logger.trace("exitShopNumber: {}", ctx::getText);
+            String text = ctx.getText();
+            try {
+                builder.setShopNumber(Integer.parseInt(text));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Unsupported shop number value: " + text, e);
+            }
+        }
+
+        @Override
         public void exitCharName(ShopInfoParser.CharNameContext ctx) {
+            logger.trace("exitCharName: {}", ctx::getText);
             builder.setCharName(ctx.getText());
         }
 
         @Override
         public void exitCurrentMana(ShopInfoParser.CurrentManaContext ctx) {
+            logger.trace("exitCurrentMana: {}", ctx::getText);
             String text = ctx.getText();
             try {
                 builder.setCurrentMana(Integer.parseInt(text));
@@ -133,6 +133,7 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
         @Override
         public void exitMaxMana(ShopInfoParser.MaxManaContext ctx) {
+            logger.trace("exitMaxMana: {}", ctx::getText);
             String text = ctx.getText();
             try {
                 builder.setMaxMana(Integer.parseInt(text));
@@ -142,34 +143,37 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         }
 
         @Override
-        public void exitProfession(ShopInfoParser.ProfessionContext ctx) {
+        public void exitProfessionFromCastle(ShopInfoParser.ProfessionFromCastleContext ctx) {
+            logger.trace("exitProfessionFromCastle: {}", ctx::getText);
             String text = ctx.getText();
-            builder.setProfession(Profession.findByCode(text)
-                .orElseThrow(() -> new ParseException("Unsupported profession: " + text))
-            );
-        }
-
-        @Override
-        public void exitCastle(ShopInfoParser.CastleContext ctx) {
-            String text = ctx.getText();
-            builder.setCastle(Castle.findByCode(text)
-                .orElseThrow(() -> new ParseException("Unsupported castle: " + text))
-            );
-        }
-
-        @Override
-        public void exitShopType(ShopInfoParser.ShopTypeContext ctx) {
-            String text = ctx.getText();
-            if (inComplexShopName) {
-                builder.setShopType(text);
-                shopType = text;
-            } else if (!shopType.equals(text)) {
-                throw new ParseException("Shop name mismatch: expected = " + shopType + ", actual = " + text);
+            String[] textParts = text.split(" ");
+            if (textParts.length != 3 || !textParts[1].equals("from")) {
+                throw new ParseException("Unknown profession from castle: " + text);
             }
+            String profession = textParts[0];
+            builder.setProfession(Profession.findByCode(profession)
+                .orElseThrow(() -> new ParseException("Unsupported profession: " + profession))
+            );
+            String castle = textParts[2];
+            builder.setCastle(Castle.findByCode(castle)
+                .orElseThrow(() -> new ParseException("Unsupported castle: " + castle))
+            );
+        }
+
+        @Override
+        public void exitShopTypeIs(ShopInfoParser.ShopTypeIsContext ctx) {
+            logger.trace("exitShopTypeIs: {}", ctx::getText);
+            String text = ctx.getText();
+            String[] textParts = text.split(" ");
+            if (textParts.length != 2 || !textParts[1].equals("is")) {
+                throw new ParseException("Unsupported shop type is: " + text);
+            }
+            builder.setShopType(textParts[0]);
         }
 
         @Override
         public void exitShopState(ShopInfoParser.ShopStateContext ctx) {
+            logger.trace("exitShopState: {}", ctx::getText);
             String text = ctx.getText();
             builder.setShopState(ShopState.findByCode(text)
                 .orElseThrow(() -> new ParseException("Unsupported shop state: " + text))
@@ -177,74 +181,36 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         }
 
         @Override
-        public void exitShopCode(ShopInfoParser.ShopCodeContext ctx) {
-            String text = ctx.getText();
-            if (inCraftCommand && !isShopCodeSet) {
-                builder.setShopCode(text);
-                shopCode = text;
-                isShopCodeSet = true;
-            } else if (!shopCode.equals(text)) {
-                throw new ParseException("Shop code mismatch: expected = " + shopCode + ", actual = " + text);
-            }
-        }
-
-        @Override
-        public void enterCraftCommand(ShopInfoParser.CraftCommandContext ctx) {
-            inCraftCommand = true;
-        }
-
-        @Override
-        public void exitCraftCommand(ShopInfoParser.CraftCommandContext ctx) {
-            inCraftCommand = false;
-        }
-
-        @Override
-        public void exitShopNumber(ShopInfoParser.ShopNumberContext ctx) {
-            String text = ctx.getText();
-            try {
-                builder.setShopNumber(Integer.parseInt(text));
-            } catch (NumberFormatException e) {
-                throw new ParseException("Unsupported shop number value: " + text, e);
-            }
-        }
-
-        @Override
         public void enterShopLine(ShopInfoParser.ShopLineContext ctx) {
+            logger.trace("enterShopLine: {}", ctx::getText);
             shopLineBuilder = ParsedShopInfo.ShopLine.builder();
         }
 
         @Override
-        public void exitShopLine(ShopInfoParser.ShopLineContext ctx) {
-            builder.addShopLine(shopLineBuilder.build());
-        }
-
-        @Override
         public void exitItemName(ShopInfoParser.ItemNameContext ctx) {
+            logger.trace("exitItemName: {}", ctx::getText);
             String text = ctx.getText();
             List<Item> items = itemSearchService.findItemByNameList(text, false);
             if (items.size() != 1) {
                 throw new ParseException("Unknown item name: " + text);
             }
-            item = items.get(0);
-            shopLineBuilder.setItem(item);
-            item.apply(CRAFTABLE_ITEM_VERIFIER);
+            shopLineBuilder.setItem(items.get(0));
         }
 
         @Override
         public void exitManaCost(ShopInfoParser.ManaCostContext ctx) {
+            logger.trace("exitManaCost: {}", ctx::getText);
             String text = ctx.getText();
-            int manaCost;
             try {
-                manaCost = Integer.parseInt(text);
+                shopLineBuilder.setMana(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported mana cost value: " + text, e);
             }
-            shopLineBuilder.setMana(manaCost);
-            item.apply(new ManaCostVerifier(manaCost));
         }
 
         @Override
         public void exitPrice(ShopInfoParser.PriceContext ctx) {
+            logger.trace("exitPrice: {}", ctx::getText);
             String text = ctx.getText();
             try {
                 shopLineBuilder.setPrice(Integer.parseInt(text));
@@ -254,36 +220,21 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         }
 
         @Override
-        public void exitItemCode(ShopInfoParser.ItemCodeContext ctx) {
-            String text = ctx.getText();
-            if (!text.equals(item.getId())) {
-                throw new ParseException("Item code mismatch: expected=" + item.getId() + ", actual=" + text);
-            }
+        public void exitCraftCommand(ShopInfoParser.CraftCommandContext ctx) {
+            logger.trace("exitCraftCommand: {}", ctx::getText);
+            shopLineBuilder.setCraftCommand(ctx.getText());
+        }
+
+        @Override
+        public void exitShopLine(ShopInfoParser.ShopLineContext ctx) {
+            logger.trace("exitShopLine: {}", ctx::getText);
+            builder.addShopLine(shopLineBuilder.build());
+        }
+
+        @Override
+        public void exitShopCommand(ShopInfoParser.ShopCommandContext ctx) {
+            logger.trace("exitShopCommand: {}", ctx::getText);
+            builder.setShopCommand(ctx.getText());
         }
     }
-
-    private static class ManaCostVerifier implements Item.Visitor {
-        private final int manaCost;
-
-        private ManaCostVerifier(int manaCost) {
-            this.manaCost = manaCost;
-        }
-
-        @Override
-        public void visit(Item item) {
-        }
-
-        @Override
-        public void visit(CraftableItem craftableItem) {
-            if (craftableItem.getMana() != manaCost) {
-                logger.warn("Mana cost is invalid for item {}: actual={}", craftableItem, manaCost);
-            }
-        }
-
-        @Override
-        public void visit(WearableItem wearableItem) {
-            visit((CraftableItem) wearableItem);
-        }
-    }
-
 }
