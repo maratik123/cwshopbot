@@ -165,14 +165,12 @@ public class ParsedShopEdit {
         private final Item item;
         private final int mana;
         private final int price;
-        private final String deleteCommand;
 
-        private ShopLine(Item item, int mana, int price, String deleteCommand) {
+        private ShopLine(Item item, int mana, int price) {
             this.item = Objects.requireNonNull(item);
             this.mana = mana;
             verifyItem(item, mana);
             this.price = price;
-            this.deleteCommand = Objects.requireNonNull(deleteCommand);
         }
 
         public Item getItem() {
@@ -187,17 +185,12 @@ public class ParsedShopEdit {
             return price;
         }
 
-        public String getDeleteCommand() {
-            return deleteCommand;
-        }
-
         @Override
         public String toString() {
             return "ShopLine{" +
                 "item=" + item +
                 ", mana=" + mana +
                 ", price=" + price +
-                ", deleteCommand='" + deleteCommand + '\'' +
                 '}';
         }
 
@@ -209,7 +202,6 @@ public class ParsedShopEdit {
             private Item item;
             private int mana;
             private int price;
-            private String deleteCommand;
 
             public Builder setItem(Item item) {
                 this.item = item;
@@ -226,13 +218,8 @@ public class ParsedShopEdit {
                 return this;
             }
 
-            public Builder setDeleteCommand(String deleteCommand) {
-                this.deleteCommand = deleteCommand;
-                return this;
-            }
-
             public ShopLine build() {
-                return new ShopLine(item, mana, price, deleteCommand);
+                return new ShopLine(item, mana, price);
             }
         }
     }

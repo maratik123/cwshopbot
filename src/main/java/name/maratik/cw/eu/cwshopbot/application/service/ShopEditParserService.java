@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;
 import name.maratik.cw.eu.cwshopbot.parser.ParseException;
@@ -32,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.objects.Message;
 
+import java.util.List;
 import java.util.Optional;
 
 import static name.maratik.cw.eu.cwshopbot.parser.ParserUtils.catchParseErrors;
@@ -67,7 +69,7 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
         }, message);
     }
 
-    private static class ShopEditParserListenerImpl extends ShopEditParserBaseListener {
+    private class ShopEditParserListenerImpl extends ShopEditParserBaseListener {
         private final ParsedShopEdit.Builder builder;
         private ParsedShopEdit.ShopLine.Builder shopLineBuilder;
 
@@ -100,6 +102,56 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
                 builder.setOffersCount(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported current offers value: " + text, e);
+            }
+        }
+
+        @Override
+        public void exitMaxOffers(ShopEditParser.MaxOffersContext ctx) {
+            logger.trace("exitMaxOffers: {}", ctx::getText);
+            String text = ctx.getText();
+            try {
+                builder.setMaxOffersCount(Integer.parseInt(text));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Unsupported max offers value: " + text, e);
+            }
+        }
+
+        @Override
+        public void enterShopLine(ShopEditParser.ShopLineContext ctx) {
+            logger.trace("enterShopLine: {}", ctx::getText);
+            shopLineBuilder = ParsedShopEdit.ShopLine.builder();
+        }
+
+        @Override
+        public void exitItemName(ShopEditParser.ItemNameContext ctx) {
+            logger.trace("exitItemName: {}", ctx::getText);
+            String text = ctx.getText();
+            List<Item> items = itemSearchService.findItemByNameList(text, false);
+            if (items.size() != 1) {
+                throw new ParseException("Unknown item name: " + text);
+            }
+            shopLineBuilder.setItem(items.get(0));
+        }
+
+        @Override
+        public void exitManaCost(ShopEditParser.ManaCostContext ctx) {
+            logger.trace("exitManaCost: {}", ctx::getText);
+            String text = ctx.getText();
+            try {
+                shopLineBuilder.setMana(Integer.parseInt(text));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Unsupported mana cost value: " + text, e);
+            }
+        }
+
+        @Override
+        public void exitPrice(ShopEditParser.PriceContext ctx) {
+            logger.trace("exitPrice: {}", ctx::getText);
+            String text = ctx.getText();
+            try {
+                shopLineBuilder.setPrice(Integer.parseInt(text));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Unsupported price value: " + text, e);
             }
         }
     }
