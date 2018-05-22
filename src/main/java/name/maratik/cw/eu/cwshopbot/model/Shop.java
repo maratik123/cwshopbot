@@ -32,8 +32,8 @@ public class Shop {
     private final int shopNumber;
     private final List<ShopLine> shopLines;
 
-    public Shop(String shopName, String charName, String shopCode, int maxOffersCount, String shopCommand,
-                int shopNumber, List<ShopLine> shopLines) {
+    private Shop(String shopName, String charName, String shopCode, int maxOffersCount, String shopCommand,
+                 int shopNumber, List<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName);
         this.charName = Objects.requireNonNull(charName);
         this.shopCode = Objects.requireNonNull(shopCode);

@@ -15,42 +15,52 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
+import name.maratik.cw.eu.cwshopbot.model.character.ShopPublishStatus;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
+import name.maratik.cw.eu.cwshopbot.parser.ParseException;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Objects;
 
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_COMMAND_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.parser.ParserUtils.extractShopCodeFromShopCommand;
+import static name.maratik.cw.eu.cwshopbot.parser.ParserUtils.verifyItem;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class ParsedShopEdit {
     private final String shopName;
-    private final String shopHelpCommand;
     private final int offersCount;
     private final int maxOffersCount;
     private final int shopNumber;
     private final String shopCode;
+    private final String shopCommand;
+    private final ShopPublishStatus shopPublishStatus;
     private final List<ShopLine> shopLines;
 
-    private ParsedShopEdit(String shopName, String shopHelpCommand, int offersCount, int maxOffersCount,
-                           int shopNumber, String shopCode, List<ShopLine> shopLines) {
+    private ParsedShopEdit(String shopName, int offersCount, int maxOffersCount, int shopNumber, String shopCode,
+                           String shopCommand, ShopPublishStatus shopPublishStatus, List<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName);
-        this.shopHelpCommand = Objects.requireNonNull(shopHelpCommand);
         this.offersCount = offersCount;
         this.maxOffersCount = maxOffersCount;
         this.shopNumber = shopNumber;
+        this.shopCommand = Objects.requireNonNull(shopCommand);
+        if (!shopCommand.startsWith(SHOP_COMMAND_PREFIX)) {
+            throw new ParseException("Shop command has unexpected format: " + shopCommand);
+        }
         this.shopCode = Objects.requireNonNull(shopCode);
+        if (!shopCommand.endsWith(shopCode)) {
+            throw new ParseException("Shop command '" + shopCommand + "' does not contain shop code: " + shopCode);
+        }
+        this.shopPublishStatus = Objects.requireNonNull(shopPublishStatus);
         this.shopLines = Objects.requireNonNull(shopLines);
     }
 
     public String getShopName() {
         return shopName;
-    }
-
-    public String getShopHelpCommand() {
-        return shopHelpCommand;
     }
 
     public int getOffersCount() {
@@ -73,15 +83,24 @@ public class ParsedShopEdit {
         return shopLines;
     }
 
+    public String getShopCommand() {
+        return shopCommand;
+    }
+
+    public ShopPublishStatus getShopPublishStatus() {
+        return shopPublishStatus;
+    }
+
     @Override
     public String toString() {
         return "ParsedShopEdit{" +
             "shopName='" + shopName + '\'' +
-            ", shopHelpCommand='" + shopHelpCommand + '\'' +
             ", offersCount=" + offersCount +
             ", maxOffersCount=" + maxOffersCount +
             ", shopNumber=" + shopNumber +
             ", shopCode='" + shopCode + '\'' +
+            ", shopCommand='" + shopCommand + '\'' +
+            ", shopPublishStatus=" + shopPublishStatus +
             ", shopLines=" + shopLines +
             '}';
     }
@@ -92,20 +111,15 @@ public class ParsedShopEdit {
 
     public static class Builder {
         private String shopName;
-        private String shopHelpCommand;
         private int offersCount;
         private int maxOffersCount;
         private int shopNumber;
-        private String shopCode;
+        private String shopCommand;
+        private ShopPublishStatus shopPublishStatus;
         private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
         public Builder setShopName(String shopName) {
             this.shopName = shopName;
-            return this;
-        }
-
-        public Builder setShopHelpCommand(String shopHelpCommand) {
-            this.shopHelpCommand = shopHelpCommand;
             return this;
         }
 
@@ -124,8 +138,13 @@ public class ParsedShopEdit {
             return this;
         }
 
-        public Builder setShopCode(String shopCode) {
-            this.shopCode = shopCode;
+        public Builder setShopCommand(String shopCommand) {
+            this.shopCommand = shopCommand;
+            return this;
+        }
+
+        public Builder setShopPublishStatus(ShopPublishStatus shopPublishStatus) {
+            this.shopPublishStatus = shopPublishStatus;
             return this;
         }
 
@@ -135,8 +154,9 @@ public class ParsedShopEdit {
         }
 
         public ParsedShopEdit build() {
-            return new ParsedShopEdit(shopName, shopHelpCommand, offersCount, maxOffersCount, shopNumber,
-                shopCode, shopLines.build()
+            String shopCode = extractShopCodeFromShopCommand(shopCommand);
+            return new ParsedShopEdit(shopName, offersCount, maxOffersCount, shopNumber, shopCode, shopCommand,
+                shopPublishStatus, shopLines.build()
             );
         }
     }
@@ -150,6 +170,7 @@ public class ParsedShopEdit {
         private ShopLine(Item item, int mana, int price, String deleteCommand) {
             this.item = Objects.requireNonNull(item);
             this.mana = mana;
+            verifyItem(item, mana);
             this.price = price;
             this.deleteCommand = Objects.requireNonNull(deleteCommand);
         }

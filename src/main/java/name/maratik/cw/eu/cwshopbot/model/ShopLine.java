@@ -28,7 +28,7 @@ public class ShopLine {
     private final Item item;
     private final int price;
 
-    public ShopLine(Item item, int price) {
+    private ShopLine(Item item, int price) {
         this.item = Objects.requireNonNull(item);
         this.price = price;
     }

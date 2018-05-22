@@ -34,4 +34,6 @@ public class Emoji {
     public static final String EAGLE = "\uD83E\uDD85";
     public static final String DEER = "\uD83E\uDD8C";
     public static final String DRAGON = "\uD83D\uDC09";
+    public static final String BELL = "\uD83D\uDD14";
+    public static final String CANCEL_BELL = "\uD83D\uDD15";
 }

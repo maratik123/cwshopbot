@@ -274,7 +274,7 @@ public class ItemSearchService {
         }
     }
 
-    private class ListRecipes implements SearchOutput {
+    private static class ListRecipes implements SearchOutput {
         private final String message;
 
         private ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {

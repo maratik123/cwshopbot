@@ -13,14 +13,33 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.application.dao;
+parser grammar ShopEditParser;
 
-/**
- * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
- */
-@SuppressWarnings("WeakerAccess")
-public class DaoException extends Exception {
-    public DaoException(String message, Throwable cause) {
-        super(message, cause);
-    }
+@header {
+package name.maratik.cw.eu.cwshopbot.parser.generated;
 }
+
+options { tokenVocab=ShopEditLexer; }
+
+shopEdit:
+ CUSTOMIZE_YOUR fullShopName MUL_NL
+ SHOP_HELP_COMMAND DASH_USAGE_NL
+ NL
+ OFFERS_WS_MUL currentOffers SLASH maxOffers MUL_NL
+ shopLines
+ NL
+ bellStatus WS_LINK_WS shopCommand;
+
+fullShopName: shopName WS_HASH shopNumber;
+shopName: WORDS;
+shopNumber: NUMBER;
+currentOffers: NUMBER;
+maxOffers: NUMBER;
+shopLines: shopLine+;
+shopLine: itemName COMMA_WS manaCost MANA_WS price GOLD_WS lineDeleteCommand NL;
+itemName: WORDS;
+manaCost: NUMBER;
+price: NUMBER;
+lineDeleteCommand: LINE_DELETE_COMMAND;
+bellStatus: (BELL | CANCEL_BELL);
+shopCommand: SHOP_COMMAND;

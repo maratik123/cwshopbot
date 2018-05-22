@@ -22,21 +22,28 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.MessageEntity;
 import org.telegram.telegrambots.api.objects.User;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@SuppressWarnings("WeakerAccess")
 public class Utils {
     public static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
         Comparator.comparingInt(MessageEntity::getOffset);
+    private static final int MAX_PREFIX_LEN = extractMaxPropLenFromMessageType(MessageType::getPrefix);
+    private static final int MAX_POSTFIX_LEN = extractMaxPropLenFromMessageType(MessageType::getPostfix);
+    private static final int MESSAGE_ENTITY_OVERHEAD = MAX_PREFIX_LEN + MAX_POSTFIX_LEN;
 
     public static int endOfEntity(MessageEntity messageEntity) {
         return messageEntity.getOffset() + messageEntity.getLength();
@@ -93,55 +100,84 @@ public class Utils {
     }
 
     public static OptionalLong optionalOf(Long l) {
-        return l == null ? OptionalLong.empty() : OptionalLong.of(l);
+        return toOptionalLong(Optional.ofNullable(l));
+    }
+
+    public static OptionalInt optionalOf(Integer i) {
+        return toOptionalInt(Optional.ofNullable(i));
+    }
+
+    public static OptionalLong toOptionalLong(Optional<Long> optional) {
+        return optional.map(OptionalLong::of).orElseGet(OptionalLong::empty);
+    }
+
+    public static OptionalInt toOptionalInt(Optional<Integer> optional) {
+        return optional.map(OptionalInt::of).orElseGet(OptionalInt::empty);
     }
 
     public static String reformatMessage(Message message) {
-        StringBuilder sb = new StringBuilder();
-        for (MessageEntity messageEntity : generateTextMessageEntities(message)) {
+        char[] text = message.getText().toCharArray();
+        List<MessageEntity> messageEntities = generateTextMessageEntities(message);
+        StringBuilder sb = new StringBuilder(
+            text.length + MESSAGE_ENTITY_OVERHEAD * messageEntities.size()
+        );
+        for (MessageEntity messageEntity : messageEntities) {
             Optional<MessageType> messageTypeOpt = MessageType.findByCode(messageEntity.getType());
             if (messageTypeOpt.isPresent()) {
                 MessageType messageType = messageTypeOpt.get();
                 messageType.getPrefix().ifPresent(sb::append);
-                sb.append(messageEntity.getText());
+                sb.append(text, messageEntity.getOffset(), messageEntity.getLength());
                 messageType.getPostfix().ifPresent(sb::append);
             } else {
-                sb.append(messageEntity.getText());
+                sb.append(text, messageEntity.getOffset(), messageEntity.getLength());
             }
         }
         return sb.toString();
+    }
+
+    public static <T> Stream<T> stream(Optional<T> optional) {
+        return optional.map(Stream::of).orElseGet(Stream::empty);
     }
 
     private static List<MessageEntity> generateTextMessageEntities(Message message) {
         List<MessageEntity> entities = message.getEntities().stream()
             .sorted(MESSAGE_ENTITY_OFFSET_COMPARATOR)
             .collect(toImmutableList());
-        String text = message.getText();
         int currPos = 0;
         ImmutableList.Builder<MessageEntity> builder = ImmutableList.builder();
         for (MessageEntity entity : entities) {
             int entityOffset = entity.getOffset();
             if (entityOffset > currPos) {
-                builder.add(new TextMessageEntity(text.substring(currPos, entityOffset), currPos));
+                builder.add(new TextMessageEntity(currPos, entityOffset - currPos));
             }
             builder.add(entity);
-            currPos = endOfEntity(entity);
+            currPos = entityOffset + entity.getLength();
         }
-        if (currPos < text.length()) {
-            builder.add(new TextMessageEntity(text.substring(currPos), currPos));
+        int textLen = message.getText().length();
+        if (currPos < textLen) {
+            builder.add(new TextMessageEntity(currPos, textLen - currPos));
         }
         return builder.build();
+    }
+
+    private static int extractMaxPropLenFromMessageType(Function<MessageType, Optional<String>> extractor) {
+        return Arrays.stream(MessageType.values())
+            .map(extractor)
+            .flatMap(Utils::stream)
+            .mapToInt(String::length)
+            .max()
+            .orElse(0);
     }
 
     @SuppressWarnings("ReturnOfNull")
     private static class TextMessageEntity extends MessageEntity {
         private static final String type = MessageType.TEXT.getCode();
-        private final String text;
         private final int offset;
+        private final int length;
 
-        private TextMessageEntity(String text, int offset) {
-            this.text = text;
+        private TextMessageEntity(int offset, int length) {
             this.offset = offset;
+            this.length = length;
         }
 
         @Override
@@ -156,7 +192,7 @@ public class Utils {
 
         @Override
         public Integer getLength() {
-            return text.length();
+            return length;
         }
 
         @Override
@@ -166,7 +202,7 @@ public class Utils {
 
         @Override
         public String getText() {
-            return text;
+            return null;
         }
 
         @Override
@@ -177,8 +213,8 @@ public class Utils {
         @Override
         public String toString() {
             return "TextMessageEntity{" +
-                "text='" + text + '\'' +
-                ", offset=" + offset +
+                "offset=" + offset +
+                ", length=" + length +
                 '}';
         }
     }

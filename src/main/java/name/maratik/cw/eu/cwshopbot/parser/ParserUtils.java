@@ -15,12 +15,17 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.parser;
 
-import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.telegram.telegrambots.api.objects.Message;
+
+import java.util.Optional;
+
+import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_COMMAND_PREFIX;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -28,20 +33,30 @@ import org.apache.logging.log4j.Logger;
 public class ParserUtils {
     private static final Logger logger = LogManager.getLogger(ParserUtils.class);
 
-    public static final Item.Visitor CRAFTABLE_ITEM_VERIFIER = new Item.Visitor() {
+    public static void verifyItem(Item item, int mana) {
+        item.apply(CraftableItemVerifier.getInstance());
+        item.apply(new ManaCostVerifier(mana));
+    }
 
-        @Override
-        public void visit(Item item) {
-            logger.warn("Item {} is not craftable", item);
+    public static String extractShopCodeFromShopCommand(String shopCommand) {
+        return shopCommand.substring(SHOP_COMMAND_PREFIX.length());
+    }
+
+    public static <T> Optional<T> catchParseErrors(ParseAction<T> parseAction, Message message) {
+        try {
+            return parseAction.action();
+        } catch (ParseCancellationException e) {
+            logger.error("Failed to parse message {}", message, e);
+            if (e.getCause() instanceof RecognitionException) {
+                RecognitionException recognitionException = (RecognitionException) e.getCause();
+                logger.error("Expected tokens: {}, offended one: {}",
+                    recognitionException.getExpectedTokens(), recognitionException.getOffendingToken()
+                );
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            logger.error("Failed to parse message {}", message, e);
+            return Optional.empty();
         }
-
-        @Override
-        public void visit(CraftableItem craftableItem) {
-        }
-
-        @Override
-        public void visit(WearableItem wearableItem) {
-        }
-    };
-
+    }
 }

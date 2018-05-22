@@ -95,7 +95,7 @@ public class ForwardKey {
             this.messageType = messageType;
         }
 
-        public MessageEntityKey(MessageEntity messageEntity) {
+        private MessageEntityKey(MessageEntity messageEntity) {
             this(messageEntity.getOffset(), messageEntity.getLength(), MessageType.findByCode(messageEntity.getType()));
         }
 

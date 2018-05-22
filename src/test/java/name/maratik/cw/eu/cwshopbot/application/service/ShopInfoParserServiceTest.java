@@ -18,8 +18,8 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Profession;
+import name.maratik.cw.eu.cwshopbot.model.character.Castle;
+import name.maratik.cw.eu.cwshopbot.model.character.Profession;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 
 import com.google.common.collect.ImmutableList;

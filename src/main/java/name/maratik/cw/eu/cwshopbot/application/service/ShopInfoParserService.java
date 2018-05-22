@@ -16,9 +16,9 @@
 package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
+import name.maratik.cw.eu.cwshopbot.model.character.Castle;
+import name.maratik.cw.eu.cwshopbot.model.character.Profession;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Profession;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;
 import name.maratik.cw.eu.cwshopbot.parser.ParseException;
@@ -30,8 +30,6 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +39,7 @@ import org.telegram.telegrambots.api.objects.Message;
 import java.util.List;
 import java.util.Optional;
 
+import static name.maratik.cw.eu.cwshopbot.parser.ParserUtils.catchParseErrors;
 import static name.maratik.cw.eu.cwshopbot.util.Utils.reformatMessage;
 
 /**
@@ -66,35 +65,19 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ShopInfoParser parser = new ShopInfoParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
-        ParsedShopInfo.Builder builder = ParsedShopInfo.builder();
-        try {
-            ParseTreeWalker.DEFAULT.walk(new ShopInfoListenerImpl(builder), parser.shopInfo());
+        return catchParseErrors(() -> {
+            ParsedShopInfo.Builder builder = ParsedShopInfo.builder();
+            ParseTreeWalker.DEFAULT.walk(new ShopInfoParserListener(builder), parser.shopInfo());
             return Optional.of(builder.build());
-        } catch (ParseCancellationException e) {
-            logger.error("Failed to parse message {}", message, e);
-            if (e.getCause() instanceof RecognitionException) {
-                RecognitionException recognitionException = (RecognitionException) e.getCause();
-                logger.error("Expected tokens: {}, offended one: {}",
-                    recognitionException.getExpectedTokens(), recognitionException.getOffendingToken()
-                );
-            }
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Failed to parse message {}", message, e);
-            return Optional.empty();
-        }
+        }, message);
     }
 
-    private class ShopInfoListenerImpl extends ShopInfoParserBaseListener {
+    private class ShopInfoParserListener extends ShopInfoParserBaseListener {
         private final ParsedShopInfo.Builder builder;
         private ParsedShopInfo.ShopLine.Builder shopLineBuilder;
 
-        private ShopInfoListenerImpl(ParsedShopInfo.Builder builder) {
+        private ShopInfoParserListener(ParsedShopInfo.Builder builder) {
             this.builder = builder;
-        }
-
-        public ParsedShopInfo.Builder getBuilder() {
-            return builder;
         }
 
         @Override

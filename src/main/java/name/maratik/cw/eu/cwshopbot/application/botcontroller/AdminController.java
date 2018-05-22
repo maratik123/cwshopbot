@@ -50,8 +50,7 @@ public class AdminController extends ShopController {
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
                            StatsService statsService) {
-        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, devUserId, devUserName,
-            statsService);
+        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, devUserId, devUserName);
         this.statsService = statsService;
     }
 

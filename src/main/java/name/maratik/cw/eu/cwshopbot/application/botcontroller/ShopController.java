@@ -18,7 +18,6 @@ package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
-import name.maratik.cw.eu.cwshopbot.application.service.StatsService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.util.MessageType;
@@ -75,7 +74,7 @@ public class ShopController {
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                           CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
                           @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
-                          @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName, StatsService statsService) {
+                          @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();

@@ -13,7 +13,9 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.util;
+package name.maratik.cw.eu.cwshopbot.model.character;
+
+import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -21,57 +23,31 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.Optional;
 
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.BELL;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.CANCEL_BELL;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum MessageType implements EnumWithCode {
-    MENTION("mention"),
-    HASHTAG("hashtag"),
-    BOT_COMMAND("bot_command"),
-    URL("url"),
-    EMAIL("email"),
-    BOLD("bold", "*", "*"),
-    ITALIC("italic"),
-    CODE("code"),
-    PRE("pre"),
-    TEXT_LINK("text_link"),
-    TEXT_MENTION("text_mention"),
-    TEXT("text");
+public enum ShopPublishStatus implements EnumWithCode {
+    PUBLISH(BELL),
+    NOT_PUBLISH(CANCEL_BELL);
 
     private final String code;
-    private final Optional<String> prefix;
-    private final Optional<String> postfix;
-    private static final Map<String, MessageType> cache = Util.createCache(values());
+    private static final Map<String, ShopPublishStatus> cache = Util.createCache(values());
 
-    MessageType(String code) {
+    ShopPublishStatus(String code) {
         this.code = code;
-        this.prefix = Optional.empty();
-        this.postfix = Optional.empty();
     }
 
-    MessageType(String code, String prefix, String postfix) {
-        this.code = code;
-        this.prefix = Optional.of(prefix);
-        this.postfix = Optional.of(postfix);
-    }
-
-    @Override
     @JsonValue
+    @Override
     public String getCode() {
         return code;
     }
 
-    public Optional<String> getPrefix() {
-        return prefix;
-    }
-
-    public Optional<String> getPostfix() {
-        return postfix;
-    }
-
     @JsonCreator
-    public static Optional<MessageType> findByCode(String code) {
+    public static Optional<ShopPublishStatus> findByValue(String code) {
         return Optional.ofNullable(cache.get(code));
     }
-
 }

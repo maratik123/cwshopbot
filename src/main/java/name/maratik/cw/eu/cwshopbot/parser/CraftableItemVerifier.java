@@ -25,29 +25,24 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class ManaCostVerifier implements Item.Visitor {
-    private static final Logger logger = LogManager.getLogger(ManaCostVerifier.class);
-
-    private final int manaCost;
-
-    public ManaCostVerifier(int manaCost) {
-        this.manaCost = manaCost;
-    }
+public class CraftableItemVerifier implements Item.Visitor {
+    private static final Logger logger = LogManager.getLogger(CraftableItemVerifier.class);
+    private static final CraftableItemVerifier INSTANCE = new CraftableItemVerifier();
 
     @Override
     public void visit(Item item) {
-        logger.warn("Trying to define mana cost '{}' for non-craftable item: {}", manaCost, item);
+        logger.warn("Item {} is not craftable", item);
     }
 
     @Override
     public void visit(CraftableItem craftableItem) {
-        if (craftableItem.getMana() != manaCost) {
-            logger.warn("Mana cost is invalid for item {}: actual={}", craftableItem, manaCost);
-        }
     }
 
     @Override
     public void visit(WearableItem wearableItem) {
-        visit((CraftableItem) wearableItem);
+    }
+
+    public static CraftableItemVerifier getInstance() {
+        return INSTANCE;
     }
 }

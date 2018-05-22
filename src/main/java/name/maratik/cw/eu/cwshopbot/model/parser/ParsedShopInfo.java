@@ -16,9 +16,9 @@
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Castle;
+import name.maratik.cw.eu.cwshopbot.model.character.Castle;
+import name.maratik.cw.eu.cwshopbot.model.character.Profession;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.Profession;
 import name.maratik.cw.eu.cwshopbot.parser.ParseException;
 
 import com.google.common.collect.ImmutableList;
@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static name.maratik.cw.eu.cwshopbot.application.botcontroller.ShopController.SHOP_COMMAND_PREFIX;
+import static name.maratik.cw.eu.cwshopbot.parser.ParserUtils.extractShopCodeFromShopCommand;
+import static name.maratik.cw.eu.cwshopbot.parser.ParserUtils.verifyItem;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -227,10 +229,11 @@ public class ParsedShopInfo {
         }
 
         public ParsedShopInfo build() {
-            String shopCode = shopCommand.substring(SHOP_COMMAND_PREFIX.length());
+            String shopCode = extractShopCodeFromShopCommand(shopCommand);
             return new ParsedShopInfo(shopName, charName, shopState, shopLines.build(), shopCode, shopNumber, castle,
                 currentMana, maxMana, profession, shopType, shopCommand);
         }
+
     }
 
     public static class ShopLine {
@@ -241,6 +244,7 @@ public class ParsedShopInfo {
 
         private ShopLine(Item item, int mana, int price, String craftCommand) {
             this.item = Objects.requireNonNull(item);
+            verifyItem(item, mana);
             this.mana = mana;
             this.price = price;
             this.craftCommand = Objects.requireNonNull(craftCommand);
@@ -258,6 +262,7 @@ public class ParsedShopInfo {
             return price;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public String getCraftCommand() {
             return craftCommand;
         }
