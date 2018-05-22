@@ -20,6 +20,8 @@ import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.cwshopbot.application.service.StatsService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
@@ -46,11 +48,12 @@ public class AdminController extends ShopController {
 
     public AdminController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                            @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
-                           CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
+                           CWParser<ParsedShopInfo> shopInfoParser, CWParser<ParsedShopEdit> shopEditParser,
+                           CWParser<ParsedHero> heroParser, ItemSearchService itemSearchService,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
                            StatsService statsService) {
-        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, itemSearchService, devUserId, devUserName);
+        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService, devUserId, devUserName);
         this.statsService = statsService;
     }
 

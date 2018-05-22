@@ -15,7 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.dao;
 
-import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
+import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
 import name.maratik.cw.eu.cwshopbot.model.Shop;
 import name.maratik.cw.eu.cwshopbot.model.ShopLine;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
@@ -44,7 +44,7 @@ import static org.junit.Assert.assertThat;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @SuppressWarnings("ZeroLengthArrayAllocation")
-public class ShopLineDaoTest extends MockedTelegramBotsApiTest {
+public class ShopLineDaoTest extends MockedTest {
     @Autowired
     private ShopLineDao shopLineDao;
     @Autowired

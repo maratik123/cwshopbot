@@ -13,14 +13,32 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.parser;
+lexer grammar HeroLexer;
 
-import java.util.Optional;
-
-/**
- * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
- */
-@FunctionalInterface
-public interface ParseAction<T> {
-    Optional<T> action();
+@header {
+package name.maratik.cw.eu.cwshopbot.parser.generated;
 }
+
+fragment MOON: '\u{1F311}';
+fragment WOLF: '\u{1F43A}';
+fragment POTATO: '\u{1F954}';
+fragment SHARK: '\u{1F988}';
+fragment EAGLE: '\u{1F985}';
+fragment DEER: '\u{1F98C}';
+fragment DRAGON: '\u{1F409}';
+fragment LETTERDIGIT: LETTER | DIGIT;
+fragment LETTER: LOWER_LETTER | UPPER_LETTER | [_()-];
+fragment LOWER_LETTER: [a-z];
+fragment UPPER_LETTER: [A-Z];
+fragment DIGIT: ZERO | NONZERO_DIGIT;
+fragment NONZERO_DIGIT: [1-9];
+fragment ZERO: '0';
+fragment WORD: LETTERDIGIT+;
+
+CASTLE_SIGN: (MOON | WOLF | POTATO | SHARK | EAGLE | DEER | DRAGON);
+WORDS: WORD (' ' WORD)*;
+MUL_WS: '* ';
+MUL: '*';
+BRACKET_OPEN: '[';
+BRACKET_CLOSE: ']';
+NL: '\n';

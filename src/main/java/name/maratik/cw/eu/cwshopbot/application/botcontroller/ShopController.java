@@ -19,6 +19,8 @@ import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
+import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.util.MessageType;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
@@ -66,19 +68,24 @@ public class ShopController {
     private final int forwardStaleSec;
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
     private final CWParser<ParsedShopInfo> shopInfoParser;
+    private final CWParser<ParsedShopEdit> shopEditParser;
+    private final CWParser<ParsedHero> heroParser;
     private final ItemSearchService itemSearchService;
     private final long devUserId;
     private final String devUserName;
 
     public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
-                          CWParser<ParsedShopInfo> shopInfoParser, ItemSearchService itemSearchService,
+                          CWParser<ParsedShopInfo> shopInfoParser, CWParser<ParsedShopEdit> shopEditParser,
+                          CWParser<ParsedHero> heroParser, ItemSearchService itemSearchService,
                           @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                           @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName) {
         this.clock = clock;
         this.forwardStaleSec = forwardStaleSec;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
+        this.shopEditParser = shopEditParser;
+        this.heroParser = heroParser;
         this.itemSearchService = itemSearchService;
         this.devUserId = devUserId;
         this.devUserName = devUserName;
@@ -122,6 +129,14 @@ public class ShopController {
         return new SendMessage()
             .setChatId(userId)
             .setText("Now you can press /help to view help");
+    }
+
+    @SuppressWarnings("MethodMayBeStatic")
+    @TelegramCommand(commands = "/register", description = "Register your shop")
+    public SendMessage registerCommand(long userId) {
+        return new SendMessage()
+            .setChatId(userId)
+            .setText("To start with registering your shop, please, send me the fresh forward of /hero info");
     }
 
     @TelegramCommand(commands = T_PREFIX + PATTERN_COMMAND_SUFFIX, description = "Info about item")
@@ -193,12 +208,22 @@ public class ShopController {
         }
 
         Optional<ParsedShopInfo> shopInfo = shopInfoParser.parse(message);
+        Optional<ParsedShopEdit> shopEdit = shopInfo.isPresent()
+            ? Optional.empty()
+            : shopEditParser.parse(message);
+        Optional<ParsedHero> hero = shopInfo.isPresent() || shopEdit.isPresent()
+            ? Optional.empty()
+            : heroParser.parse(message);
 
         return new SendMessage()
             .setChatId(userId)
             .setText(shopInfo
-                .map(s -> "You've sent the shop " + s
-                ).orElse("Unsupported forward")
+                .map(s -> "You've sent the shop " + s)
+                .orElseGet(() -> shopEdit.map(s -> "You've sent the shop edit " + s)
+                    .orElseGet(() -> hero.map(s -> "Hero forward: " + s)
+                        .orElse("Unsupported forward")
+                    )
+                )
             );
     }
 

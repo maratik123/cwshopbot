@@ -15,7 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.httpcontroller;
 
-import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
+import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class HelloControllerTest extends MockedTelegramBotsApiTest {
+public class HelloControllerTest extends MockedTest {
 
     @Autowired
     private MockMvc mvc;

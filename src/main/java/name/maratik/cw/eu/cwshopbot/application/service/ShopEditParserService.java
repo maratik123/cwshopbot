@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
+import name.maratik.cw.eu.cwshopbot.model.character.ShopPublishStatus;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;
@@ -73,7 +74,7 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
         private final ParsedShopEdit.Builder builder;
         private ParsedShopEdit.ShopLine.Builder shopLineBuilder;
 
-        public ShopEditParserListenerImpl(ParsedShopEdit.Builder builder) {
+        private ShopEditParserListenerImpl(ParsedShopEdit.Builder builder) {
             this.builder = builder;
         }
 
@@ -123,6 +124,12 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
         }
 
         @Override
+        public void exitShopLine(ShopEditParser.ShopLineContext ctx) {
+            logger.trace("exitShopLine: {}", ctx::getText);
+            builder.addShopLine(shopLineBuilder.build());
+        }
+
+        @Override
         public void exitItemName(ShopEditParser.ItemNameContext ctx) {
             logger.trace("exitItemName: {}", ctx::getText);
             String text = ctx.getText();
@@ -153,6 +160,21 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported price value: " + text, e);
             }
+        }
+
+        @Override
+        public void exitShopCommand(ShopEditParser.ShopCommandContext ctx) {
+            logger.trace("exitShopCommand: {}", ctx::getText);
+            builder.setShopCommand(ctx.getText());
+        }
+
+        @Override
+        public void exitBellStatus(ShopEditParser.BellStatusContext ctx) {
+            logger.trace("exitBellStatus: {}", ctx::getText);
+            String text = ctx.getText();
+            builder.setShopPublishStatus(ShopPublishStatus.findByValue(text)
+                .orElseThrow(() -> new ParseException("Unsupported bell status: " + text))
+            );
         }
     }
 }

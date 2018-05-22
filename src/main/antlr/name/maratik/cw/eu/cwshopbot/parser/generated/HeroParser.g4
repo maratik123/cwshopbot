@@ -13,14 +13,17 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.parser;
+parser grammar HeroParser;
 
-import java.util.Optional;
-
-/**
- * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
- */
-@FunctionalInterface
-public interface ParseAction<T> {
-    Optional<T> action();
+@header {
+package name.maratik.cw.eu.cwshopbot.parser.generated;
 }
+
+options { tokenVocab=HeroLexer; }
+
+hero: castleSign MUL (guild?) charName MUL_WS ofCastleCastle NL;
+castleSign: CASTLE_SIGN;
+guild: BRACKET_OPEN guildAbbrev BRACKET_CLOSE;
+guildAbbrev: WORDS;
+charName: WORDS;
+ofCastleCastle: WORDS;

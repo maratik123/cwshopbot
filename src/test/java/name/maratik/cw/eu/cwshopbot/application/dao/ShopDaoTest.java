@@ -15,7 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.dao;
 
-import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
+import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
 import name.maratik.cw.eu.cwshopbot.model.Shop;
 import name.maratik.cw.eu.cwshopbot.model.ShopLine;
 
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class ShopDaoTest extends MockedTelegramBotsApiTest {
+public class ShopDaoTest extends MockedTest {
     private static final String SHOP_CODE = "shopCode";
 
     @Autowired

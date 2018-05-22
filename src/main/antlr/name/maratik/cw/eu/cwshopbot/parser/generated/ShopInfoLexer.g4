@@ -20,7 +20,7 @@ package name.maratik.cw.eu.cwshopbot.parser.generated;
 }
 
 fragment LETTERDIGIT: LETTER | DIGIT;
-fragment LETTER: LOWER_LETTER | UPPER_LETTER | [_[\]()-];
+fragment LETTER: LOWER_LETTER | UPPER_LETTER | [_()-];
 fragment LOWER_LETTER: [a-z];
 fragment UPPER_LETTER: [A-Z];
 fragment DIGIT: ZERO | NONZERO_DIGIT;

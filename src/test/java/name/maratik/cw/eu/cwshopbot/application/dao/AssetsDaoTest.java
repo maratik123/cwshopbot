@@ -15,7 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.dao;
 
-import name.maratik.cw.eu.cwshopbot.mock.MockedTelegramBotsApiTest;
+import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertThat;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Import(AssetsDaoTest.TestConfig.class)
-public class AssetsDaoTest extends MockedTelegramBotsApiTest {
+public class AssetsDaoTest extends MockedTest {
     private static final Logger logger = LogManager.getLogger(AssetsDaoTest.class);
 
     @Autowired

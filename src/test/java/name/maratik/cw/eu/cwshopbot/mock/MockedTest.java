@@ -76,7 +76,7 @@ import java.util.Collections;
     excludeFilters = @ComponentScan.Filter(Configuration.class),
     basePackageClasses = Application.class
 )
-public abstract class MockedTelegramBotsApiTest {
+public abstract class MockedTest {
     @MockBean
     protected TelegramBotsApi telegramBotsApi;
 

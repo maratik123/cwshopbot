@@ -13,14 +13,36 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.parser;
+package name.maratik.cw.eu.cwshopbot.mock;
 
-import java.util.Optional;
+import org.telegram.telegrambots.api.objects.MessageEntity;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@FunctionalInterface
-public interface ParseAction<T> {
-    Optional<T> action();
+public class MockMessageEntity extends MessageEntity {
+    private final String type;
+    private final int offset;
+    private final int length;
+
+    public MockMessageEntity(String type, int offset, int length) {
+        this.type = type;
+        this.offset = offset;
+        this.length = length;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public Integer getOffset() {
+        return offset;
+    }
+
+    @Override
+    public Integer getLength() {
+        return length;
+    }
 }
