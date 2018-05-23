@@ -16,8 +16,8 @@
 package name.maratik.cw.eu.cwshopbot.application.service;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
-import name.maratik.cw.eu.cwshopbot.model.character.Castle;
-import name.maratik.cw.eu.cwshopbot.model.character.Profession;
+import name.maratik.cw.eu.cwshopbot.model.Castle;
+import name.maratik.cw.eu.cwshopbot.model.Profession;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;
@@ -173,7 +173,7 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         public void exitItemName(ShopInfoParser.ItemNameContext ctx) {
             logger.trace("exitItemName: {}", ctx::getText);
             String text = ctx.getText();
-            List<Item> items = itemSearchService.findItemByNameList(text, false);
+            List<Item> items = itemSearchService.findItemByNameList(text, false, false);
             if (items.size() != 1) {
                 throw new ParseException("Unknown item name: " + text);
             }

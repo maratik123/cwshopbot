@@ -215,13 +215,19 @@ public class ShopController {
             ? Optional.empty()
             : heroParser.parse(message);
 
+        if (!(shopInfo.isPresent() || shopEdit.isPresent() || hero.isPresent())) {
+            return new SendMessage()
+                .setChatId(userId)
+                .setText("Unsupported forward");
+        }
+
         return new SendMessage()
             .setChatId(userId)
             .setText(shopInfo
                 .map(s -> "You've sent the shop " + s)
                 .orElseGet(() -> shopEdit.map(s -> "You've sent the shop edit " + s)
                     .orElseGet(() -> hero.map(s -> "Hero forward: " + s)
-                        .orElse("Unsupported forward")
+                        .orElse("")
                     )
                 )
             );

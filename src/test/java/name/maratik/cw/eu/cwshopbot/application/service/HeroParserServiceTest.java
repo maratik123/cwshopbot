@@ -18,7 +18,7 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 import name.maratik.cw.eu.cwshopbot.mock.MockMessage;
 import name.maratik.cw.eu.cwshopbot.mock.MockMessageEntity;
 import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
-import name.maratik.cw.eu.cwshopbot.model.character.Castle;
+import name.maratik.cw.eu.cwshopbot.model.Castle;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
 
 import com.google.common.collect.ImmutableList;

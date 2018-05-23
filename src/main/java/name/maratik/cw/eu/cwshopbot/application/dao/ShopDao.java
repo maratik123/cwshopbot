@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.application.dao;
 
 import name.maratik.cw.eu.cwshopbot.model.Shop;
 
+import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
@@ -25,7 +26,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -34,6 +39,7 @@ import java.util.Optional;
 public class ShopDao {
     private static final Logger logger = LogManager.getLogger(ShopDao.class);
     public static final String TABLE_NAME = "shop";
+    public static final String USER_ID_INDEX = "userId-index";
 
     private final Table shopTable;
 
@@ -45,17 +51,31 @@ public class ShopDao {
         logger.debug("Get shop info for {}", code);
         try {
             return Optional.ofNullable(shopTable.getItem("code", code))
-                .map(item -> Shop.builder()
-                    .setShopCode(code)
-                    .setShopCommand(item.getString("command"))
-                    .setCharName(item.getString("charName"))
-                    .setShopName(item.getString("name"))
-                    .setMaxOffersCount(item.getInt("maxOffersCount"))
-                    .setShopNumber(item.getInt("shopNumber"))
-                );
+                .map(ShopDao::shopRowMapper);
         } catch (Exception e) {
-            throw new DaoException("Getting shop failed", e);
+            throw new DaoException("Getting shop '" + code + "' failed", e);
         }
+    }
+
+    public List<Shop.Builder> getAllShops() throws DaoException {
+        logger.debug("Get all shops");
+        try {
+            return StreamSupport.stream(shopTable.scan().spliterator(), false)
+                .map(ShopDao::shopRowMapper)
+                .collect(toImmutableList());
+        } catch (Exception e) {
+            throw new DaoException("Getting all shops failed", e);
+        }
+    }
+
+    private static Shop.Builder shopRowMapper(Item item) {
+        return Shop.builder()
+            .setShopCode(item.getString("code"))
+            .setShopCommand(item.getString("command"))
+            .setCharName(item.getString("charName"))
+            .setShopName(item.getString("name"))
+            .setMaxOffersCount(item.getInt("maxOffersCount"))
+            .setShopNumber(item.getInt("shopNumber"));
     }
 
     public void putShop(Shop shop) throws DaoException {
@@ -70,7 +90,17 @@ public class ShopDao {
             );
             logger.debug("Result is {}", outcome);
         } catch (Exception e) {
-            throw new DaoException("Putting shop failed", e);
+            throw new DaoException("Putting shop " + shop + " failed", e);
+        }
+    }
+
+    public void deleteShop(String code) throws DaoException {
+        logger.debug("Delete shop {} from db", code);
+        try {
+            DeleteItemOutcome outcome = shopTable.deleteItem("code", code);
+            logger.debug("Result is {}", outcome);
+        } catch (Exception e) {
+            throw new DaoException("Deleting shop '" + code + "' failed", e);
         }
     }
 }

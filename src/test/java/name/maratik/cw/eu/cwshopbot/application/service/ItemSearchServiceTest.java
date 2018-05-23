@@ -13,18 +13,31 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.application.dao;
+package name.maratik.cw.eu.cwshopbot.application.service;
+
+import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@SuppressWarnings("WeakerAccess")
-public class DaoException extends Exception {
-    public DaoException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public class ItemSearchServiceTest extends MockedTest {
 
-    public DaoException(String message) {
-        super(message);
+    @Autowired
+    private ItemSearchService itemSearchService;
+
+    @Test
+    public void findHunterGlovesByName() {
+        assertThat(
+            itemSearchService.findItemByNameList("Hunter Gloves", false, false),
+            contains(hasProperty("name", equalTo("Hunter Gloves")))
+        );
     }
 }

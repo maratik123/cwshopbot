@@ -71,16 +71,21 @@ public class ItemSearchService {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public List<Item> findItemByNameList(String name, boolean ignoreCase) {
-        final String searchName;
-        final Function<Item, String> nameExtractor;
-        if (ignoreCase) {
-            searchName = name.toLowerCase();
-            nameExtractor = Item::getLowerName;
-        } else {
-            searchName = name;
-            nameExtractor = Item::getName;
+    public List<Item> findItemByNameList(String name, boolean ignoreCase, boolean partialMatch) {
+        final String searchName = ignoreCase
+            ? name.toLowerCase()
+            : name;
+        if (!partialMatch) {
+            final Map<String, Item> itemsByNameMap = ignoreCase
+                ? assets.getItemsByNameLowerCase()
+                : assets.getItemsByName();
+            return Optional.ofNullable(itemsByNameMap.get(searchName))
+                .map(Collections::singletonList)
+                .orElseGet(Collections::emptyList);
         }
+        final Function<Item, String> nameExtractor = ignoreCase
+            ? Item::getLowerName
+            : Item::getName;
         return assets.getAllItems().values().stream()
             .filter(item -> nameExtractor.apply(item).contains(searchName))
             .sorted(ITEM_NAME_COMPARATOR)
@@ -90,7 +95,7 @@ public class ItemSearchService {
 
     @SuppressWarnings("WeakerAccess")
     public Optional<String> findItemByName(String name) {
-        List<Item> items = findItemByNameList(name, true);
+        List<Item> items = findItemByNameList(name, true, true);
         switch (items.size()) {
             case 0:
                 return Optional.empty();

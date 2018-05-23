@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
@@ -60,11 +60,11 @@ public class AssetsTest extends MockedTest {
     public void init() {
         anyOfAllItems = anyOf(assets.getAllItems().keySet().stream()
             .map(Matchers::equalTo)
-            .collect(toList())
+            .collect(toImmutableList())
         );
         anyOfCraftableItems = anyOf(assets.getCraftableItems().keySet().stream()
             .map(Matchers::equalTo)
-            .collect(toList())
+            .collect(toImmutableList())
         );
     }
 
@@ -98,11 +98,11 @@ public class AssetsTest extends MockedTest {
             assets.getItemsByCraftbook().values().stream()
                 .flatMap(Collection::stream)
                 .map(Item::getId)
-                .collect(toList()),
+                .collect(toImmutableList()),
             containsInAnyOrder(assets.getCraftableItems().values().stream()
                 .map(Item::getId)
                 .map(Matchers::equalTo)
-                .collect(toList())
+                .collect(toImmutableList())
             )
         );
     }
@@ -112,10 +112,10 @@ public class AssetsTest extends MockedTest {
         assertThat(
             assets.getItemsByItemLocation().get(ItemLocation.EQUIPMENT).stream()
                 .map(Item::getId)
-                .collect(toList()),
+                .collect(toImmutableList()),
             containsInAnyOrder(assets.getWearableItems().keySet().stream()
                 .map(Matchers::equalTo)
-                .collect(toList())
+                .collect(toImmutableList())
             )
         );
     }
@@ -183,5 +183,21 @@ public class AssetsTest extends MockedTest {
             .forEach(id ->
                 assertTrue(id + " not in recipes", assets.getCraftableItemsByRecipe().containsKey(id))
             );
+    }
+
+    @Test
+    public void shouldItemsByNameContainsAllItems() {
+        assertThat(assets.getItemsByName().values(), containsInAnyOrder(assets.getAllItems().values().stream()
+            .map(Matchers::equalTo)
+            .collect(toImmutableList())
+        ));
+    }
+
+    @Test
+    public void shouldItemsByNameLowerCaseContainsAllItems() {
+        assertThat(assets.getItemsByNameLowerCase().values(), containsInAnyOrder(assets.getAllItems().values().stream()
+            .map(Matchers::equalTo)
+            .collect(toImmutableList())
+        ));
     }
 }

@@ -18,7 +18,7 @@ package name.maratik.cw.eu.cwshopbot.application.service;
 import name.maratik.cw.eu.cwshopbot.mock.MockMessage;
 import name.maratik.cw.eu.cwshopbot.mock.MockMessageEntity;
 import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
-import name.maratik.cw.eu.cwshopbot.model.character.ShopPublishStatus;
+import name.maratik.cw.eu.cwshopbot.model.ShopPublishStatus;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 
@@ -104,6 +104,69 @@ public class ShopEditParserServiceTest extends MockedTest {
                 .setItem(assets.getCraftableItems().get("511"))
                 .setMana(120)
                 .setPrice(1)
+                .build()
+            ).build();
+
+        assertThat(parsedShopEdit, samePropertyValuesAsExcept(expected, "shopLines"));
+        assertThat(parsedShopEdit.getShopLines(), contains(expected.getShopLines().stream()
+            .map(Matchers::samePropertyValuesAs)
+            .collect(toImmutableList())
+        ));
+    }
+
+    @Test
+    public void testParser2() {
+        Message mockedMessage = new MockMessage("" +
+            "Customize your Drunken Master Shack #56\n" +
+            "/s_56_help - usage\n" +
+            '\n' +
+            "Offers 4/5\n" +
+            "String, 10\uD83D\uDCA7 1\uD83D\uDCB0 /s_56_d_1\n" +
+            "Hunter Gloves, 150\uD83D\uDCA7 30\uD83D\uDCB0 /s_56_d_2\n" +
+            "Silver mold, 15\uD83D\uDCA7 1\uD83D\uDCB0 /s_56_d_3\n" +
+            "Hunter Boots, 150\uD83D\uDCA7 30\uD83D\uDCB0 /s_56_d_4\n" +
+            '\n' +
+            "\uD83D\uDD14 Link: /ws_lBR02",
+            ImmutableList.of(
+                new MockMessageEntity("bold", 15, 24),
+                new MockMessageEntity("bot_command", 40, 10),
+                new MockMessageEntity("bold", 67, 3),
+                new MockMessageEntity("bot_command", 88, 9),
+                new MockMessageEntity("bot_command", 124, 9),
+                new MockMessageEntity("bot_command", 156, 9),
+                new MockMessageEntity("bot_command", 191, 9),
+                new MockMessageEntity("bot_command", 211, 9)
+            )
+        );
+        ParsedShopEdit parsedShopEdit = shopEditParser.parse(mockedMessage)
+            .orElseThrow(AssertionError::new);
+
+        ParsedShopEdit expected = ParsedShopEdit.builder()
+            .setShopName("Drunken Master Shack")
+            .setShopNumber(56)
+            .setMaxOffersCount(5)
+            .setOffersCount(4)
+            .setShopCommand("/ws_lBR02")
+            .setShopPublishStatus(ShopPublishStatus.PUBLISH)
+            .addShopLine(ParsedShopEdit.ShopLine.builder()
+                .setItem(assets.getCraftableItems().get("22"))
+                .setMana(10)
+                .setPrice(1)
+                .build()
+            ).addShopLine(ParsedShopEdit.ShopLine.builder()
+                .setItem(assets.getCraftableItems().get("a35"))
+                .setMana(150)
+                .setPrice(30)
+                .build()
+            ).addShopLine(ParsedShopEdit.ShopLine.builder()
+                .setItem(assets.getCraftableItems().get("28"))
+                .setMana(15)
+                .setPrice(1)
+                .build()
+            ).addShopLine(ParsedShopEdit.ShopLine.builder()
+                .setItem(assets.getCraftableItems().get("a34"))
+                .setMana(150)
+                .setPrice(30)
                 .build()
             ).build();
 

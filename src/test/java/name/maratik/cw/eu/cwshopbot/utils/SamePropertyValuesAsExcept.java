@@ -28,6 +28,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
@@ -53,7 +56,7 @@ public class SamePropertyValuesAsExcept<T> extends TypeSafeDiagnosingMatcher<T> 
         if (excludeExpectedPropertyNames) {
             stream = stream.filter(propertyDescriptor -> !propertyNames.contains(propertyDescriptor.getName()));
         }
-        return stream.collect(Collectors.toList());
+        return stream.collect(toImmutableList());
     }
 
     @Override
@@ -100,13 +103,13 @@ public class SamePropertyValuesAsExcept<T> extends TypeSafeDiagnosingMatcher<T> 
     private static <T> List<SamePropertyValuesAs.PropertyMatcher> propertyMatchersFor(T bean, List<PropertyDescriptor> descriptors) {
         return descriptors.stream()
             .map(propertyDescriptor -> new SamePropertyValuesAs.PropertyMatcher(propertyDescriptor, bean))
-            .collect(Collectors.toList());
+            .collect(toImmutableList());
     }
 
     private static Set<String> propertyNamesFrom(List<PropertyDescriptor> descriptors) {
         return descriptors.stream()
             .map(PropertyDescriptor::getName)
-            .collect(Collectors.toSet());
+            .collect(toImmutableSet());
     }
 
     /**

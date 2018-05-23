@@ -15,7 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
-import name.maratik.cw.eu.cwshopbot.model.character.Castle;
+import name.maratik.cw.eu.cwshopbot.model.Castle;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;
 import name.maratik.cw.eu.cwshopbot.parser.ParseException;

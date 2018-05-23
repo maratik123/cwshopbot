@@ -19,15 +19,25 @@ import name.maratik.cw.eu.cwshopbot.model.Shop;
 import name.maratik.cw.eu.cwshopbot.model.ShopLine;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
-import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 
+import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
+
+import java.util.AbstractMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.StreamSupport;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -36,6 +46,7 @@ import org.springframework.stereotype.Repository;
 public class ShopLineDao {
     private static final Logger logger = LogManager.getLogger(ShopLineDao.class);
     public static final String TABLE_NAME = "shopLine";
+    public static final String ITEM_CODE_SHOP_CODE_INDEX = "itemCode-shopCode-index";
 
     private final Table shopLineTable;
     private final Assets assets;
@@ -55,23 +66,13 @@ public class ShopLineDao {
         return shopBuilder.build();
     }
 
-    public void putShopLines(ParsedShopInfo parsedShopInfo) throws DaoException {
-        try {
-            parsedShopInfo.getShopLines().stream()
-                .map(ShopLine::of)
-                .forEach(shopLine -> putShopLine(parsedShopInfo.getShopCode(), shopLine));
-        } catch (Exception e) {
-            throw new DaoException("Putting shopLine failed", e);
-        }
-    }
-
     public void putShopLines(ParsedShopEdit parsedShopEdit) throws DaoException {
         try {
             parsedShopEdit.getShopLines().stream()
                 .map(ShopLine::of)
                 .forEach(shopLine -> putShopLine(parsedShopEdit.getShopCode(), shopLine));
         } catch (Exception e) {
-            throw new DaoException("Putting shopLine failed", e);
+            throw new DaoException("Putting shopLines failed", e);
         }
     }
 
@@ -79,7 +80,7 @@ public class ShopLineDao {
         try {
             shop.getShopLines().forEach(shopLine -> putShopLine(shop.getShopCode(), shopLine));
         } catch (Exception e) {
-            throw new DaoException("Putting shopLine failed", e);
+            throw new DaoException("Putting shopLines failed", e);
         }
     }
 
@@ -92,5 +93,35 @@ public class ShopLineDao {
             ).withInt("price", shopLine.getPrice())
         );
         logger.debug("Result is {}", outcome);
+    }
+
+    public Map<String, List<ShopLine>> getAllShopLines() throws DaoException {
+        logger.debug("Getting all shop lines");
+        try {
+            return ImmutableMap.copyOf(StreamSupport.stream(shopLineTable.scan().spliterator(), false)
+                .map(item -> new AbstractMap.SimpleImmutableEntry<>(
+                    item.getString("shopCode"),
+                    ShopLine.builder()
+                        .setItem(assets.getAllItems().get(item.getString("itemCode")))
+                        .setPrice(item.getInt("price"))
+                        .build()
+                )).collect(groupingBy(
+                    Map.Entry::getKey,
+                    mapping(Map.Entry::getValue, toImmutableList())
+                ))
+            );
+        } catch (Exception e) {
+            throw new DaoException("Getting all shop lines failed", e);
+        }
+    }
+
+    public void deleteLine(String shopCode, String itemCode) throws DaoException {
+        logger.debug("Delete line for shop='{}', item='{}'", shopCode, itemCode);
+        try {
+            DeleteItemOutcome outcome = shopLineTable.deleteItem("shopCode", shopCode, "itemCode", itemCode);
+            logger.debug("Result is {}", outcome);
+        } catch (Exception e) {
+            throw new DaoException("Delete line for shop='" + shopCode + "', item='" + itemCode + "' failed", e);
+        }
     }
 }

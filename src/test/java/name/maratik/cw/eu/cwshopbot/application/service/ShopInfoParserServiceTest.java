@@ -19,8 +19,8 @@ import name.maratik.cw.eu.cwshopbot.mock.MockMessageEntity;
 import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
-import name.maratik.cw.eu.cwshopbot.model.character.Castle;
-import name.maratik.cw.eu.cwshopbot.model.character.Profession;
+import name.maratik.cw.eu.cwshopbot.model.Castle;
+import name.maratik.cw.eu.cwshopbot.model.Profession;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.mock.MockMessage;
 

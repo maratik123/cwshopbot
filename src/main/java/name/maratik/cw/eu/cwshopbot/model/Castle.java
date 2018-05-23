@@ -13,8 +13,9 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model.character;
+package name.maratik.cw.eu.cwshopbot.model;
 
+import name.maratik.cw.eu.cwshopbot.util.Emoji;
 import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,21 +24,32 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.Optional;
 
-import static name.maratik.cw.eu.cwshopbot.util.Emoji.BELL;
-import static name.maratik.cw.eu.cwshopbot.util.Emoji.CANCEL_BELL;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.DEER;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.DRAGON;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.EAGLE;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.MOON;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHARK;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.WOLF;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum ShopPublishStatus implements EnumWithCode {
-    PUBLISH(BELL),
-    NOT_PUBLISH(CANCEL_BELL);
+public enum Castle implements EnumWithCode {
+    MOONLIGHT("Moonlight", MOON),
+    WOLFPACK("Wolfpack", WOLF),
+    POTATO("Potato", Emoji.POTATO),
+    SHARKTEETH("Sharkteeth", SHARK),
+    HIGHNEST("Highnest", EAGLE),
+    DEERHORN("Deerhorn", DEER),
+    DRAGONSCALE("Dragonscale", DRAGON);
 
     private final String code;
-    private static final Map<String, ShopPublishStatus> cache = Util.createCache(values());
+    private final String gameName;
+    private static final Map<String, Castle> cache = Util.createCache(values());
 
-    ShopPublishStatus(String code) {
+    Castle(String code, String emoji) {
         this.code = code;
+        this.gameName = emoji + code;
     }
 
     @JsonValue
@@ -46,8 +58,12 @@ public enum ShopPublishStatus implements EnumWithCode {
         return code;
     }
 
+    public String getGameName() {
+        return gameName;
+    }
+
     @JsonCreator
-    public static Optional<ShopPublishStatus> findByValue(String code) {
+    public static Optional<Castle> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }
 }

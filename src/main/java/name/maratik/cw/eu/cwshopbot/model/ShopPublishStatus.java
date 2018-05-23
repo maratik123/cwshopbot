@@ -13,7 +13,7 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.model.character;
+package name.maratik.cw.eu.cwshopbot.model;
 
 import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
@@ -23,17 +23,20 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.Optional;
 
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.BELL;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.CANCEL_BELL;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum Profession implements EnumWithCode {
-    BLACKSMITH("Blacksmith"),
-    ALCHEMIST("Alchemist");
+public enum ShopPublishStatus implements EnumWithCode {
+    PUBLISH(BELL),
+    NOT_PUBLISH(CANCEL_BELL);
 
     private final String code;
-    private static final Map<String, Profession> cache = Util.createCache(values());
+    private static final Map<String, ShopPublishStatus> cache = Util.createCache(values());
 
-    Profession(String code) {
+    ShopPublishStatus(String code) {
         this.code = code;
     }
 
@@ -44,7 +47,7 @@ public enum Profession implements EnumWithCode {
     }
 
     @JsonCreator
-    public static Optional<Profession> findByCode(String code) {
+    public static Optional<ShopPublishStatus> findByValue(String code) {
         return Optional.ofNullable(cache.get(code));
     }
 }

@@ -44,8 +44,14 @@ public class Assets {
     private final Map<String, CraftableItem> craftableItems;
     private final Map<String, WearableItem> wearableItems;
     private final Map<String, Set<CraftableItem>> craftableItemsByRecipe;
+    private final Map<String, Item> itemsByName;
+    private final Map<String, Item> itemsByNameLowerCase;
 
-    protected Assets(Map<String, Item> allItems, Map<ItemLocation, Set<Item>> itemsByItemLocation, Map<BodyPart, Set<WearableItem>> itemsByBodyPart, Map<ItemType, Set<WearableItem>> itemsByItemType, Map<Craftbook, Set<CraftableItem>> itemsByCraftbook, Map<String, CraftableItem> craftableItems, Map<String, WearableItem> wearableItems, Map<String, Set<CraftableItem>> craftableItemsByRecipe) {
+    private Assets(Map<String, Item> allItems, Map<ItemLocation, Set<Item>> itemsByItemLocation,
+                   Map<BodyPart, Set<WearableItem>> itemsByBodyPart, Map<ItemType, Set<WearableItem>> itemsByItemType,
+                   Map<Craftbook, Set<CraftableItem>> itemsByCraftbook, Map<String, CraftableItem> craftableItems,
+                   Map<String, WearableItem> wearableItems, Map<String, Set<CraftableItem>> craftableItemsByRecipe,
+                   Map<String, Item> itemsByName, Map<String, Item> itemsByNameLowerCase) {
         this.allItems = Objects.requireNonNull(allItems);
         this.itemsByItemLocation = Objects.requireNonNull(itemsByItemLocation);
         this.itemsByBodyPart = Objects.requireNonNull(itemsByBodyPart);
@@ -54,6 +60,8 @@ public class Assets {
         this.craftableItems = Objects.requireNonNull(craftableItems);
         this.wearableItems = Objects.requireNonNull(wearableItems);
         this.craftableItemsByRecipe = Objects.requireNonNull(craftableItemsByRecipe);
+        this.itemsByName = Objects.requireNonNull(itemsByName);
+        this.itemsByNameLowerCase = Objects.requireNonNull(itemsByNameLowerCase);
     }
 
     public Map<String, Item> getAllItems() {
@@ -88,6 +96,14 @@ public class Assets {
         return craftableItemsByRecipe;
     }
 
+    public Map<String, Item> getItemsByName() {
+        return itemsByName;
+    }
+
+    public Map<String, Item> getItemsByNameLowerCase() {
+        return itemsByNameLowerCase;
+    }
+
     @Override
     public String toString() {
         return "Assets{" +
@@ -116,9 +132,12 @@ public class Assets {
             Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder = new EnumMap<>(Craftbook.class);
             ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder = ImmutableMap.builder();
             ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Item> itemsByNameBuilder = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder = ImmutableMap.builder();
             allItems.forEach((id, item) -> item.apply(
-                new BuilderFiller(id, itemsByItemLocationBuilder, itemsByCraftbookBuilder, itemsByBodyPartBuilder, itemsByItemTypeBuilder, craftableItemsBuilder,
-                    wearableItemsBuilder
+                new BuilderFiller(id, itemsByItemLocationBuilder, itemsByCraftbookBuilder, itemsByBodyPartBuilder,
+                    itemsByItemTypeBuilder, craftableItemsBuilder, wearableItemsBuilder, itemsByNameBuilder,
+                    itemsByNameLowerCaseBuilder
                 )
             ));
             Map<String, CraftableItem> craftableItems = craftableItemsBuilder.build();
@@ -142,7 +161,9 @@ public class Assets {
                     .collect(createImmutableMapCollector()),
                 craftableItems,
                 wearableItemsBuilder.build(),
-                craftableItemsByRecipe);
+                craftableItemsByRecipe,
+                itemsByNameBuilder.build(),
+                itemsByNameLowerCaseBuilder.build());
         }
 
         private static <K extends Enum<K>, V, T extends Map.Entry<K, ImmutableSet.Builder<V>>>
@@ -158,13 +179,17 @@ public class Assets {
             private final Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder;
             private final ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder;
             private final ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder;
+            private final ImmutableMap.Builder<String, Item> itemsByNameBuilder;
+            private final ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder;
 
             private BuilderFiller(String id, Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder,
                                   Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder,
                                   Map<BodyPart, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder,
                                   Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder,
                                   ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder,
-                                  ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder) {
+                                  ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder,
+                                  ImmutableMap.Builder<String, Item> itemsByNameBuilder,
+                                  ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder) {
                 this.id = id;
                 this.itemsByItemLocationBuilder = itemsByItemLocationBuilder;
                 this.itemsByCraftbookBuilder = itemsByCraftbookBuilder;
@@ -172,6 +197,8 @@ public class Assets {
                 this.itemsByItemTypeBuilder = itemsByItemTypeBuilder;
                 this.craftableItemsBuilder = craftableItemsBuilder;
                 this.wearableItemsBuilder = wearableItemsBuilder;
+                this.itemsByNameBuilder = itemsByNameBuilder;
+                this.itemsByNameLowerCaseBuilder = itemsByNameLowerCaseBuilder;
             }
 
             @Override
@@ -180,6 +207,9 @@ public class Assets {
                     item.getItemLocation(),
                     itemLocation -> ImmutableSet.builder()
                 ).add(item);
+                String itemName = item.getName();
+                itemsByNameBuilder.put(itemName, item);
+                itemsByNameLowerCaseBuilder.put(itemName.toLowerCase(), item);
             }
 
             @Override

@@ -18,18 +18,24 @@ package name.maratik.cw.eu.cwshopbot.mock;
 import name.maratik.cw.eu.cwshopbot.application.Application;
 import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
 import name.maratik.cw.eu.cwshopbot.application.config.TestDynamoDBConfig;
+import name.maratik.cw.eu.cwshopbot.application.dao.DaoException;
 import name.maratik.cw.eu.cwshopbot.application.dao.ShopDao;
 import name.maratik.cw.eu.cwshopbot.application.dao.ShopLineDao;
+import name.maratik.cw.eu.cwshopbot.model.Shop;
+import name.maratik.cw.eu.cwshopbot.model.ShopLine;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.GlobalSecondaryIndex;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
+import com.amazonaws.services.dynamodbv2.model.Projection;
+import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
-import com.google.common.collect.ImmutableList;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
@@ -39,12 +45,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.telegram.telegrambots.TelegramBotsApi;
 
-import java.util.Collections;
+import javax.annotation.PostConstruct;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -74,58 +81,112 @@ import java.util.Collections;
 @AutoConfigureCache
 @ComponentScan(
     excludeFilters = @ComponentScan.Filter(Configuration.class),
-    basePackageClasses = Application.class
+    basePackageClasses = { Application.class, MockedTest.CreateTables.class }
 )
 public abstract class MockedTest {
     @MockBean
     protected TelegramBotsApi telegramBotsApi;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
-    private DynamoDB client;
+    private ShopDao shopDao;
 
-    @Before
-    public void setUp() throws InterruptedException {
-        createTables();
-    }
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired
+    private ShopLineDao shopLineDao;
 
     @After
-    public void cleanUp() {
+    public void cleanUp() throws DaoException {
         clearTables();
     }
 
-    private void clearTables() {
-        client.listTables().forEach(table -> {
-            table.delete();
-            try {
-                table.waitForDelete();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
+    private void clearTables() throws DaoException {
+        clearShopTable();
+        clearShopLineTable();
     }
 
-    private void createTables() throws InterruptedException {
-        ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(5L, 5L);
-
-        createShopTable(client, provisionedThroughput);
-        createShopLineTable(client, provisionedThroughput);
+    private void clearShopTable() throws DaoException {
+        shopDao.getAllShops().stream()
+            .map(Shop.Builder::build)
+            .map(Shop::getShopCode)
+            .forEach(code -> {
+                try {
+                    shopDao.deleteShop(code);
+                } catch (DaoException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
-    private static void createShopTable(DynamoDB client, ProvisionedThroughput provisionedThroughput) throws InterruptedException {
-        client.createTable(ShopDao.TABLE_NAME, Collections.singletonList(
-            new KeySchemaElement("code", KeyType.HASH)
-        ), Collections.singletonList(
-            new AttributeDefinition("code", ScalarAttributeType.S)
-        ), provisionedThroughput).waitForActive();
+    private void clearShopLineTable() throws DaoException {
+        shopLineDao.getAllShopLines().forEach((shopCode, shopLine) ->
+            shopLine.stream()
+                .map(ShopLine::getItem)
+                .map(Item::getId)
+                .forEach(itemId -> {
+                    try {
+                        shopLineDao.deleteLine(shopCode, itemId);
+                    } catch (DaoException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+        );
     }
 
-    private static void createShopLineTable(DynamoDB client, ProvisionedThroughput provisionedThroughput) throws InterruptedException {
-        client.createTable(ShopLineDao.TABLE_NAME, ImmutableList.of(
-            new KeySchemaElement("shopCode", KeyType.HASH),
-            new KeySchemaElement("itemCode", KeyType.RANGE)
-        ), ImmutableList.of(
-            new AttributeDefinition("shopCode", ScalarAttributeType.S),
-            new AttributeDefinition("itemCode", ScalarAttributeType.S)
-        ), provisionedThroughput).waitForActive();
+    @Component
+    public static class CreateTables {
+        @Autowired
+        private DynamoDB client;
+
+        @PostConstruct
+        public void createTables() throws InterruptedException {
+            ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(5L, 5L);
+
+            createShopTable(provisionedThroughput);
+            createShopLineTable(provisionedThroughput);
+        }
+
+        private void createShopTable(ProvisionedThroughput provisionedThroughput) throws InterruptedException {
+            CreateTableRequest request = new CreateTableRequest()
+                .withTableName(ShopDao.TABLE_NAME)
+                .withKeySchema(
+                    new KeySchemaElement("code", KeyType.HASH)
+                ).withAttributeDefinitions(
+                    new AttributeDefinition("code", ScalarAttributeType.S),
+                    new AttributeDefinition("userId", ScalarAttributeType.S)
+                ).withProvisionedThroughput(provisionedThroughput)
+                .withGlobalSecondaryIndexes(new GlobalSecondaryIndex()
+                    .withIndexName(ShopDao.USER_ID_INDEX)
+                    .withKeySchema(
+                        new KeySchemaElement("userId", KeyType.HASH)
+                    ).withProjection(new Projection()
+                        .withProjectionType(ProjectionType.ALL)
+                    ).withProvisionedThroughput(provisionedThroughput)
+                );
+            client.createTable(request).waitForActive();
+        }
+
+        private void createShopLineTable(ProvisionedThroughput provisionedThroughput) throws InterruptedException {
+            CreateTableRequest request = new CreateTableRequest()
+                .withTableName(ShopLineDao.TABLE_NAME)
+                .withKeySchema(
+                    new KeySchemaElement("shopCode", KeyType.HASH),
+                    new KeySchemaElement("itemCode", KeyType.RANGE)
+                ).withAttributeDefinitions(
+                    new AttributeDefinition("shopCode", ScalarAttributeType.S),
+                    new AttributeDefinition("itemCode", ScalarAttributeType.S)
+                ).withProvisionedThroughput(provisionedThroughput)
+                .withGlobalSecondaryIndexes(new GlobalSecondaryIndex()
+                    .withIndexName(ShopLineDao.ITEM_CODE_SHOP_CODE_INDEX)
+                    .withKeySchema(
+                        new KeySchemaElement("itemCode", KeyType.HASH),
+                        new KeySchemaElement("shopCode", KeyType.RANGE)
+                    )
+                    .withProjection(new Projection()
+                        .withProjectionType(ProjectionType.ALL)
+                    ).withProvisionedThroughput(provisionedThroughput)
+                );
+            client.createTable(request).waitForActive();
+        }
     }
 }

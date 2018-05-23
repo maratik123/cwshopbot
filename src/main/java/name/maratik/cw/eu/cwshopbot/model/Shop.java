@@ -24,6 +24,7 @@ import java.util.Objects;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class Shop {
+    private final long userId;
     private final String shopName;
     private final String charName;
     private final String shopCode;
@@ -32,8 +33,9 @@ public class Shop {
     private final int shopNumber;
     private final List<ShopLine> shopLines;
 
-    private Shop(String shopName, String charName, String shopCode, int maxOffersCount, String shopCommand,
+    private Shop(long userId, String shopName, String charName, String shopCode, int maxOffersCount, String shopCommand,
                  int shopNumber, List<ShopLine> shopLines) {
+        this.userId = userId;
         this.shopName = Objects.requireNonNull(shopName);
         this.charName = Objects.requireNonNull(charName);
         this.shopCode = Objects.requireNonNull(shopCode);
@@ -41,6 +43,10 @@ public class Shop {
         this.shopCommand = Objects.requireNonNull(shopCommand);
         this.shopNumber = shopNumber;
         this.shopLines = Objects.requireNonNull(shopLines);
+    }
+
+    public long getUserId() {
+        return userId;
     }
 
     public String getShopName() {
@@ -74,7 +80,8 @@ public class Shop {
     @Override
     public String toString() {
         return "Shop{" +
-            "shopName='" + shopName + '\'' +
+            "userId=" + userId +
+            ", shopName='" + shopName + '\'' +
             ", charName='" + charName + '\'' +
             ", shopCode='" + shopCode + '\'' +
             ", maxOffersCount=" + maxOffersCount +
@@ -89,6 +96,7 @@ public class Shop {
     }
 
     public static class Builder {
+        private long userId;
         private String shopName;
         private String charName;
         private String shopCode;
@@ -96,6 +104,11 @@ public class Shop {
         private String shopCommand;
         private int shopNumber;
         private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
+
+        private Builder setUserId(long userId) {
+            this.userId = userId;
+            return this;
+        }
 
         public Builder setShopName(String shopName) {
             this.shopName = shopName;
@@ -133,7 +146,9 @@ public class Shop {
         }
 
         public Shop build() {
-            return new Shop(shopName, charName, shopCode, maxOffersCount, shopCommand, shopNumber, shopLines.build());
+            return new Shop(userId, shopName, charName, shopCode, maxOffersCount, shopCommand, shopNumber,
+                shopLines.build()
+            );
         }
     }
 }

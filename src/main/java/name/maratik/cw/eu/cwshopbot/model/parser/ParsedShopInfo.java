@@ -16,8 +16,8 @@
 package name.maratik.cw.eu.cwshopbot.model.parser;
 
 import name.maratik.cw.eu.cwshopbot.model.ShopState;
-import name.maratik.cw.eu.cwshopbot.model.character.Castle;
-import name.maratik.cw.eu.cwshopbot.model.character.Profession;
+import name.maratik.cw.eu.cwshopbot.model.Castle;
+import name.maratik.cw.eu.cwshopbot.model.Profession;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.parser.ParseException;
 
