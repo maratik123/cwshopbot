@@ -23,6 +23,7 @@ import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.eu.spring.TelegramBotService;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
 import name.maratik.cw.eu.spring.model.TelegramMessageCommand;
@@ -35,6 +36,8 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.time.Clock;
 
 /**
@@ -45,6 +48,8 @@ public class AdminController extends ShopController {
     private static final Logger logger = LogManager.getLogger(AdminController.class);
 
     private final StatsService statsService;
+    private final DefaultAbsSender client;
+    private final long devUserId;
 
     public AdminController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
                            @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
@@ -52,9 +57,32 @@ public class AdminController extends ShopController {
                            CWParser<ParsedHero> heroParser, ItemSearchService itemSearchService,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
-                           StatsService statsService) {
-        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService, devUserId, devUserName);
+                           StatsService statsService, TelegramBotService telegramBotService) {
+        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
+            devUserId, devUserName);
+        this.devUserId = devUserId;
         this.statsService = statsService;
+        this.client = telegramBotService.getClient();
+    }
+
+    @PostConstruct
+    public void init() throws TelegramApiException {
+        client.execute(new SendMessage()
+            .setChatId(devUserId)
+            .setText("Bot is up")
+        );
+    }
+
+    @PreDestroy
+    public void destroy() {
+        try {
+            client.execute(new SendMessage()
+                .setChatId(devUserId)
+                .setText("Bot is going down")
+            );
+        } catch (TelegramApiException e) {
+            logger.error("Can not send goodbye", e);
+        }
     }
 
     @TelegramCommand(commands = "/stats", description = "Get statistics")
