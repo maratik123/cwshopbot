@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.mock;
 
 import name.maratik.cw.eu.cwshopbot.application.Application;
 import name.maratik.cw.eu.cwshopbot.application.config.InternalConfig;
+import name.maratik.cw.eu.cwshopbot.application.config.MocksConfig;
 import name.maratik.cw.eu.cwshopbot.application.config.TestDynamoDBConfig;
 import name.maratik.cw.eu.cwshopbot.application.dao.DaoException;
 import name.maratik.cw.eu.cwshopbot.application.dao.ShopDao;
@@ -73,7 +74,8 @@ import javax.annotation.PostConstruct;
 )
 @ContextConfiguration(classes = {
     InternalConfig.class,
-    TestDynamoDBConfig.class
+    TestDynamoDBConfig.class,
+    MocksConfig.class
 })
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -85,7 +87,7 @@ import javax.annotation.PostConstruct;
 )
 public abstract class MockedTest {
     @MockBean
-    protected TelegramBotsApi telegramBotsApi;
+    private TelegramBotsApi telegramBotsApi;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
