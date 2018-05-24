@@ -64,6 +64,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.springframework.boot:spring-boot-starter-jetty'
+    compile 'org.springframework.boot:spring-boot-starter-amqp'
     compile "org.telegram:telegrambots:${telegrambotsVersion}"
     compile "com.google.guava:guava:${guavaVersion}"
     compile "com.amazonaws:aws-java-sdk-dynamodb:${awsJavaSdkVersion}"
