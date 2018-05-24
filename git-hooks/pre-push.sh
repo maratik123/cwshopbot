@@ -9,7 +9,7 @@
 git stash -q --keep-index
 
 # run the checks with the gradle wrapper
-./gradlew clean check
+./gradlew check
 # Another possibility could be to run an aggregate test report task and automatically open the generated html
 
 # store the last exit code in a variable
