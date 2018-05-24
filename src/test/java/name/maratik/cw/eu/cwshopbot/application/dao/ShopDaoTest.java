@@ -37,7 +37,7 @@ public class ShopDaoTest extends MockedTest {
     private ShopDao shopDao;
 
     @Test
-    public void putTest() throws DaoException {
+    public void shouldPut() throws DaoException {
         Shop shop = createShop();
         shopDao.putShop(shop);
         Shop result = shopDao.getShopByCode(SHOP_CODE).orElseThrow(AssertionError::new).build();
@@ -45,7 +45,7 @@ public class ShopDaoTest extends MockedTest {
     }
 
     @Test
-    public void putTwiceTest() throws DaoException {
+    public void shouldPutTwice() throws DaoException {
         Shop shop = createShop();
         shopDao.putShop(shop);
         shopDao.putShop(shop);
@@ -54,7 +54,7 @@ public class ShopDaoTest extends MockedTest {
     }
 
     @Test
-    public void updateMaxOffersCountTest() throws DaoException {
+    public void shouldUpdateMaxOffersCount() throws DaoException {
         Shop shop = createShop();
         shopDao.putShop(shop);
         shop = createShopBuilder(shop.getMaxOffersCount() + 5).build();

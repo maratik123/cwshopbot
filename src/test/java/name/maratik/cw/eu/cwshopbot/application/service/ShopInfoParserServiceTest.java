@@ -48,7 +48,7 @@ public class ShopInfoParserServiceTest extends MockedTest {
     private Assets assets;
 
     @Test
-    public void testParser() {
+    public void shouldParseShopInfoMessage() {
         Message mockedMessage = new MockMessage( "" +
             "Welcome, to the Drunken Master Shack #56.\n" +
             "Forester SM 730/730\uD83D\uDCA7the Blacksmith from Moonlight\n" +

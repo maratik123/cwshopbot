@@ -37,7 +37,7 @@ public class HeroParserServiceTest extends MockedTest {
     private CWParser<ParsedHero> heroParser;
 
     @Test
-    public void testParser() {
+    public void shouldParseHeroInfoMessage() {
         Message mockedMessage = new MockMessage("" +
             "\uD83C\uDF11[ETC]Forester SM of Moonlight Castle\n" +
             "\uD83C\uDFC5Level: 31\n" +

@@ -45,7 +45,7 @@ public class ShopEditParserServiceTest extends MockedTest {
     private Assets assets;
 
     @Test
-    public void testParser() {
+    public void shouldParserShopEditMessage() {
         Message mockedMessage = new MockMessage("" +
             "Customize your Drunken Master Shack #56\n" +
             "/s_56_help - usage\n" +
@@ -115,7 +115,7 @@ public class ShopEditParserServiceTest extends MockedTest {
     }
 
     @Test
-    public void testParser2() {
+    public void shouldParserShopEditMessageWithHunterGloves() {
         Message mockedMessage = new MockMessage("" +
             "Customize your Drunken Master Shack #56\n" +
             "/s_56_help - usage\n" +

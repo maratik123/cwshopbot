@@ -37,22 +37,24 @@ import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.telegram.telegrambots.TelegramBotsApi;
 
 import javax.annotation.PostConstruct;
+import java.util.Map;
+
+import static org.mockito.Mockito.reset;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -86,16 +88,22 @@ import javax.annotation.PostConstruct;
     basePackageClasses = { Application.class, MockedTest.CreateTables.class }
 )
 public abstract class MockedTest {
-    @MockBean
-    private TelegramBotsApi telegramBotsApi;
-
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ShopDao shopDao;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ShopLineDao shopLineDao;
+
+    @Autowired
+    private Map<Object, Runnable> mocks;
+
+    @Before
+    public void resetMocks() {
+        mocks.forEach((mock, resetAction) -> {
+            reset(mock);
+            resetAction.run();
+        });
+    }
 
     @After
     public void cleanUp() throws DaoException {

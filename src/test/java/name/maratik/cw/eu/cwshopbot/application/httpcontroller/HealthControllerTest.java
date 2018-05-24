@@ -32,7 +32,7 @@ public class HealthControllerTest extends MockedTest {
     private MockMvc mvc;
 
     @Test
-    public void testPing() throws Exception {
+    public void shoulPingReturnOk() throws Exception {
         mvc.perform(get("/ping"))
                 .andDo(log())
                 .andExpect(status().is2xxSuccessful())

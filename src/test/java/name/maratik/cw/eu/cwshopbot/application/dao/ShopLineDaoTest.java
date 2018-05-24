@@ -67,7 +67,7 @@ public class ShopLineDaoTest extends MockedTest {
     }
 
     @Test
-    public void putLineTest() throws DaoException {
+    public void shouldPutLine() throws DaoException {
         ShopLine shopLine = createShopLine(item);
         Shop shop = createShop(shopLine);
         shopLineDao.putShopLines(shop);
@@ -76,7 +76,7 @@ public class ShopLineDaoTest extends MockedTest {
     }
 
     @Test
-    public void putMultipleLinesTest() throws DaoException {
+    public void shouldPutMultipleLines() throws DaoException {
         List<ShopLine> shopLines = Stream.of(item, craftableItem, wearableItem)
             .map(ShopLineDaoTest::createShopLine)
             .collect(toImmutableList());
@@ -90,7 +90,7 @@ public class ShopLineDaoTest extends MockedTest {
     }
 
     @Test
-    public void updatePriceTest() throws DaoException {
+    public void shouldUpdatePrice() throws DaoException {
         ShopLine shopLine = createShopLine(item, 1);
         Shop shop = createShop(shopLine);
         shopLineDao.putShopLines(shop);

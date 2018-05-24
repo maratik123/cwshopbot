@@ -19,9 +19,14 @@ import name.maratik.cw.eu.spring.TelegramBotService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -30,10 +35,28 @@ import static org.mockito.Mockito.mock;
 @Configuration
 public class MocksConfig {
     @Bean
-    public TelegramBotService telegramBotService() {
-        TelegramBotService telegramBotService = mock(TelegramBotService.class);
-        DefaultAbsSender client = mock(DefaultAbsSender.class);
-        given(telegramBotService.getClient()).willReturn(client);
+    public Map<Object, Runnable> mocks() {
+        return new IdentityHashMap<>();
+    }
+
+    @Bean
+    public TelegramBotService telegramBotService(Map<Object, Runnable> mocks) {
+        DefaultAbsSender client = mock(DefaultAbsSender.class, RETURNS_SMART_NULLS);
+        mocks.put(client, () -> {});
+        TelegramBotService telegramBotService = mock(TelegramBotService.class, RETURNS_SMART_NULLS);
+        resetTelegramBotService(telegramBotService, client);
+        mocks.put(telegramBotService, () -> resetTelegramBotService(telegramBotService, client));
         return telegramBotService;
+    }
+
+    @Bean
+    public TelegramBotsApi telegramBotsApi(Map<Object, Runnable> mocks) {
+        TelegramBotsApi telegramBotsApi = mock(TelegramBotsApi.class, RETURNS_SMART_NULLS);
+        mocks.put(telegramBotsApi, () -> {});
+        return mock(TelegramBotsApi.class, RETURNS_SMART_NULLS);
+    }
+
+    private static void resetTelegramBotService(TelegramBotService telegramBotService, DefaultAbsSender client) {
+        given(telegramBotService.getClient()).willReturn(client);
     }
 }

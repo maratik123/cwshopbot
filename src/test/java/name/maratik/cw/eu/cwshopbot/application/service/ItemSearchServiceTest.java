@@ -34,7 +34,7 @@ public class ItemSearchServiceTest extends MockedTest {
     private ItemSearchService itemSearchService;
 
     @Test
-    public void findHunterGlovesByName() {
+    public void shouldFindHunterGlovesByName() {
         assertThat(
             itemSearchService.findItemByNameList("Hunter Gloves", false, false),
             contains(hasProperty("name", equalTo("Hunter Gloves")))

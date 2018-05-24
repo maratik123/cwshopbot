@@ -32,7 +32,7 @@ public class HelloControllerTest extends MockedTest {
     private MockMvc mvc;
 
     @Test
-    public void testIndex() throws Exception {
+    public void shouldIndexReturn2xx() throws Exception {
         mvc.perform(get("/"))
                 .andDo(log())
                 .andExpect(status().is2xxSuccessful())
