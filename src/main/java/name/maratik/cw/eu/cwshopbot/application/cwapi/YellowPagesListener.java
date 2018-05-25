@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.application.cwapi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ public class YellowPagesListener {
 
     @SuppressWarnings("MethodMayBeStatic")
     @RabbitListener(queues = "marat321_cwshop_bot_yellow_pages")
-    public void processYellowPagesAnnounce(String data) {
+    public void processYellowPagesAnnounce(Message data) {
         logger.debug("Received next: {}", data);
     }
 }
