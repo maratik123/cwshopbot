@@ -77,6 +77,8 @@ dependencies {
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "com.amazonaws:DynamoDBLocal:${awsDynamodbLocalVersion}"
+    testCompile 'org.springframework.amqp:spring-rabbit-junit'
+    testCompile 'org.springframework.amqp:spring-rabbit-test'
 }
 
 bootJar {
