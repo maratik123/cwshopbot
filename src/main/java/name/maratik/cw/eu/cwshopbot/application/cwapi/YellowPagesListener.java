@@ -29,7 +29,7 @@ public class YellowPagesListener {
     private static final Logger logger = LogManager.getLogger(YellowPagesListener.class);
 
     @SuppressWarnings("MethodMayBeStatic")
-    @RabbitListener(queues = "${spring.rabbitmq.username}_pages")
+    @RabbitListener(queues = "${spring.rabbitmq.username}_yellow_pages")
     public void processYellowPagesAnnounce(Message data) {
         logger.debug("Received next: {}", data);
     }
