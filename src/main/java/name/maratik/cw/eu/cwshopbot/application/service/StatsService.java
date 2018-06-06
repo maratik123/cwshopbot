@@ -15,6 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
+import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
+import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+import name.maratik.cw.eu.cwshopbot.util.LRUCachingMap;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.google.common.cache.Cache;
 import org.springframework.stereotype.Service;
 
 import java.lang.management.ClassLoadingMXBean;
@@ -35,13 +41,18 @@ public class StatsService {
     private final OffsetDateTime startTime;
     private final Clock clock;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final LRUCachingMap<Object, JavaType> unifiedObjectMapperCache;
+    private final Cache<ForwardKey, Long> forwardUserCache;
 
-    public StatsService(Clock clock) {
+    public StatsService(Clock clock, LRUCachingMap<Object, JavaType> unifiedObjectMapperCache,
+                        @ForwardUser Cache<ForwardKey, Long> forwardUserCache) {
         this.clock = clock;
         startTime = clock.instant().atOffset(ZoneOffset.UTC);
+        this.unifiedObjectMapperCache = unifiedObjectMapperCache;
+        this.forwardUserCache = forwardUserCache;
     }
 
-    public String getMessage() {
+    public String getStats() {
         Duration workTime = Duration.between(startTime, clock.instant().atOffset(ZoneOffset.UTC));
         GCStats gcStats = getGCStats();
         ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
@@ -56,7 +67,7 @@ public class StatsService {
             "Classes loaded is " + classLoadingMXBean.getLoadedClassCount() + '\n' +
             "Total classes loaded is " + classLoadingMXBean.getTotalLoadedClassCount() + '\n' +
             "Unloaded classes is " + classLoadingMXBean.getUnloadedClassCount() + '\n' +
-            "System load average is " + ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage() + '\n';
+            "System load average is " + ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
     }
 
     private static GCStats getGCStats() {
@@ -73,6 +84,11 @@ public class StatsService {
             }
         }
         return new GCStats(gcCount, gcTime);
+    }
+
+    public String getCacheStats() {
+        return "Forward user cache: " + forwardUserCache.stats() + '\n' +
+            "Unified object mapper cache: " + unifiedObjectMapperCache.stats();
     }
 
     private static class GCStats {

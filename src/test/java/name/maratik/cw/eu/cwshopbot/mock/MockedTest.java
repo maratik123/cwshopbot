@@ -70,8 +70,8 @@ import static org.mockito.Mockito.reset;
     "name.maratik.cw.eu.cwshopbot.accessKeyId=qqq",
     "name.maratik.cw.eu.cwshopbot.secretAccessKey=zzz",
     "name.maratik.cw.eu.cwshopbot.region=eee",
-    "name.maratik.cw.eu.cwshopbot.cwapi.username=amqp_username",
-    "name.maratik.cw.eu.cwshopbot.cwapi.password=amqp_password",
+    "spring.rabbitmq.username=amqp_username",
+    "spring.rabbitmq.password=amqp_password",
     "cwuserid=987654321"
 },
     locations = "classpath:test-application.properties"

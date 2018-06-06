@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
 import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
+import name.maratik.cw.eu.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
@@ -42,6 +43,7 @@ import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
@@ -65,7 +67,7 @@ public class ShopController {
     public static final String SHOP_COMMAND_PREFIX = "/ws_";
 
     private final Clock clock;
-    private final int forwardStaleSec;
+    private final Duration forwardStale;
     private final ConcurrentMap<ForwardKey, Long> forwardUserCache;
     private final CWParser<ParsedShopInfo> shopInfoParser;
     private final CWParser<ParsedShopEdit> shopEditParser;
@@ -73,15 +75,20 @@ public class ShopController {
     private final ItemSearchService itemSearchService;
     private final long devUserId;
     private final String devUserName;
+    private final ChatWarsAuthService chatWarsAuthService;
+    private final String cwUserName;
 
-    public ShopController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
+    public ShopController(Clock clock, Duration forwardStale,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                           CWParser<ParsedShopInfo> shopInfoParser, CWParser<ParsedShopEdit> shopEditParser,
                           CWParser<ParsedHero> heroParser, ItemSearchService itemSearchService,
                           @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
-                          @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName) {
+                          @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
+                          ChatWarsAuthService chatWarsAuthService,
+                          @Value("${cwusername}") String cwUserName
+    ) {
         this.clock = clock;
-        this.forwardStaleSec = forwardStaleSec;
+        this.forwardStale = forwardStale;
         this.forwardUserCache = forwardUserCache.asMap();
         this.shopInfoParser = shopInfoParser;
         this.shopEditParser = shopEditParser;
@@ -89,6 +96,8 @@ public class ShopController {
         this.itemSearchService = itemSearchService;
         this.devUserId = devUserId;
         this.devUserName = devUserName;
+        this.chatWarsAuthService = chatWarsAuthService;
+        this.cwUserName = cwUserName;
     }
 
     @TelegramMessage
@@ -131,8 +140,15 @@ public class ShopController {
             .setText("Now you can press /help to view help");
     }
 
+    @TelegramCommand(commands = "/auth", description = "Authenticate within CW", hidden = true)
+    public SendMessage authCommand(long userId) {
+        return new SendMessage()
+            .setChatId(userId)
+            .setText("Now, send me the authentication code from " + cwUserName);
+    }
+
     @SuppressWarnings("MethodMayBeStatic")
-    @TelegramCommand(commands = "/register", description = "Register your shop")
+    @TelegramCommand(commands = "/register", description = "Register your shop", hidden = true)
     public SendMessage registerCommand(long userId) {
         return new SendMessage()
             .setChatId(userId)
@@ -274,7 +290,7 @@ public class ShopController {
     }
 
     private boolean messageIsStale(Instant forwardTime) {
-        return clock.instant().minusSeconds(forwardStaleSec).isAfter(forwardTime);
+        return clock.instant().minus(forwardStale).isAfter(forwardTime);
     }
 
     private SendMessage itemInfo(long userId, Message message, int prefixLen) {

@@ -13,24 +13,25 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.application.cwapi;
+package name.maratik.cw.eu.cwshopbot.application.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
-public class DealsListener {
-    private static final Logger logger = LogManager.getLogger(DealsListener.class);
+@Service
+public class ChatWarsAuthService {
+    private final RabbitTemplate rabbitTemplate;
 
-    @SuppressWarnings("MethodMayBeStatic")
-    @RabbitListener(queues = "${spring.rabbitmq.username}_deals")
-    public void processDealsAnnounce(Message data) {
-        logger.debug("Received message: {}", data);
+    public ChatWarsAuthService(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public void auth(long userId) {
+        rabbitTemplate.execute(channel -> Optional.empty());
     }
 }

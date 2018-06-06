@@ -45,11 +45,13 @@ public enum Castle implements EnumWithCode {
 
     private final String code;
     private final String gameName;
+    private final String emoji;
     private static final Map<String, Castle> cache = Util.createCache(values());
 
     Castle(String code, String emoji) {
         this.code = code;
         this.gameName = emoji + code;
+        this.emoji = emoji;
     }
 
     @JsonValue
@@ -60,6 +62,10 @@ public enum Castle implements EnumWithCode {
 
     public String getGameName() {
         return gameName;
+    }
+
+    public String getEmoji() {
+        return emoji;
     }
 
     @JsonCreator

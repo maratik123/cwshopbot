@@ -17,6 +17,7 @@ package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
 import name.maratik.cw.eu.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.eu.cwshopbot.application.service.CWParser;
+import name.maratik.cw.eu.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.eu.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.eu.cwshopbot.application.service.StatsService;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
@@ -39,6 +40,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Clock;
+import java.time.Duration;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -51,15 +53,18 @@ public class AdminController extends ShopController {
     private final DefaultAbsSender client;
     private final long devUserId;
 
-    public AdminController(Clock clock, @Value("${forwardStaleSec}") int forwardStaleSec,
+    public AdminController(Clock clock, Duration forwardStale,
                            @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
                            CWParser<ParsedShopInfo> shopInfoParser, CWParser<ParsedShopEdit> shopEditParser,
                            CWParser<ParsedHero> heroParser, ItemSearchService itemSearchService,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
-                           StatsService statsService, TelegramBotService telegramBotService) {
-        super(clock, forwardStaleSec, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
-            devUserId, devUserName);
+                           StatsService statsService, TelegramBotService telegramBotService,
+                           ChatWarsAuthService chatWarsAuthService,
+                           @Value("${cwusername}") String cwUserName
+    ) {
+        super(clock, forwardStale, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
+            devUserId, devUserName, chatWarsAuthService, cwUserName);
         this.devUserId = devUserId;
         this.statsService = statsService;
         this.client = telegramBotService.getClient();
@@ -89,7 +94,14 @@ public class AdminController extends ShopController {
     public SendMessage getStat(long userId) {
         return new SendMessage()
             .setChatId(userId)
-            .setText(statsService.getMessage());
+            .setText(statsService.getStats());
+    }
+
+    @TelegramCommand(commands = "/stats_cache", description = "Get caches statistics")
+    public SendMessage getCacheStats(long userId) {
+        return new SendMessage()
+            .setChatId(userId)
+            .setText(statsService.getCacheStats());
     }
 
     @SuppressWarnings("MethodMayBeStatic")

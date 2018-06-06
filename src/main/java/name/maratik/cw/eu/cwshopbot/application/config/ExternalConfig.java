@@ -35,79 +35,35 @@ import org.springframework.context.annotation.Configuration;
 @EnableTelegramBot
 public class ExternalConfig {
 
-//    @Configuration
-//    @EnableRabbit
-//    public static class RabbitConfiguration {
-//        @Bean
-//        public ConnectionFactory connectionFactory(
-//            @Value("${cwapi.host}") String host, @Value("${cwapi.port}") int port,
-//            @Value("${name.maratik.cw.eu.cwshopbot.cwapi.username}") String username,
-//            @Value("${name.maratik.cw.eu.cwshopbot.cwapi.password}") String password,
-//            com.rabbitmq.client.ConnectionFactory clientConnectionFactory
-//        ) {
-//            CachingConnectionFactory connectionFactory = new CachingConnectionFactory(
-//                clientConnectionFactory
-//            );
-//            connectionFactory.setHost(host);
-//            connectionFactory.setPort(port);
-//            connectionFactory.setUsername(username);
-//            connectionFactory.setPassword(password);
-//            ThreadFactory tf = new CustomizableThreadFactory("rabbitmq-");
-//            connectionFactory.setConnectionThreadFactory(tf);
-//            return connectionFactory;
-//        }
-//
-//        @Bean
-//        public FactoryBean<com.rabbitmq.client.ConnectionFactory> clientConnectionFactory() {
-//            RabbitConnectionFactoryBean rabbitConnectionFactoryBean = new RabbitConnectionFactoryBean();
-//            rabbitConnectionFactoryBean.setUseSSL(true);
-//            rabbitConnectionFactoryBean.setUseNio(true);
-//            rabbitConnectionFactoryBean.setSslAlgorithm("TLSv1.2");
-//            return rabbitConnectionFactoryBean;
-//        }
-//
-//        @Bean
-//        public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-//            RetryTemplate retryTemplate = new RetryTemplate();
-//            ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
-//            exponentialBackOffPolicy.setInitialInterval(500);
-//            exponentialBackOffPolicy.setMultiplier(10);
-//            exponentialBackOffPolicy.setMaxInterval(10_000);
-//            retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
-//            RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-//            rabbitTemplate.setRetryTemplate(retryTemplate);
-//            return rabbitTemplate;
-//        }
-//
-//        @Bean
-//        public DirectRabbitListenerContainerFactoryConfigurer
-//    }
-
     @Configuration
     public static class AWSConfiguration {
+        @Value("${name.maratik.cw.eu.cwshopbot.accessKeyId}")
+        private String accessKey;
+        @Value("${name.maratik.cw.eu.cwshopbot.secretAccessKey}")
+        private String secretKey;
+        @Value("${name.maratik.cw.eu.cwshopbot.region}")
+        private String regionName;
+
         @Bean
-        public AWSCredentials awsCredentials(
-            @Value("${name.maratik.cw.eu.cwshopbot.accessKeyId}") String accessKey,
-            @Value("${name.maratik.cw.eu.cwshopbot.secretAccessKey}") String secretKey
-        ) {
+        public AWSCredentials awsCredentials() {
             return new BasicAWSCredentials(accessKey, secretKey);
         }
 
         @Bean
-        public AWSCredentialsProvider awsCredentialsProvider(AWSCredentials awsCredentials) {
-            return new AWSStaticCredentialsProvider(awsCredentials);
+        public AWSCredentialsProvider awsCredentialsProvider() {
+            return new AWSStaticCredentialsProvider(awsCredentials());
         }
 
         @Bean
-        public Regions regions(@Value("${name.maratik.cw.eu.cwshopbot.region}") String regionName) {
+        public Regions regions() {
             return Regions.fromName(regionName);
         }
 
         @Bean
-        public AmazonDynamoDB amazonDynamoDB(AWSCredentialsProvider awsCredentialsProvider) {
+        public AmazonDynamoDB amazonDynamoDB() {
             return AmazonDynamoDBClientBuilder.standard()
                 .withRegion(Regions.AP_NORTHEAST_1)
-                .withCredentials(awsCredentialsProvider)
+                .withCredentials(awsCredentialsProvider())
                 .build();
         }
     }

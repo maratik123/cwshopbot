@@ -27,6 +27,7 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.apache.logging.log4j.LogManager;
@@ -52,10 +53,11 @@ public class AssetsDao {
 
     private final AssetsDto assetsDto;
 
-    public AssetsDao(Resource assets) throws IOException {
+    public AssetsDao(Resource assets, TypeFactory typeFactory) throws IOException {
         logger.info("Loading assets");
         try (InputStream is = assets.getInputStream()) {
             assetsDto = new ObjectMapper(new YAMLFactory())
+                .setTypeFactory(typeFactory)
                 .registerModule(new Jdk8Module())
                 .readValue(is, AssetsDto.class);
         }

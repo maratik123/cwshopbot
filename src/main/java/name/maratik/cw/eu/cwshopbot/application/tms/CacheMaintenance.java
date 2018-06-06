@@ -16,7 +16,9 @@
 package name.maratik.cw.eu.cwshopbot.application.tms;
 
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
+import name.maratik.cw.eu.cwshopbot.util.LRUCachingMap;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.cache.Cache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,17 +33,28 @@ public class CacheMaintenance {
     private static final Logger logger = LogManager.getLogger(CacheMaintenance.class);
 
     private final Cache<ForwardKey, Long> forwardUserCache;
+    private final LRUCachingMap<Object, JavaType> unifiedObjectMapperCache;
 
-    public CacheMaintenance(Cache<ForwardKey, Long> forwardUserCache) {
+    public CacheMaintenance(Cache<ForwardKey, Long> forwardUserCache, LRUCachingMap<Object, JavaType> unifiedObjectMapperCache) {
         this.forwardUserCache = forwardUserCache;
+        this.unifiedObjectMapperCache = unifiedObjectMapperCache;
     }
 
-    @Scheduled(fixedRate = 60 * 60 * 1000L)
+    @Scheduled(fixedRateString = "PT1H")
     public void cleanupForwardUserCache() {
         try {
             forwardUserCache.cleanUp();
         } catch (Exception e) {
             logger.error("Failed with cleanupForwardUserCache", e);
+        }
+    }
+
+    @Scheduled(fixedRateString = "P1D", initialDelayString = "PT30M")
+    public void cleanupUnifiedObjectMapperCache() {
+        try {
+            unifiedObjectMapperCache.cleanUp();
+        } catch (Exception e) {
+            logger.error("Failed with cleanupUnifiedObjectMapperCache", e);
         }
     }
 }

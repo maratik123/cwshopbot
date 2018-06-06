@@ -18,6 +18,7 @@ package name.maratik.cw.eu.cwshopbot.application.dao;
 import name.maratik.cw.eu.cwshopbot.mock.MockedTest;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
@@ -75,8 +76,8 @@ public class AssetsDaoTest extends MockedTest {
     @Configuration
     public static class TestConfig {
         @Bean
-        public AssetsDao assetsDao(ResourceLoader resourceLoader) throws IOException {
-            return new AssetsDao(resourceLoader.getResource("classpath:test-assets.yaml"));
+        public AssetsDao assetsDao(ResourceLoader resourceLoader, TypeFactory typeFactory) throws IOException {
+            return new AssetsDao(resourceLoader.getResource("classpath:test-assets.yaml"), typeFactory);
         }
     }
 }

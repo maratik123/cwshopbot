@@ -17,6 +17,12 @@ package name.maratik.cw.eu.cwshopbot.application.config;
 
 import name.maratik.cw.eu.spring.TelegramBotService;
 
+import com.rabbitmq.client.Channel;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.Connection;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.test.TestRabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -25,6 +31,7 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
@@ -33,6 +40,7 @@ import static org.mockito.Mockito.mock;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Configuration
+@EnableRabbit
 public class MocksConfig {
     @Bean
     public Map<Object, Runnable> mocks() {
@@ -40,23 +48,61 @@ public class MocksConfig {
     }
 
     @Bean
-    public TelegramBotService telegramBotService(Map<Object, Runnable> mocks) {
+    public TelegramBotService telegramBotService() {
         DefaultAbsSender client = mock(DefaultAbsSender.class, RETURNS_SMART_NULLS);
-        mocks.put(client, () -> {});
+        mocks().put(client, () -> {});
         TelegramBotService telegramBotService = mock(TelegramBotService.class, RETURNS_SMART_NULLS);
         resetTelegramBotService(telegramBotService, client);
-        mocks.put(telegramBotService, () -> resetTelegramBotService(telegramBotService, client));
+        mocks().put(telegramBotService, () -> resetTelegramBotService(telegramBotService, client));
         return telegramBotService;
     }
 
     @Bean
-    public TelegramBotsApi telegramBotsApi(Map<Object, Runnable> mocks) {
+    public TelegramBotsApi telegramBotsApi() {
         TelegramBotsApi telegramBotsApi = mock(TelegramBotsApi.class, RETURNS_SMART_NULLS);
-        mocks.put(telegramBotsApi, () -> {});
+        mocks().put(telegramBotsApi, () -> {});
         return mock(TelegramBotsApi.class, RETURNS_SMART_NULLS);
+    }
+
+    @Bean
+    public TestRabbitTemplate template() {
+        return new TestRabbitTemplate(connectionFactory());
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        ConnectionFactory factory = mock(ConnectionFactory.class);
+        Connection connection = mock(Connection.class);
+        Channel channel = mock(Channel.class);
+        resetFactory(factory, connection);
+        resetConnection(connection, channel);
+        resetChannel(channel);
+        mocks().put(factory, () -> resetFactory(factory, connection));
+        mocks().put(connection, () -> resetConnection(connection, channel));
+        mocks().put(channel, () -> resetChannel(channel));
+        return factory;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        return factory;
     }
 
     private static void resetTelegramBotService(TelegramBotService telegramBotService, DefaultAbsSender client) {
         given(telegramBotService.getClient()).willReturn(client);
+    }
+
+    private static void resetChannel(Channel channel) {
+        given(channel.isOpen()).willReturn(true);
+    }
+
+    private static void resetConnection(Connection connection, Channel channel) {
+        given(connection.createChannel(anyBoolean())).willReturn(channel);
+    }
+
+    private static void resetFactory(ConnectionFactory factory, Connection connection) {
+        given(factory.createConnection()).willReturn(connection);
     }
 }
