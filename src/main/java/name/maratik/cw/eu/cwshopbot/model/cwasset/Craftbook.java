@@ -27,21 +27,28 @@ import java.util.Optional;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public enum Craftbook implements EnumWithCode {
-    CRAFTBOOK_1("1"),
-    CRAFTBOOK_2("2"),
-    CRAFTBOOK_3("3");
+    CRAFTBOOK_1("1", true),
+    CRAFTBOOK_2("2", true),
+    CRAFTBOOK_3("3", true),
+    CRAFTBOOK_X("x", false);
 
     private final String code;
+    private final boolean visible;
     private static final Map<String, Craftbook> cache = Util.createCache(values());
 
-    Craftbook(String code) {
+    Craftbook(String code, boolean visible) {
         this.code = code;
+        this.visible = visible;
     }
 
     @JsonValue
     @Override
     public String getCode() {
         return code;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     @JsonCreator

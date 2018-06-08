@@ -55,8 +55,8 @@ public class Item {
         return lowerName;
     }
 
-    public void apply(Visitor visitor) {
-        visitor.visit(this);
+    public <T> T apply(Visitor<? extends T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override
@@ -137,11 +137,15 @@ public class Item {
         }
     }
 
-    public interface Visitor {
-        void visit(Item item);
+    public interface Visitor<T> {
+        T visit(Item item);
 
-        void visit(CraftableItem craftableItem);
+        default T visit(CraftableItem craftableItem) {
+            return visit((Item) craftableItem);
+        }
 
-        void visit(WearableItem wearableItem);
+        default T visit(WearableItem wearableItem) {
+            return visit((CraftableItem) wearableItem);
+        }
     }
 }

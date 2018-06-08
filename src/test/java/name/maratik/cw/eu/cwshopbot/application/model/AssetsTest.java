@@ -49,6 +49,17 @@ import static org.junit.Assert.assertTrue;
  */
 public class AssetsTest extends MockedTest {
     private static final Logger logger = LogManager.getLogger(AssetsTest.class);
+    private static final Item.Visitor<Boolean> VISIBILITY_VISITOR = new Item.Visitor<Boolean>() {
+        @Override
+        public Boolean visit(Item item) {
+            return true;
+        }
+
+        @Override
+        public Boolean visit(CraftableItem craftableItem) {
+            return craftableItem.getCraftbook().isVisible();
+        }
+    };
 
     @Autowired
     private Assets assets;
@@ -144,10 +155,10 @@ public class AssetsTest extends MockedTest {
     }
 
     @Test
-    public void shouldAllManaPositive() {
+    public void shouldAllManaNonNegative() {
         assets.getCraftableItems().values().stream()
             .map(CraftableItem::getMana)
-            .forEach(mana -> assertTrue(mana + " failed",mana > 0));
+            .forEach(mana -> assertTrue(mana + " failed",mana >= 0));
     }
 
     @Test
@@ -175,10 +186,11 @@ public class AssetsTest extends MockedTest {
     }
 
     @Test
-    public void shouldAllStockAndCraftingItemsInRecipes() {
+    public void shouldAllStockOrCraftingItemsInVisibleRecipes() {
         Stream.of(ItemLocation.STOCK, ItemLocation.CRAFTING)
             .map(assets.getItemsByItemLocation()::get)
             .flatMap(Collection::stream)
+            .filter(item -> item.apply(VISIBILITY_VISITOR))
             .map(Item::getId)
             .forEach(id ->
                 assertTrue(id + " not in recipes", assets.getCraftableItemsByRecipe().containsKey(id))

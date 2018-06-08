@@ -186,9 +186,7 @@ public class ItemSearchService {
         private final String message;
 
         private ItemOutput(Item item) {
-            StringBuilder sb = new StringBuilder();
-            item.apply(new MessageConstructor(sb));
-            message = sb.toString();
+            message = item.apply(new MessageConstructor(new StringBuilder())).toString();
         }
 
         @Override
@@ -196,7 +194,7 @@ public class ItemSearchService {
             return message;
         }
 
-        private class MessageConstructor implements Item.Visitor {
+        private class MessageConstructor implements Item.Visitor<StringBuilder> {
             @SuppressWarnings("StringBufferField")
             private final StringBuilder sb;
 
@@ -205,7 +203,7 @@ public class ItemSearchService {
             }
 
             @Override
-            public void visit(Item item) {
+            public StringBuilder visit(Item item) {
                 sb.append("Code: ").append(item.getId()).append('\n')
                     .append("Name: *").append(item.getName()).append("*\n")
                     .append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
@@ -217,28 +215,31 @@ public class ItemSearchService {
                     sb.append("View recipes with item: ");
                     appendCommandLink(sb, RVIEW_PREFIX, item).append('\n');
                 }
+                return sb;
             }
 
             @Override
-            public void visit(CraftableItem craftableItem) {
-                visit((Item) craftableItem);
+            public StringBuilder visit(CraftableItem craftableItem) {
+                Item.Visitor.super.visit(craftableItem);
 
-                sb.append('\n')
-                    .append("View item recipe: ");
-                appendCommandLink(sb, VIEW_PREFIX, craftableItem).append('\n')
-                    .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
-                    .append("Craftbook: ");
-                appendCommandLink(sb, CRAFTBOOK_PREFIX, craftableItem.getCraftbook().getCode())
-                    .append('\n')
-                    .append("Find shops with item: ");
-                appendCommandLink(sb, SHOP_SEARCH_PREFIX, craftableItem).append('\n');
+                Craftbook craftbook = craftableItem.getCraftbook();
+                if (craftbook.isVisible()) {
+                    sb.append('\n')
+                        .append("View item recipe: ");
+                    appendCommandLink(sb, VIEW_PREFIX, craftableItem).append('\n')
+                        .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
+                        .append("Craftbook: ");
+                    appendCommandLink(sb, CRAFTBOOK_PREFIX, craftbook.getCode()).append('\n')
+                        .append("Find shops with item: ");
+                    appendCommandLink(sb, SHOP_SEARCH_PREFIX, craftableItem).append('\n');
+                }
+                return sb;
             }
 
             @Override
-            public void visit(WearableItem wearableItem) {
-                visit((CraftableItem) wearableItem);
+            public StringBuilder visit(WearableItem wearableItem) {
+                Item.Visitor.super.visit(wearableItem).append('\n');
 
-                sb.append('\n');
                 boolean needNewLine = false;
                 if (wearableItem.getAttack() > 0) {
                     sb.append(SWORDS + ": +").append(wearableItem.getAttack()).append(' ');
@@ -255,7 +256,7 @@ public class ItemSearchService {
                 if (needNewLine) {
                     sb.append('\n');
                 }
-                sb.append("Body part: ").append(wearableItem.getBodyPart().getCode()).append('\n')
+                return sb.append("Body part: ").append(wearableItem.getBodyPart().getCode()).append('\n')
                     .append("Class: ").append(wearableItem.getItemType().getCode()).append('\n');
             }
         }

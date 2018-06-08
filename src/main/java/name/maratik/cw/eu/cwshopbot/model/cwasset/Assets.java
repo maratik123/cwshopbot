@@ -171,7 +171,7 @@ public class Assets {
             return toImmutableEnumMap(Map.Entry::getKey, entry -> entry.getValue().build());
         }
 
-        private static class BuilderFiller implements Item.Visitor {
+        private static class BuilderFiller implements Item.Visitor<Void> {
             private final String id;
             private final Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder;
             private final Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder;
@@ -202,7 +202,7 @@ public class Assets {
             }
 
             @Override
-            public void visit(Item item) {
+            public Void visit(Item item) {
                 itemsByItemLocationBuilder.computeIfAbsent(
                     item.getItemLocation(),
                     itemLocation -> ImmutableSet.builder()
@@ -210,22 +210,24 @@ public class Assets {
                 String itemName = item.getName();
                 itemsByNameBuilder.put(itemName, item);
                 itemsByNameLowerCaseBuilder.put(itemName.toLowerCase(), item);
+                return null;
             }
 
             @Override
-            public void visit(CraftableItem craftableItem) {
-                visit((Item) craftableItem);
+            public Void visit(CraftableItem craftableItem) {
+                Item.Visitor.super.visit(craftableItem);
 
                 itemsByCraftbookBuilder.computeIfAbsent(
                     craftableItem.getCraftbook(),
                     craftbook -> ImmutableSet.builder()
                 ).add(craftableItem);
                 craftableItemsBuilder.put(id, craftableItem);
+                return null;
             }
 
             @Override
-            public void visit(WearableItem wearableItem) {
-                visit((CraftableItem) wearableItem);
+            public Void visit(WearableItem wearableItem) {
+                Item.Visitor.super.visit(wearableItem);
 
                 itemsByBodyPartBuilder.computeIfAbsent(
                     wearableItem.getBodyPart(),
@@ -236,6 +238,7 @@ public class Assets {
                     itemType -> ImmutableSet.builder()
                 ).add(wearableItem);
                 wearableItemsBuilder.put(id, wearableItem);
+                return null;
             }
         }
     }

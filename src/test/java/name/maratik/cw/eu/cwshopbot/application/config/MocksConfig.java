@@ -30,6 +30,7 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
@@ -43,25 +44,19 @@ import static org.mockito.Mockito.mock;
 @EnableRabbit
 public class MocksConfig {
     @Bean
-    public Map<Object, Runnable> mocks() {
+    public Map<Object, Consumer<Object>> mocks() {
         return new IdentityHashMap<>();
     }
 
     @Bean
     public TelegramBotService telegramBotService() {
-        DefaultAbsSender client = mock(DefaultAbsSender.class, RETURNS_SMART_NULLS);
-        mocks().put(client, () -> {});
-        TelegramBotService telegramBotService = mock(TelegramBotService.class, RETURNS_SMART_NULLS);
-        resetTelegramBotService(telegramBotService, client);
-        mocks().put(telegramBotService, () -> resetTelegramBotService(telegramBotService, client));
-        return telegramBotService;
+        DefaultAbsSender client = resetAndAddToMocks(DefaultAbsSender.class, mock -> {});
+        return resetAndAddToMocks(TelegramBotService.class, mock -> resetTelegramBotService(mock, client));
     }
 
     @Bean
     public TelegramBotsApi telegramBotsApi() {
-        TelegramBotsApi telegramBotsApi = mock(TelegramBotsApi.class, RETURNS_SMART_NULLS);
-        mocks().put(telegramBotsApi, () -> {});
-        return mock(TelegramBotsApi.class, RETURNS_SMART_NULLS);
+        return resetAndAddToMocks(TelegramBotsApi.class, mock -> {});
     }
 
     @Bean
@@ -71,16 +66,9 @@ public class MocksConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        ConnectionFactory factory = mock(ConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        Channel channel = mock(Channel.class);
-        resetFactory(factory, connection);
-        resetConnection(connection, channel);
-        resetChannel(channel);
-        mocks().put(factory, () -> resetFactory(factory, connection));
-        mocks().put(connection, () -> resetConnection(connection, channel));
-        mocks().put(channel, () -> resetChannel(channel));
-        return factory;
+        Channel channel = resetAndAddToMocks(Channel.class, MocksConfig::resetChannel);
+        Connection connection = resetAndAddToMocks(Connection.class, mock -> resetConnection(mock, channel));
+        return resetAndAddToMocks(ConnectionFactory.class, mock -> resetFactory(mock, connection));
     }
 
     @Bean
@@ -88,6 +76,14 @@ public class MocksConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory());
         return factory;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T resetAndAddToMocks(Class<T> mockedClass, Consumer<? super T> resetAction) {
+        T mock = mock(mockedClass, RETURNS_SMART_NULLS);
+        resetAction.accept(mock);
+        mocks().put(mock, (Consumer<Object>) resetAction);
+        return mock;
     }
 
     private static void resetTelegramBotService(TelegramBotService telegramBotService, DefaultAbsSender client) {

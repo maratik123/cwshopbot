@@ -112,6 +112,19 @@ stock:
       08: 3
       07: 3
       02: 3
+  34:
+    name: Metallic fiber
+    tradeable: false
+    recipe:
+      xxx: 1
+  35:
+    name: Crafted leather
+    tradeable: false
+    recipe:
+      xxx: 1
+  xxx:
+    name: xxx
+    tradeable: false
 crafting:
   tradeable: false
   r01:
@@ -532,3 +545,8 @@ craftbook:
       - w30
       - w31
       - w32
+  x:
+    mana: 0
+    items:
+      - 34
+      - 35

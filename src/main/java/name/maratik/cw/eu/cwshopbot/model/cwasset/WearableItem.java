@@ -61,8 +61,8 @@ public class WearableItem extends CraftableItem {
     }
 
     @Override
-    public void apply(Visitor visitor) {
-        visitor.visit(this);
+    public <T> T apply(Visitor<? extends T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

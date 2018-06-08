@@ -17,7 +17,6 @@ package name.maratik.cw.eu.cwshopbot.parser;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,21 +24,19 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class CraftableItemVerifier implements Item.Visitor {
+public class CraftableItemVerifier implements Item.Visitor<Void> {
     private static final Logger logger = LogManager.getLogger(CraftableItemVerifier.class);
     private static final CraftableItemVerifier INSTANCE = new CraftableItemVerifier();
 
     @Override
-    public void visit(Item item) {
+    public Void visit(Item item) {
         logger.warn("Item {} is not craftable", item);
+        return null;
     }
 
     @Override
-    public void visit(CraftableItem craftableItem) {
-    }
-
-    @Override
-    public void visit(WearableItem wearableItem) {
+    public Void visit(CraftableItem craftableItem) {
+        return null;
     }
 
     public static CraftableItemVerifier getInstance() {

@@ -53,6 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static org.mockito.Mockito.reset;
 
@@ -60,22 +61,7 @@ import static org.mockito.Mockito.reset;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {
-    "name.maratik.cw.eu.cwshopbot.username=testUsername",
-    "name.maratik.cw.eu.cwshopbot.token=test:Token",
-    "name.maratik.cw.eu.cwshopbot.admin=123456789",
-    "name.maratik.cw.eu.cwshopbot.dev=123321",
-    "name.maratik.cw.eu.cwshopbot.dev.username=dev_user_name",
-    "name.maratik.cw.eu.cwshopbot.ban=1233211",
-    "name.maratik.cw.eu.cwshopbot.accessKeyId=qqq",
-    "name.maratik.cw.eu.cwshopbot.secretAccessKey=zzz",
-    "name.maratik.cw.eu.cwshopbot.region=eee",
-    "spring.rabbitmq.username=amqp_username",
-    "spring.rabbitmq.password=amqp_password",
-    "cwuserid=987654321"
-},
-    locations = "classpath:test-application.properties"
-)
+@TestPropertySource("classpath:test-application.properties")
 @ContextConfiguration(classes = {
     InternalConfig.class,
     TestDynamoDBConfig.class,
@@ -97,13 +83,13 @@ public abstract class MockedTest {
     private ShopLineDao shopLineDao;
 
     @Autowired
-    private Map<Object, Runnable> mocks;
+    private Map<Object, Consumer<Object>> mocks;
 
     @Before
     public void resetMocks() {
         mocks.forEach((mock, resetAction) -> {
             reset(mock);
-            resetAction.run();
+            resetAction.accept(mock);
         });
     }
 

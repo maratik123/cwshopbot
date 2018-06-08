@@ -17,7 +17,6 @@ package name.maratik.cw.eu.cwshopbot.parser;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class ManaCostVerifier implements Item.Visitor {
+public class ManaCostVerifier implements Item.Visitor<Void> {
     private static final Logger logger = LogManager.getLogger(ManaCostVerifier.class);
 
     private final int manaCost;
@@ -35,19 +34,16 @@ public class ManaCostVerifier implements Item.Visitor {
     }
 
     @Override
-    public void visit(Item item) {
+    public Void visit(Item item) {
         logger.warn("Trying to define mana cost '{}' for non-craftable item: {}", manaCost, item);
+        return null;
     }
 
     @Override
-    public void visit(CraftableItem craftableItem) {
+    public Void visit(CraftableItem craftableItem) {
         if (craftableItem.getMana() != manaCost) {
             logger.warn("Mana cost is invalid for item {}: actual={}", craftableItem, manaCost);
         }
-    }
-
-    @Override
-    public void visit(WearableItem wearableItem) {
-        visit((CraftableItem) wearableItem);
+        return null;
     }
 }
