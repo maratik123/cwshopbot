@@ -13,16 +13,11 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.application.dao;
+package name.maratik.cw.eu.cwshopbot.util;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@SuppressWarnings("WeakerAccess")
-public class DaoException extends Exception {
-    private static final long serialVersionUID = 1593915462475497036L;
-
-    public DaoException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface LocalizableValue {
+    String getTranslationTag();
 }

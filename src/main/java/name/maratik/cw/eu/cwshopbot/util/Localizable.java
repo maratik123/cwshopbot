@@ -39,4 +39,12 @@ public class Localizable implements ApplicationContextAware {
     public String t(String code, Object... args) {
         return messageSourceAccessor.getMessage(code, args);
     }
+
+    public String t(LocalizableValue localizableValue) {
+        return t(localizableValue.getTranslationTag());
+    }
+
+    public String t(LocalizableValue localizableValue, Object... args) {
+        return t(localizableValue.getTranslationTag(), args);
+    }
 }

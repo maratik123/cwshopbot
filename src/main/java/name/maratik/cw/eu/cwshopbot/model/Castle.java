@@ -24,11 +24,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.Optional;
 
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.AUBERGINE;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.BAT;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.BLACK_HEART;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.DEER;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.DRAGON;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.EAGLE;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.MAPLE_LEAF;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.MOON;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.ROSE;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHAMROCK;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHARK;
+import static name.maratik.cw.eu.cwshopbot.util.Emoji.TURTLE;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.WOLF;
 
 /**
@@ -41,7 +48,14 @@ public enum Castle implements EnumWithCode {
     SHARKTEETH("Sharkteeth", SHARK),
     HIGHNEST("Highnest", EAGLE),
     DEERHORN("Deerhorn", DEER),
-    DRAGONSCALE("Dragonscale", DRAGON);
+    DRAGONSCALE("Dragonscale", DRAGON),
+    TORTUGA("Тортуга", TURTLE),
+    NIGHT_CASTLE("Ночной Замок", BAT),
+    AMBER("Амбер", MAPLE_LEAF),
+    STRONGHOLD("Оплот", SHAMROCK),
+    CLIFF("Скала", BLACK_HEART),
+    DAWN_CASTLE("Замок Рассвета", ROSE),
+    FARM("Ферма", AUBERGINE);
 
     private final String code;
     private final String gameName;

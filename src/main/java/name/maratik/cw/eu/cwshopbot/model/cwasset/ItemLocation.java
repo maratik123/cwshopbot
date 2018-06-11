@@ -16,6 +16,7 @@
 package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
 import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
+import name.maratik.cw.eu.cwshopbot.util.LocalizableValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -23,27 +24,22 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.Optional;
 
-import static name.maratik.cw.eu.cwshopbot.util.Emoji.BOX;
-import static name.maratik.cw.eu.cwshopbot.util.Emoji.CHEST;
-import static name.maratik.cw.eu.cwshopbot.util.Emoji.HAMMERS;
-import static name.maratik.cw.eu.cwshopbot.util.Emoji.LABEL;
-
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum ItemLocation implements EnumWithCode {
-    STOCK("stock", BOX + "Resources"),
-    CRAFTING("crafting", HAMMERS + "Crafting"),
-    MISC("misc", CHEST + "Misc"),
-    EQUIPMENT("equipment", LABEL + "Equipment");
+public enum ItemLocation implements EnumWithCode, LocalizableValue {
+    STOCK("stock", "il.RESOURCES"),
+    CRAFTING("crafting", "il.CRAFTING"),
+    MISC("misc", "il.MISC"),
+    EQUIPMENT("equipment", "il.EQUIPMENT");
 
     private final String code;
-    private final String buttonText;
+    private final String translationTag;
     private static final Map<String, ItemLocation> cache = Util.createCache(values());
 
-    ItemLocation(String code, String buttonText) {
+    ItemLocation(String code, String translationTag) {
         this.code = code;
-        this.buttonText = buttonText;
+        this.translationTag = translationTag;
     }
 
     @Override
@@ -52,12 +48,13 @@ public enum ItemLocation implements EnumWithCode {
         return code;
     }
 
-    public String getButtonText() {
-        return buttonText;
-    }
-
     @JsonCreator
     public static Optional<ItemLocation> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
+    }
+
+    @Override
+    public String getTranslationTag() {
+        return translationTag;
     }
 }

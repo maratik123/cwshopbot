@@ -16,6 +16,7 @@
 package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
 import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
+import name.maratik.cw.eu.cwshopbot.util.LocalizableValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -26,26 +27,28 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum ItemType implements EnumWithCode {
-    HEAVY_ARMOR("heavy armor", ItemClass.ARMOR),
-    LIGHT_ARMOR("light armor", ItemClass.ARMOR),
-    SHIELD("shield", ItemClass.SECONDARY_WEAPON),
-    ROBE_ARMOR("robe armor", ItemClass.ARMOR),
-    SWORD("sword", ItemClass.PRIMARY_WEAPON),
-    SPEAR("spear", ItemClass.PRIMARY_WEAPON),
-    BOW("bow", ItemClass.PRIMARY_WEAPON),
-    BLUNT("blunt", ItemClass.PRIMARY_WEAPON),
-    DAGGER("dagger", ItemClass.SECONDARY_WEAPON),
-    TOOL("tool", ItemClass.SECONDARY_WEAPON),
-    ARROWS_PACK("arrows pack", ItemClass.SECONDARY_WEAPON);
+public enum ItemType implements EnumWithCode, LocalizableValue {
+    HEAVY_ARMOR("heavy armor", ItemClass.ARMOR, "it.ARMOR.HEAVY"),
+    LIGHT_ARMOR("light armor", ItemClass.ARMOR, "it.ARMOR.LIGHT"),
+    SHIELD("shield", ItemClass.SECONDARY_WEAPON, "it.SHIELD"),
+    ROBE_ARMOR("robe armor", ItemClass.ARMOR, "it.ARMOR.ROBE"),
+    SWORD("sword", ItemClass.PRIMARY_WEAPON, "it.WEAPON.SWORD"),
+    SPEAR("spear", ItemClass.PRIMARY_WEAPON, "it.WEAPON.SPEAR"),
+    BOW("bow", ItemClass.PRIMARY_WEAPON, "it.WEAPON.BOW"),
+    BLUNT("blunt", ItemClass.PRIMARY_WEAPON, "it.WEAPON.BLUNT"),
+    DAGGER("dagger", ItemClass.SECONDARY_WEAPON, "it.DAGGER"),
+    TOOL("tool", ItemClass.SECONDARY_WEAPON, "it.TOOL"),
+    ARROWS_PACK("arrows pack", ItemClass.SECONDARY_WEAPON, "it.ARROWS_PACK");
 
     private final String code;
     private final ItemClass itemClass;
+    private final String translationFlag;
     private static final Map<String, ItemType> cache = Util.createCache(values());
 
-    ItemType(String code, ItemClass itemClass) {
+    ItemType(String code, ItemClass itemClass, String translationFlag) {
         this.code = code;
         this.itemClass = itemClass;
+        this.translationFlag = translationFlag;
     }
 
     @Override
@@ -61,5 +64,10 @@ public enum ItemType implements EnumWithCode {
     @JsonCreator
     public static Optional<ItemType> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
+    }
+
+    @Override
+    public String getTranslationTag() {
+        return translationFlag;
     }
 }

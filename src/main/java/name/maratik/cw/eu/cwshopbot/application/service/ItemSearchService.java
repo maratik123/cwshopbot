@@ -206,7 +206,7 @@ public class ItemSearchService extends Localizable {
             @Override
             public StringBuilder visit(Item item) {
                 sb.append(t("iss.MESSAGE.ITEM.COMMON",
-                    item.getId(), item.getName(), item.getItemLocation().getButtonText()
+                    item.getId(), item.getName(), t(item.getItemLocation())
                 ));
                 if (item.isTradeable()) {
                     sb.append(t("iss.MESSAGE.ITEM.TRADEABLE", createCommandLink(T_PREFIX, item)));
@@ -255,7 +255,7 @@ public class ItemSearchService extends Localizable {
                     sb.append('\n');
                 }
                 return sb.append(t("iss.MESSAGE.WEARABLE_ITEM",
-                    wearableItem.getBodyPart().getCode(), wearableItem.getItemType().getCode()
+                    t(wearableItem.getBodyPart()), t(wearableItem.getItemType())
                 ));
             }
         }

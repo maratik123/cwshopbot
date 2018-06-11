@@ -103,7 +103,6 @@ public class AdminController extends ShopController {
             .setText(statsService.getCacheStats());
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
     @TelegramCommand(commands = "/send", description = "#{@loc.t('ac.SEND_MESSAGE')}")
     public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client) {
         String[] args = messageCommand.getArgument()

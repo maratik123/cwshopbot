@@ -16,6 +16,7 @@
 package name.maratik.cw.eu.cwshopbot.model.cwasset;
 
 import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
+import name.maratik.cw.eu.cwshopbot.util.LocalizableValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -26,21 +27,23 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum BodyPart implements EnumWithCode {
-    BODY("body", ItemClass.ARMOR),
-    HANDS("hands", ItemClass.ARMOR),
-    LEGS("legs", ItemClass.ARMOR),
-    HEAD("head", ItemClass.ARMOR),
-    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON),
-    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON);
+public enum BodyPart implements EnumWithCode, LocalizableValue {
+    BODY("body", ItemClass.ARMOR, "bp.BODY"),
+    HANDS("hands", ItemClass.ARMOR, "bp.HANDS"),
+    LEGS("legs", ItemClass.ARMOR, "bp.LEGS"),
+    HEAD("head", ItemClass.ARMOR, "bp.HEAD"),
+    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON, "bp.HAND.PRIMARY"),
+    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "bp.HAND.SECONDARY");
 
     private final String code;
     private final ItemClass itemClass;
+    private final String translationTag;
     private static final Map<String, BodyPart> cache = Util.createCache(values());
 
-    BodyPart(String code, ItemClass itemClass) {
+    BodyPart(String code, ItemClass itemClass, String translationTag) {
         this.code = code;
         this.itemClass = itemClass;
+        this.translationTag = translationTag;
     }
 
     @Override
@@ -56,5 +59,10 @@ public enum BodyPart implements EnumWithCode {
 
     public ItemClass getItemClass() {
         return itemClass;
+    }
+
+    @Override
+    public String getTranslationTag() {
+        return translationTag;
     }
 }

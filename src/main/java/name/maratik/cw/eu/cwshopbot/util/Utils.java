@@ -97,7 +97,7 @@ public class Utils {
     @SuppressWarnings("WeakerAccess")
     public static Optional<MessageEntity> extractByType(MessageType messageType, Iterator<MessageEntity> it) {
         return extractFromIterator(it, messageEntity -> Optional.of(messageEntity)
-            .filter(msgEntity -> MessageType.findByCode(msgEntity.getType()).filter(messageType::equals).isPresent())
+            .filter(msgEntity -> MessageType.findByCode(msgEntity.getType()) == messageType)
         );
     }
 
@@ -132,15 +132,10 @@ public class Utils {
             text.length + MESSAGE_ENTITY_OVERHEAD * messageEntities.size()
         );
         for (MessageEntity messageEntity : messageEntities) {
-            Optional<MessageType> messageTypeOpt = MessageType.findByCode(messageEntity.getType());
-            if (messageTypeOpt.isPresent()) {
-                MessageType messageType = messageTypeOpt.get();
-                messageType.getPrefix().ifPresent(sb::append);
-                sb.append(text, messageEntity.getOffset(), messageEntity.getLength());
-                messageType.getPostfix().ifPresent(sb::append);
-            } else {
-                sb.append(text, messageEntity.getOffset(), messageEntity.getLength());
-            }
+            MessageType messageType = MessageType.findByCode(messageEntity.getType());
+            messageType.getPrefix().ifPresent(sb::append);
+            sb.append(text, messageEntity.getOffset(), messageEntity.getLength());
+            messageType.getPostfix().ifPresent(sb::append);
         }
         return sb.toString();
     }

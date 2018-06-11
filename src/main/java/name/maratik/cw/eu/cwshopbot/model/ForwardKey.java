@@ -87,12 +87,12 @@ public class ForwardKey {
     private static class MessageEntityKey {
         private final int offset;
         private final int length;
-        private final Optional<MessageType> messageType;
+        private final MessageType messageType;
 
-        private MessageEntityKey(int offset, int length, Optional<MessageType> messageType) {
+        private MessageEntityKey(int offset, int length, MessageType messageType) {
             this.offset = offset;
             this.length = length;
-            this.messageType = messageType;
+            this.messageType = Objects.requireNonNull(messageType);
         }
 
         private MessageEntityKey(MessageEntity messageEntity) {
@@ -116,7 +116,7 @@ public class ForwardKey {
             if (length != that.length) {
                 return false;
             }
-            return messageType.equals(that.messageType);
+            return messageType == that.messageType;
         }
 
         @Override

@@ -267,7 +267,11 @@ public abstract class TelegramBotService implements AutoCloseable {
     }
 
     @SuppressWarnings("WeakerAccess")
-    @TelegramCommand(commands = "/help", isHelp = true, description = "This help")
+    @TelegramCommand(
+        commands = "/help",
+        isHelp = true,
+        description = "#{@loc?.t('TelegramBotService.HELP.DESC')?:'This help'}"
+    )
     public void helpMethod() {
     }
 
@@ -292,7 +296,7 @@ public abstract class TelegramBotService implements AutoCloseable {
     }
 
     private Handlers createOrGet(OptionalLong key) {
-        return handlers.computeIfAbsent(key, Handlers::create);
+        return handlers.computeIfAbsent(key, k -> new Handlers());
     }
 
     private static class Handlers {
@@ -302,10 +306,6 @@ public abstract class TelegramBotService implements AutoCloseable {
         private TelegramHandler defaultMessageHandler;
         private TelegramHandler defaultForwardHandler;
         private String prefixHelpMessage;
-
-        private static Handlers create(@SuppressWarnings("unused") OptionalLong key) {
-            return new Handlers();
-        }
 
         private Map<String, TelegramHandler> getCommandList() {
             return commandList;

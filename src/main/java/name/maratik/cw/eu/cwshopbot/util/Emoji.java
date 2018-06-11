@@ -36,4 +36,11 @@ public class Emoji {
     public static final String DRAGON = "\uD83D\uDC09";
     public static final String BELL = "\uD83D\uDD14";
     public static final String CANCEL_BELL = "\uD83D\uDD15";
+    public static final String TURTLE = "\uD83D\uDC22";
+    public static final String BAT = "\uD83E\uDD87";
+    public static final String MAPLE_LEAF = "\uD83C\uDF41";
+    public static final String SHAMROCK = "\u2618\uFE0F";
+    public static final String BLACK_HEART = "\uD83D\uDDA4";
+    public static final String ROSE = "\uD83C\uDF39";
+    public static final String AUBERGINE = "\uD83C\uDF46";
 }

@@ -70,8 +70,8 @@ public enum MessageType implements EnumWithCode {
     }
 
     @JsonCreator
-    public static Optional<MessageType> findByCode(String code) {
-        return Optional.ofNullable(cache.get(code));
+    public static MessageType findByCode(String code) {
+        return cache.getOrDefault(code, TEXT);
     }
 
 }
