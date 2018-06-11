@@ -37,7 +37,7 @@ public class TelegramBotConfiguration implements ImportAware {
 
     @Bean
     public TelegramBeanPostProcessor telegramBeanPostProcessor(
-        TelegramBotService telegramBotService, EmbeddedValueResolver embeddedValueResolver
+        TelegramBotService telegramBotService, @TelegramBotInternal EmbeddedValueResolver embeddedValueResolver
     ) {
         return new TelegramBeanPostProcessor(telegramBotService, embeddedValueResolver);
     }
@@ -45,7 +45,7 @@ public class TelegramBotConfiguration implements ImportAware {
     @Bean
     public TelegramBotService telegramBotService(
         TelegramBotType telegramBotType, TelegramBotBuilder telegramBotBuilder, TelegramBotsApi api,
-        EmbeddedValueResolver embeddedValueResolver
+        @TelegramBotInternal EmbeddedValueResolver embeddedValueResolver
     ) {
         return telegramBotType.createService(telegramBotBuilder, api, embeddedValueResolver);
     }
@@ -57,6 +57,7 @@ public class TelegramBotConfiguration implements ImportAware {
     }
 
     @Bean
+    @TelegramBotInternal
     public EmbeddedValueResolver embeddedValueResolver(ConfigurableBeanFactory configurableBeanFactory) {
         return new EmbeddedValueResolver(configurableBeanFactory);
     }
