@@ -32,11 +32,11 @@ public class Localizable implements ApplicationContextAware {
         messageSourceAccessor = new MessageSourceAccessor(applicationContext);
     }
 
-    protected String t(String code) {
+    public String t(String code) {
         return messageSourceAccessor.getMessage(code);
     }
 
-    protected String t(String code, Object... args) {
+    public String t(String code, Object... args) {
         return messageSourceAccessor.getMessage(code, args);
     }
 }
