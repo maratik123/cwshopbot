@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
@@ -60,7 +61,7 @@ public abstract class TelegramBotService implements AutoCloseable {
         Comparator.comparing(Map.Entry::getKey, Comparator.comparingInt(String::length));
 
     private final Map<OptionalLong, Handlers> handlers = new HashMap<>();
-    private final ConfigurableBeanFactory beanFactory;
+    private final EmbeddedValueResolver embeddedValueResolver;
 
     private final Map<Type, BiFunction<TelegramMessageCommand, Update, ?>> argumentMapper;
     private static final Comparator<TelegramBotCommand> TELEGRAM_BOT_COMMAND_COMPARATOR =
@@ -69,8 +70,8 @@ public abstract class TelegramBotService implements AutoCloseable {
             Comparator.comparing(ImmutableSet.of("/license", "/help")::contains)
         ).thenComparing(TelegramBotCommand::getCommand);
 
-    public TelegramBotService(TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
+    public TelegramBotService(TelegramBotsApi api, ConfigurableBeanFactory configurableBeanFactory) {
+        this.embeddedValueResolver = new EmbeddedValueResolver(configurableBeanFactory);
 
         BiFunction<TelegramMessageCommand, Update, Long> userIdExtractor = (telegramMessageCommand, update) ->
             update.getMessage().getFrom().getId().longValue();
@@ -173,7 +174,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             .forEach(method -> sb
                 .append(method.getCommand())
                 .append(' ')
-                .append(beanFactory.resolveEmbeddedValue(method.getDescription()))
+                .append(embeddedValueResolver.resolveStringValue(method.getDescription()))
                 .append('\n')
             );
         return sb.toString();
@@ -236,7 +237,7 @@ public abstract class TelegramBotService implements AutoCloseable {
                 createOrGet(userId).setDefaultForwardHandler(new TelegramHandler(bean, method, null));
             } else {
                 for (String from : fromArr) {
-                    String parsedFromStr = beanFactory.resolveEmbeddedValue(from);
+                    String parsedFromStr = embeddedValueResolver.resolveStringValue(from);
                     if (parsedFromStr == null) {
                         throw new RuntimeException("NPE in " + from);
                     }

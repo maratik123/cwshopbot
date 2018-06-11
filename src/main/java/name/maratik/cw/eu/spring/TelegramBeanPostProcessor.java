@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.NonNull;
 
@@ -46,11 +47,11 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
     private final TelegramBotService telegramBotService;
     private final Map<String, Class<?>> botControllerMap = new HashMap<>();
     private final Map<OptionalLong, Map<String, Class<?>>> botControllerMapByUserId = new HashMap<>();
-    private final ConfigurableBeanFactory configurableBeanFactory;
+    private final EmbeddedValueResolver embeddedValueResolver;
 
     public TelegramBeanPostProcessor(TelegramBotService telegramBotService, ConfigurableBeanFactory configurableBeanFactory) {
         this.telegramBotService = telegramBotService;
-        this.configurableBeanFactory = configurableBeanFactory;
+        this.embeddedValueResolver = new EmbeddedValueResolver(configurableBeanFactory);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
         if (telegramBot != null) {
             if (telegramBot.userId().length != 0) {
                 for (String userId : telegramBot.userId()) {
-                    String evalUserId = configurableBeanFactory.resolveEmbeddedValue(userId);
+                    String evalUserId = embeddedValueResolver.resolveStringValue(userId);
                     if (evalUserId == null) {
                         throw new RuntimeException("NPE at beanClass: " + beanClass + " on userId: " + userId);
                     }
