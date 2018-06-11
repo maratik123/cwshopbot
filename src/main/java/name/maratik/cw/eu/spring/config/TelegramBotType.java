@@ -20,6 +20,7 @@ import name.maratik.cw.eu.spring.TelegramBotService;
 import name.maratik.cw.eu.spring.WebhookTelegramBotService;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.telegram.telegrambots.TelegramBotsApi;
 
 /**
@@ -28,16 +29,22 @@ import org.telegram.telegrambots.TelegramBotsApi;
 public enum TelegramBotType {
     LONG_POLLING {
         @Override
-        public TelegramBotService createService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-            return new LongPollingTelegramBotService(botBuilder, api, beanFactory);
+        public TelegramBotService createService(
+            TelegramBotBuilder botBuilder, TelegramBotsApi api, EmbeddedValueResolver embeddedValueResolver
+        ) {
+            return new LongPollingTelegramBotService(botBuilder, api, embeddedValueResolver);
         }
     },
     WEBHOOK {
         @Override
-        public TelegramBotService createService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-            return new WebhookTelegramBotService(botBuilder, api, beanFactory);
+        public TelegramBotService createService(
+            TelegramBotBuilder botBuilder, TelegramBotsApi api, EmbeddedValueResolver embeddedValueResolver
+        ) {
+            return new WebhookTelegramBotService(botBuilder, api, embeddedValueResolver);
         }
     };
 
-    public abstract TelegramBotService createService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory);
+    public abstract TelegramBotService createService(
+        TelegramBotBuilder botBuilder, TelegramBotsApi api, EmbeddedValueResolver embeddedValueResolver
+    );
 }

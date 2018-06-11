@@ -25,7 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.NonNull;
@@ -49,9 +48,11 @@ public class TelegramBeanPostProcessor implements BeanPostProcessor {
     private final Map<OptionalLong, Map<String, Class<?>>> botControllerMapByUserId = new HashMap<>();
     private final EmbeddedValueResolver embeddedValueResolver;
 
-    public TelegramBeanPostProcessor(TelegramBotService telegramBotService, ConfigurableBeanFactory configurableBeanFactory) {
+    public TelegramBeanPostProcessor(
+        TelegramBotService telegramBotService, EmbeddedValueResolver embeddedValueResolver
+    ) {
         this.telegramBotService = telegramBotService;
-        this.embeddedValueResolver = new EmbeddedValueResolver(configurableBeanFactory);
+        this.embeddedValueResolver = embeddedValueResolver;
     }
 
     @Override

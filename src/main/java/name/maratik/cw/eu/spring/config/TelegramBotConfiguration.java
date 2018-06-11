@@ -19,6 +19,7 @@ import name.maratik.cw.eu.spring.TelegramBeanPostProcessor;
 import name.maratik.cw.eu.spring.TelegramBotService;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportAware;
 import org.springframework.core.type.AnnotationMetadata;
@@ -35,20 +36,28 @@ public class TelegramBotConfiguration implements ImportAware {
     }
 
     @Bean
-    public TelegramBeanPostProcessor telegramBeanPostProcessor(TelegramBotService telegramBotService,
-                                                               ConfigurableBeanFactory configurableBeanFactory) {
-        return new TelegramBeanPostProcessor(telegramBotService, configurableBeanFactory);
+    public TelegramBeanPostProcessor telegramBeanPostProcessor(
+        TelegramBotService telegramBotService, EmbeddedValueResolver embeddedValueResolver
+    ) {
+        return new TelegramBeanPostProcessor(telegramBotService, embeddedValueResolver);
     }
 
     @Bean
-    public TelegramBotService telegramBotService(TelegramBotType telegramBotType, TelegramBotBuilder telegramBotBuilder,
-                                                 TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-        return telegramBotType.createService(telegramBotBuilder, api, beanFactory);
+    public TelegramBotService telegramBotService(
+        TelegramBotType telegramBotType, TelegramBotBuilder telegramBotBuilder, TelegramBotsApi api,
+        EmbeddedValueResolver embeddedValueResolver
+    ) {
+        return telegramBotType.createService(telegramBotBuilder, api, embeddedValueResolver);
     }
 
     @Bean
     public TelegramBotsApi telegramBotsApi() {
         ApiContextInitializer.init();
         return new TelegramBotsApi();
+    }
+
+    @Bean
+    public EmbeddedValueResolver embeddedValueResolver(ConfigurableBeanFactory configurableBeanFactory) {
+        return new EmbeddedValueResolver(configurableBeanFactory);
     }
 }

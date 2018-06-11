@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -70,8 +69,8 @@ public abstract class TelegramBotService implements AutoCloseable {
             Comparator.comparing(ImmutableSet.of("/license", "/help")::contains)
         ).thenComparing(TelegramBotCommand::getCommand);
 
-    public TelegramBotService(TelegramBotsApi api, ConfigurableBeanFactory configurableBeanFactory) {
-        this.embeddedValueResolver = new EmbeddedValueResolver(configurableBeanFactory);
+    public TelegramBotService(TelegramBotsApi api, EmbeddedValueResolver embeddedValueResolver) {
+        this.embeddedValueResolver = embeddedValueResolver;
 
         BiFunction<TelegramMessageCommand, Update, Long> userIdExtractor = (telegramMessageCommand, update) ->
             update.getMessage().getFrom().getId().longValue();

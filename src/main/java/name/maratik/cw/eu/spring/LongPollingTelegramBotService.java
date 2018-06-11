@@ -19,7 +19,7 @@ import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -43,8 +43,10 @@ public class LongPollingTelegramBotService extends TelegramBotService implements
     private final ExecutorService botExecutor;
     private final TelegramLongPollingBot client;
 
-    public LongPollingTelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-        super(api, beanFactory);
+    public LongPollingTelegramBotService(
+        TelegramBotBuilder botBuilder, TelegramBotsApi api, EmbeddedValueResolver embeddedValueResolver
+    ) {
+        super(api, embeddedValueResolver);
         logger.info("Registering Long Polling with {}", botBuilder);
         username = botBuilder.getUsername();
         token = botBuilder.getToken();

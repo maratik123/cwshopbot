@@ -19,7 +19,7 @@ import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.objects.Update;
@@ -37,8 +37,10 @@ public class WebhookTelegramBotService extends TelegramBotService {
     private final String path;
     private final TelegramWebhookBot client;
 
-    public WebhookTelegramBotService(TelegramBotBuilder botBuilder, TelegramBotsApi api, ConfigurableBeanFactory beanFactory) {
-        super(api, beanFactory);
+    public WebhookTelegramBotService(
+        TelegramBotBuilder botBuilder, TelegramBotsApi api, EmbeddedValueResolver embeddedValueResolver
+    ) {
+        super(api, embeddedValueResolver);
         username = botBuilder.getUsername();
         token = botBuilder.getToken();
         path = botBuilder.getPath();
