@@ -28,17 +28,17 @@ import java.util.Optional;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public enum ItemType implements EnumWithCode, LocalizableValue {
-    HEAVY_ARMOR("heavy armor", ItemClass.ARMOR, "it.ARMOR.HEAVY"),
-    LIGHT_ARMOR("light armor", ItemClass.ARMOR, "it.ARMOR.LIGHT"),
-    SHIELD("shield", ItemClass.SECONDARY_WEAPON, "it.SHIELD"),
-    ROBE_ARMOR("robe armor", ItemClass.ARMOR, "it.ARMOR.ROBE"),
-    SWORD("sword", ItemClass.PRIMARY_WEAPON, "it.WEAPON.SWORD"),
-    SPEAR("spear", ItemClass.PRIMARY_WEAPON, "it.WEAPON.SPEAR"),
-    BOW("bow", ItemClass.PRIMARY_WEAPON, "it.WEAPON.BOW"),
-    BLUNT("blunt", ItemClass.PRIMARY_WEAPON, "it.WEAPON.BLUNT"),
-    DAGGER("dagger", ItemClass.SECONDARY_WEAPON, "it.DAGGER"),
-    TOOL("tool", ItemClass.SECONDARY_WEAPON, "it.TOOL"),
-    ARROWS_PACK("arrows pack", ItemClass.SECONDARY_WEAPON, "it.ARROWS_PACK");
+    HEAVY_ARMOR("heavy armor", ItemClass.ARMOR, "ItemType.ARMOR.HEAVY"),
+    LIGHT_ARMOR("light armor", ItemClass.ARMOR, "ItemType.ARMOR.LIGHT"),
+    SHIELD("shield", ItemClass.SECONDARY_WEAPON, "ItemType.SHIELD"),
+    ROBE_ARMOR("robe armor", ItemClass.ARMOR, "ItemType.ARMOR.ROBE"),
+    SWORD("sword", ItemClass.PRIMARY_WEAPON, "ItemType.WEAPON.SWORD"),
+    SPEAR("spear", ItemClass.PRIMARY_WEAPON, "ItemType.WEAPON.SPEAR"),
+    BOW("bow", ItemClass.PRIMARY_WEAPON, "ItemType.WEAPON.BOW"),
+    BLUNT("blunt", ItemClass.PRIMARY_WEAPON, "ItemType.WEAPON.BLUNT"),
+    DAGGER("dagger", ItemClass.SECONDARY_WEAPON, "ItemType.DAGGER"),
+    TOOL("tool", ItemClass.SECONDARY_WEAPON, "ItemType.TOOL"),
+    ARROWS_PACK("arrows pack", ItemClass.SECONDARY_WEAPON, "ItemType.ARROWS_PACK");
 
     private final String code;
     private final ItemClass itemClass;

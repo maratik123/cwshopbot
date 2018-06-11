@@ -28,10 +28,10 @@ import java.util.Optional;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public enum ItemLocation implements EnumWithCode, LocalizableValue {
-    STOCK("stock", "il.RESOURCES"),
-    CRAFTING("crafting", "il.CRAFTING"),
-    MISC("misc", "il.MISC"),
-    EQUIPMENT("equipment", "il.EQUIPMENT");
+    STOCK("stock", "ItemLocation.RESOURCES"),
+    CRAFTING("crafting", "ItemLocation.CRAFTING"),
+    MISC("misc", "ItemLocation.MISC"),
+    EQUIPMENT("equipment", "ItemLocation.EQUIPMENT");
 
     private final String code;
     private final String translationTag;

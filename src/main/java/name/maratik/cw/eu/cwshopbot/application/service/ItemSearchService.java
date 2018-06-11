@@ -159,7 +159,7 @@ public class ItemSearchService extends Localizable {
 
         private RecipeOutput(CraftableItem craftableItem) {
             Map<String, Integer> recipe = craftableItem.getRecipe();
-            StringBuilder sb = new StringBuilder(t("iss.RECIPE.HEADER",
+            StringBuilder sb = new StringBuilder(t("ItemSearchService.RECIPE.HEADER",
                 craftableItem.getName(), createCommandLink(T_PREFIX, craftableItem), craftableItem.getMana()
             )).append('\n');
             recipe.entrySet().stream()
@@ -205,14 +205,14 @@ public class ItemSearchService extends Localizable {
 
             @Override
             public StringBuilder visit(Item item) {
-                sb.append(t("iss.MESSAGE.ITEM.COMMON",
+                sb.append(t("ItemSearchService.MESSAGE.ITEM.COMMON",
                     item.getId(), item.getName(), t(item.getItemLocation())
                 ));
                 if (item.isTradeable()) {
-                    sb.append(t("iss.MESSAGE.ITEM.TRADEABLE", createCommandLink(T_PREFIX, item)));
+                    sb.append(t("ItemSearchService.MESSAGE.ITEM.TRADEABLE", createCommandLink(T_PREFIX, item)));
                 }
                 if (assets.getCraftableItemsByRecipe().containsKey(item.getId())) {
-                    sb.append(t("iss.MESSAGE.ITEM.RECIPES_WITH_ITEM", createCommandLink(RVIEW_PREFIX, item)));
+                    sb.append(t("ItemSearchService.MESSAGE.ITEM.RECIPES_WITH_ITEM", createCommandLink(RVIEW_PREFIX, item)));
                 }
                 return sb;
             }
@@ -224,7 +224,7 @@ public class ItemSearchService extends Localizable {
                 Craftbook craftbook = craftableItem.getCraftbook();
                 if (craftbook.isVisible()) {
                     sb.append('\n')
-                        .append(t("iss.MESSAGE.CRAFTABLE_ITEM",
+                        .append(t("ItemSearchService.MESSAGE.CRAFTABLE_ITEM",
                         createCommandLink(VIEW_PREFIX, craftableItem),
                         craftableItem.getMana(),
                         createCommandLink(CRAFTBOOK_PREFIX, craftbook.getCode()),
@@ -254,7 +254,7 @@ public class ItemSearchService extends Localizable {
                 if (needNewLine) {
                     sb.append('\n');
                 }
-                return sb.append(t("iss.MESSAGE.WEARABLE_ITEM",
+                return sb.append(t("ItemSearchService.MESSAGE.WEARABLE_ITEM",
                     t(wearableItem.getBodyPart()), t(wearableItem.getItemType())
                 ));
             }
@@ -285,7 +285,7 @@ public class ItemSearchService extends Localizable {
         private ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
             StringBuilder sb = new StringBuilder();
             optionalItem.ifPresent(item ->
-                sb.append(t("iss.RECIPE_LIST.HEADER",
+                sb.append(t("ItemSearchService.RECIPE_LIST.HEADER",
                     item.getName(), createCommandLink(T_PREFIX, item)
                 )).append('\n')
             );

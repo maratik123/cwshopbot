@@ -118,13 +118,13 @@ public class ShopController extends Localizable {
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)
-                    .setText(t("sc.MESSAGE.TO_DEVS"));
+                    .setText(t("ShopController.MESSAGE.TO_DEVS"));
             } catch (Exception e) {
                 logger.error("Error on send #bug forward", e);
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)
-                    .setText(t("sc.MESSAGE.TO_DEVS.FAILED", devUserName));
+                    .setText(t("ShopController.MESSAGE.TO_DEVS.FAILED", devUserName));
             }
         }
         return new SendMessage()
@@ -133,35 +133,42 @@ public class ShopController extends Localizable {
             .setText(getMessage(itemSearchService.findByCodeThenByName(message.getText())));
     }
 
-    @TelegramCommand(commands = "/start", description = "#{@loc.t('sc.COMMAND.START.DESC')}", hidden = true)
+    @TelegramCommand(commands = "/start", description = "#{@loc.t('ShopController.COMMAND.START.DESC')}", hidden = true)
     public SendMessage startCommand(long userId) {
         return new SendMessage()
             .setChatId(userId)
-            .setText(t("sc.COMMAND.START.REPLY"));
+            .setText(t("ShopController.COMMAND.START.REPLY"));
     }
 
-    @TelegramCommand(commands = "/auth", description = "#{@loc.t('sc.COMMAND.AUTH.DESC')}", hidden = true)
+    @TelegramCommand(commands = "/auth", description = "#{@loc.t('ShopController.COMMAND.AUTH.DESC')}", hidden = true)
     public SendMessage authCommand(long userId) {
         return new SendMessage()
             .setChatId(userId)
-            .setText(t("sc.COMMAND.AUTH.REPLY", cwUserName));
+            .setText(t("ShopController.COMMAND.AUTH.REPLY", cwUserName));
     }
 
-    @TelegramCommand(commands = "/register", description = "#{@loc.t('sc.COMMAND.REGISTER.DESC')}", hidden = true)
+    @TelegramCommand(
+        commands = "/register",
+        description = "#{@loc.t('ShopController.COMMAND.REGISTER.DESC')}",
+        hidden = true
+    )
     public SendMessage registerCommand(long userId) {
         return new SendMessage()
             .setChatId(userId)
-            .setText(t("sc.COMMAND.REGISTER.REPLY"));
+            .setText(t("ShopController.COMMAND.REGISTER.REPLY"));
     }
 
-    @TelegramCommand(commands = T_PREFIX + PATTERN_COMMAND_SUFFIX, description = "#{@loc.t('sc.COMMAND.T.DESC')}")
+    @TelegramCommand(
+        commands = T_PREFIX + PATTERN_COMMAND_SUFFIX,
+        description = "#{@loc.t('ShopController.COMMAND.T.DESC')}"
+    )
     public SendMessage itemInfo(long userId, Message message) {
         return itemInfo(userId, message, T_PREFIX.length());
     }
 
     @TelegramCommand(
         commands = A_PREFIX + PATTERN_COMMAND_SUFFIX,
-        description = "#{@loc.t('sc.COMMAND.T.DESC')}",
+        description = "#{@loc.t('ShopController.COMMAND.T.DESC')}",
         hidden = true
     )
     public SendMessage itemInfoA(long userId, Message message) {
@@ -170,7 +177,7 @@ public class ShopController extends Localizable {
 
     @TelegramCommand(
         commands = { CRAFTBOOK_PREFIX + '1', CRAFTBOOK_PREFIX + '2', CRAFTBOOK_PREFIX + '3' },
-        description = "#{@loc.t('sc.COMMAND.CRAFTBOOK.DESC')}"
+        description = "#{@loc.t('ShopController.COMMAND.CRAFTBOOK.DESC')}"
     )
     public SendMessage showCraftbook(long userId, Message message) {
         Optional<String> result = itemSearchService.getCraftbook(getCommandSuffix(message, CRAFTBOOK_PREFIX.length()));
@@ -180,7 +187,10 @@ public class ShopController extends Localizable {
             .setText(getMessage(result));
     }
 
-    @TelegramCommand(commands = VIEW_PREFIX + PATTERN_COMMAND_SUFFIX, description = "#{@loc.t('sc.COMMAND.VIEW.DESC')}")
+    @TelegramCommand(
+        commands = VIEW_PREFIX + PATTERN_COMMAND_SUFFIX,
+        description = "#{@loc.t('ShopController.COMMAND.VIEW.DESC')}"
+    )
     public SendMessage recipeView(long userId, Message message) {
         return new SendMessage()
             .setChatId(userId)
@@ -190,7 +200,7 @@ public class ShopController extends Localizable {
 
     @TelegramCommand(
         commands = RVIEW_PREFIX + PATTERN_COMMAND_SUFFIX,
-        description = "#{@loc.t('sc.COMMAND.RVIEW.DESC')}"
+        description = "#{@loc.t('ShopController.COMMAND.RVIEW.DESC')}"
     )
     public SendMessage reverseRecipeSearch(long userId, Message message) {
         return new SendMessage()
@@ -211,7 +221,7 @@ public class ShopController extends Localizable {
             logger.info("Forwarded stale update: {}", update);
             return new SendMessage()
                 .setChatId(userId)
-                .setText(t("sc.FORWARD.STALE"));
+                .setText(t("ShopController.FORWARD.STALE"));
         }
 
         Long previousUserForwarded = forwardUserCache.putIfAbsent(new ForwardKey(message), userId);
@@ -221,8 +231,8 @@ public class ShopController extends Localizable {
                 .setChatId(userId)
                 .setText(t(
                     previousUserForwarded != userId
-                        ? "sc.FORWARD.OTHER_S"
-                        : "sc.FORWARD.ALREADY_SEEN"
+                        ? "ShopController.FORWARD.OTHER_S"
+                        : "ShopController.FORWARD.ALREADY_SEEN"
                 ));
         }
 
@@ -237,7 +247,7 @@ public class ShopController extends Localizable {
         if (!(shopInfo.isPresent() || shopEdit.isPresent() || hero.isPresent())) {
             return new SendMessage()
                 .setChatId(userId)
-                .setText(t("sc.FORWARD.UNSUPPORTED"));
+                .setText(t("ShopController.FORWARD.UNSUPPORTED"));
         }
 
         return new SendMessage()
@@ -257,28 +267,32 @@ public class ShopController extends Localizable {
         logger.info("Accepted unsupported forward data from user: ", userId);
         return new SendMessage()
             .setChatId(userId)
-            .setText(t("sc.FORWARD.UNSUPPORTED", user.getFirstName()));
+            .setText(t("ShopController.FORWARD.UNSUPPORTED", user.getFirstName()));
     }
 
-    @TelegramCommand(commands = "/license", description = "#{@loc.t('sc.COMMAND.LICENSE.DESC')}")
+    @TelegramCommand(commands = "/license", description = "#{@loc.t('ShopController.COMMAND.LICENSE.DESC')}")
     public SendMessage license(long userId) {
         return new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)
-            .setText(t("sc.COMMAND.LICENSE.REPLY"));
+            .setText(t("ShopController.COMMAND.LICENSE.REPLY"));
     }
 
-    @TelegramCommand(commands = "/source", description = "#{@loc.t('sc.COMMAND.SOURCE.DESC')}", hidden = true)
+    @TelegramCommand(
+        commands = "/source",
+        description = "#{@loc.t('ShopController.COMMAND.SOURCE.DESC')}",
+        hidden = true
+    )
     public SendMessage source(long userId) {
         return new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)
-            .setText(t("sc.COMMAND.SOURCE.REPLY", "https://github.com/maratik123/cwshopbot"));
+            .setText(t("ShopController.COMMAND.SOURCE.REPLY", "https://github.com/maratik123/cwshopbot"));
     }
 
     @TelegramHelp
     public String getHelpPrefix() {
-        return t("sc.HELP.PREFIX") + "\n\n";
+        return t("ShopController.HELP.PREFIX") + "\n\n";
     }
 
     private boolean messageIsStale(Instant forwardTime) {
@@ -293,7 +307,7 @@ public class ShopController extends Localizable {
     }
 
     private String getMessage(Optional<String> message) {
-        return message.orElseGet(() -> t("sc.404"));
+        return message.orElseGet(() -> t("ShopController.404"));
     }
 
     private static String getCommandSuffix(Message message, int prefixLen) {

@@ -73,7 +73,7 @@ public class AdminController extends ShopController {
     public void init() throws TelegramApiException {
         client.execute(new SendMessage()
             .setChatId(devUserId)
-            .setText(t("ac.BOT.UP"))
+            .setText(t("AdminController.BOT.UP"))
         );
     }
 
@@ -82,33 +82,33 @@ public class AdminController extends ShopController {
         try {
             client.execute(new SendMessage()
                 .setChatId(devUserId)
-                .setText(t("ac.BOT.DOWN"))
+                .setText(t("AdminController.BOT.DOWN"))
             );
         } catch (TelegramApiException e) {
             logger.error("Can not send goodbye", e);
         }
     }
 
-    @TelegramCommand(commands = "/stats", description = "#{@loc.t('ac.STATS.COMMON')}")
+    @TelegramCommand(commands = "/stats", description = "#{@loc.t('AdminController.STATS.COMMON')}")
     public SendMessage getStat(long userId) {
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getStats());
     }
 
-    @TelegramCommand(commands = "/stats_cache", description = "#{@loc.t('ac.STATS.CACHES')}")
+    @TelegramCommand(commands = "/stats_cache", description = "#{@loc.t('AdminController.STATS.CACHES')}")
     public SendMessage getCacheStats(long userId) {
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getCacheStats());
     }
 
-    @TelegramCommand(commands = "/send", description = "#{@loc.t('ac.SEND_MESSAGE')}")
+    @TelegramCommand(commands = "/send", description = "#{@loc.t('AdminController.SEND_MESSAGE')}")
     public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client) {
         String[] args = messageCommand.getArgument()
             .map(arg -> arg.split(" ", 2))
             .filter(arr -> arr.length == 2)
-            .orElseGet(() -> new String[] {Long.toString(userId), t("ac.SEND_MESSAGE.WRONG_COMMAND")});
+            .orElseGet(() -> new String[] {Long.toString(userId), t("AdminController.SEND_MESSAGE.WRONG_COMMAND")});
 
         try {
             client.execute(new SendMessage()
@@ -117,12 +117,12 @@ public class AdminController extends ShopController {
             );
             return new SendMessage()
                 .setChatId(userId)
-                .setText(t("ac.SEND_MESSAGE.SUCCESS"));
+                .setText(t("AdminController.SEND_MESSAGE.SUCCESS"));
         } catch (TelegramApiException e) {
             logger.error("Send message wrong", e);
             return new SendMessage()
                 .setChatId(userId)
-                .setText(t("ac.SEND_MESSAGE.ERROR", e.getMessage()));
+                .setText(t("AdminController.SEND_MESSAGE.ERROR", e.getMessage()));
         }
     }
 }

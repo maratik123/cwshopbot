@@ -28,12 +28,12 @@ import java.util.Optional;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public enum BodyPart implements EnumWithCode, LocalizableValue {
-    BODY("body", ItemClass.ARMOR, "bp.BODY"),
-    HANDS("hands", ItemClass.ARMOR, "bp.HANDS"),
-    LEGS("legs", ItemClass.ARMOR, "bp.LEGS"),
-    HEAD("head", ItemClass.ARMOR, "bp.HEAD"),
-    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON, "bp.HAND.PRIMARY"),
-    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "bp.HAND.SECONDARY");
+    BODY("body", ItemClass.ARMOR, "BodyPart.BODY"),
+    HANDS("hands", ItemClass.ARMOR, "BodyPart.HANDS"),
+    LEGS("legs", ItemClass.ARMOR, "BodyPart.LEGS"),
+    HEAD("head", ItemClass.ARMOR, "BodyPart.HEAD"),
+    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON, "BodyPart.HAND.PRIMARY"),
+    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "BodyPart.HAND.SECONDARY");
 
     private final String code;
     private final ItemClass itemClass;
