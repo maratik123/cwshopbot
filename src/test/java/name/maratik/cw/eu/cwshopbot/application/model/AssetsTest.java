@@ -26,10 +26,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
@@ -67,7 +67,8 @@ public class AssetsTest extends MockedTest {
     private Matcher<String> anyOfAllItems;
     private Matcher<String> anyOfCraftableItems;
 
-    @PostConstruct
+    @Before
+    @Override
     public void init() {
         anyOfAllItems = anyOf(assets.getAllItems().keySet().stream()
             .map(Matchers::equalTo)

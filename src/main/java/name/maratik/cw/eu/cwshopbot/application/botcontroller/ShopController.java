@@ -23,6 +23,7 @@ import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.eu.cwshopbot.util.Localizable;
 import name.maratik.cw.eu.cwshopbot.util.MessageType;
 import name.maratik.cw.eu.spring.annotation.TelegramBot;
 import name.maratik.cw.eu.spring.annotation.TelegramCommand;
@@ -55,7 +56,7 @@ import static name.maratik.cw.eu.spring.TelegramBotService.PATTERN_COMMAND_SUFFI
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @TelegramBot
-public class ShopController {
+public class ShopController extends Localizable {
     private static final Logger logger = LogManager.getLogger(ShopController.class);
 
     public static final String VIEW_PREFIX = "/view_";

@@ -55,7 +55,9 @@ public class ShopLineDaoTest extends MockedTest {
     private WearableItem wearableItem;
 
     @Before
+    @Override
     public void init() {
+        super.init();
         item = assets.getAllItems().values().iterator().next();
         craftableItem = assets.getCraftableItems().values().stream()
             .filter(itm -> !itm.equals(item))

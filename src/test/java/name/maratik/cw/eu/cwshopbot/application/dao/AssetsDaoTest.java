@@ -50,7 +50,9 @@ public class AssetsDaoTest extends MockedTest {
     private AssetsDao.AssetsDto assetsDto;
 
     @Before
+    @Override
     public void init() {
+        super.init();
         assetsDto = assetsDao.getAssetsDto();
     }
 

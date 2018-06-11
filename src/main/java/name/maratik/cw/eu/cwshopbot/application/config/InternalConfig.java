@@ -37,15 +37,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -83,9 +84,9 @@ public class InternalConfig {
 
     @Bean
     @ForwardUser
-    public Cache<ForwardKey, Long> forwardUserCache() {
+    public Cache<ForwardKey, Long> forwardUserCache(Ticker ticker) {
         return CacheBuilder.newBuilder()
-            .ticker(ticker())
+            .ticker(ticker)
             .recordStats()
             .expireAfterWrite(forwardStale())
             .removalListener(notification -> logger.debug(
@@ -102,29 +103,29 @@ public class InternalConfig {
     }
 
     @Bean
-    public Ticker ticker() {
-        return new CacheTicker(clock());
+    public LRUCachingMap<Object, JavaType> unifiedObjectMapperCache(Ticker ticker) {
+        return new LRUCachingMap<>(1000, Duration.of(1, ChronoUnit.DAYS), ticker);
     }
 
     @Bean
-    public LRUCachingMap<Object, JavaType> unifiedObjectMapperCache() {
-        return new LRUCachingMap<>(1000, Duration.of(1, ChronoUnit.DAYS), ticker());
+    public TypeFactory typeFactory(LRUCachingMap<Object, JavaType> unifiedObjectMapperCache) {
+        return TypeFactory.defaultInstance().withCache(unifiedObjectMapperCache);
     }
 
     @Bean
-    public TypeFactory typeFactory() {
-        return TypeFactory.defaultInstance().withCache(unifiedObjectMapperCache());
-    }
-
-    @Bean
-    public Assets assets(ResourceLoader resourceLoader) throws IOException {
-        return new AssetsDao(resourceLoader.getResource("classpath:assets/resources.yaml"), typeFactory())
+    public Assets assets(ResourceLoader resourceLoader, TypeFactory typeFactory) throws IOException {
+        return new AssetsDao(resourceLoader.getResource("classpath:assets/resources.yaml"), typeFactory)
             .createAssets();
     }
 
     @Bean
     public DynamoDB dynamoDB(AmazonDynamoDB client) {
         return new DynamoDB(client);
+    }
+
+    @Bean
+    public MessageSourceAccessor messageSourceAccessor(ApplicationContext applicationContext) {
+        return new MessageSourceAccessor(applicationContext);
     }
 
     @Configuration
@@ -139,20 +140,6 @@ public class InternalConfig {
                         new Jdk8Module()
                     )
             );
-        }
-    }
-
-    private static class CacheTicker extends Ticker {
-        private final Instant ZERO = Instant.ofEpochSecond(0);
-        private final Clock clock;
-
-        private CacheTicker(Clock clock) {
-            this.clock = clock;
-        }
-
-        @Override
-        public long read() {
-            return ZERO.until(clock.instant(), ChronoUnit.NANOS);
         }
     }
 }

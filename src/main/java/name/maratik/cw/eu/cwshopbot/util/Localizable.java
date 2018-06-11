@@ -13,37 +13,30 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.mock;
+package name.maratik.cw.eu.cwshopbot.util;
 
-import org.telegram.telegrambots.api.objects.MessageEntity;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.lang.NonNull;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class MockMessageEntity extends MessageEntity {
-    private static final long serialVersionUID = -7927225285130441258L;
-    private final String type;
-    private final int offset;
-    private final int length;
-
-    public MockMessageEntity(String type, int offset, int length) {
-        this.type = type;
-        this.offset = offset;
-        this.length = length;
-    }
+public abstract class Localizable implements ApplicationContextAware {
+    private MessageSourceAccessor messageSourceAccessor;
 
     @Override
-    public String getType() {
-        return type;
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        messageSourceAccessor = new MessageSourceAccessor(applicationContext);
     }
 
-    @Override
-    public Integer getOffset() {
-        return offset;
+    protected String t(String code) {
+        return messageSourceAccessor.getMessage(code);
     }
 
-    @Override
-    public Integer getLength() {
-        return length;
+    protected String t(String code, Object... args) {
+        return messageSourceAccessor.getMessage(code, args);
     }
 }

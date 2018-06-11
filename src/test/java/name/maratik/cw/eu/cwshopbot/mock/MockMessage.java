@@ -24,6 +24,7 @@ import java.util.List;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class MockMessage extends Message {
+    private static final long serialVersionUID = 5121279891837815528L;
     private final String text;
 
     private final List<MessageEntity> entities;

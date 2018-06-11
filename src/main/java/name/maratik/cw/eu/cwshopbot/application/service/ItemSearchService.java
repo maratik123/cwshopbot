@@ -20,6 +20,7 @@ import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Craftbook;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.WearableItem;
+import name.maratik.cw.eu.cwshopbot.util.Localizable;
 
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,7 @@ import static name.maratik.cw.eu.cwshopbot.util.Emoji.MANA;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SHIELD;
 import static name.maratik.cw.eu.cwshopbot.util.Emoji.SWORDS;
 import static name.maratik.cw.eu.cwshopbot.util.Utils.appendCommandLink;
+import static name.maratik.cw.eu.cwshopbot.util.Utils.createCommandLink;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -50,7 +52,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Service
-public class ItemSearchService {
+public class ItemSearchService extends Localizable {
     private static final Comparator<Item> ITEM_NAME_COMPARATOR = Comparator.comparing(Item::getName);
     private static final Comparator<Map.Entry<Item, ?>> ITEM_NAME_IN_KEY_COMPARATOR =
         Comparator.comparing(Map.Entry::getKey, ITEM_NAME_COMPARATOR);
@@ -157,10 +159,9 @@ public class ItemSearchService {
 
         private RecipeOutput(CraftableItem craftableItem) {
             Map<String, Integer> recipe = craftableItem.getRecipe();
-            StringBuilder sb = new StringBuilder("Recipe for *")
-                .append(craftableItem.getName()).append("* (");
-            appendCommandLink(sb, T_PREFIX, craftableItem).append(")\n")
-                .append(MANA + " cost: ").append(craftableItem.getMana()).append("\n\n");
+            StringBuilder sb = new StringBuilder(t("iss.RECIPE.HEADER",
+                craftableItem.getName(), createCommandLink(T_PREFIX, craftableItem), craftableItem.getMana()
+            )).append("\n\n");
             recipe.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
                     assets.getAllItems().get(entry.getKey()),
@@ -204,16 +205,15 @@ public class ItemSearchService {
 
             @Override
             public StringBuilder visit(Item item) {
-                sb.append("Code: ").append(item.getId()).append('\n')
-                    .append("Name: *").append(item.getName()).append("*\n")
-                    .append("Located in: ").append(item.getItemLocation().getButtonText()).append('\n');
+                sb.append(t("iss.MESSAGE.ITEM.COMMON",
+                    item.getId(), item.getName(), item.getItemLocation().getButtonText()
+                )).append('\n');
                 if (item.isTradeable()) {
-                    sb.append("Can be exchanged using ");
-                    appendCommandLink(sb, T_PREFIX, item).append(" command\n");
+                    sb.append(t("iss.MESSAGE.ITEM.TRADEABLE", createCommandLink(T_PREFIX, item))).append('\n');
                 }
                 if (assets.getCraftableItemsByRecipe().containsKey(item.getId())) {
-                    sb.append("View recipes with item: ");
-                    appendCommandLink(sb, RVIEW_PREFIX, item).append('\n');
+                    sb.append(t("iss.MESSAGE.ITEM.RECIPES_WITH_ITEM", createCommandLink(RVIEW_PREFIX, item)))
+                        .append('\n');
                 }
                 return sb;
             }
@@ -225,13 +225,12 @@ public class ItemSearchService {
                 Craftbook craftbook = craftableItem.getCraftbook();
                 if (craftbook.isVisible()) {
                     sb.append('\n')
-                        .append("View item recipe: ");
-                    appendCommandLink(sb, VIEW_PREFIX, craftableItem).append('\n')
-                        .append(MANA + " cost: ").append(craftableItem.getMana()).append('\n')
-                        .append("Craftbook: ");
-                    appendCommandLink(sb, CRAFTBOOK_PREFIX, craftbook.getCode()).append('\n')
-                        .append("Find shops with item: ");
-                    appendCommandLink(sb, SHOP_SEARCH_PREFIX, craftableItem).append('\n');
+                        .append(t("iss.MESSAGE.CRAFTABLE_ITEM",
+                        createCommandLink(VIEW_PREFIX, craftableItem),
+                        craftableItem.getMana(),
+                        createCommandLink(CRAFTBOOK_PREFIX, craftbook.getCode()),
+                        createCommandLink(SHOP_SEARCH_PREFIX, craftableItem)
+                    )).append('\n');
                 }
                 return sb;
             }
@@ -256,8 +255,9 @@ public class ItemSearchService {
                 if (needNewLine) {
                     sb.append('\n');
                 }
-                return sb.append("Body part: ").append(wearableItem.getBodyPart().getCode()).append('\n')
-                    .append("Class: ").append(wearableItem.getItemType().getCode()).append('\n');
+                return sb.append(t("iss.MESSAGE.WEARABLE_ITEM",
+                    wearableItem.getBodyPart().getCode(), wearableItem.getItemType().getCode()
+                )).append('\n');
             }
         }
     }
@@ -280,15 +280,16 @@ public class ItemSearchService {
         }
     }
 
-    private static class ListRecipes implements SearchOutput {
+    private class ListRecipes implements SearchOutput {
         private final String message;
 
         private ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
             StringBuilder sb = new StringBuilder();
-            optionalItem.ifPresent(item -> {
-                sb.append("Recipe list with *").append(item.getName()).append("* (");
-                appendCommandLink(sb, T_PREFIX, item).append(")\n\n");
-            });
+            optionalItem.ifPresent(item ->
+                sb.append(t("iss.RECIPE_LIST.HEADER",
+                    item.getName(), createCommandLink(T_PREFIX, item)
+                )).append("\n\n")
+            );
             items.stream()
                 .sorted(ITEM_NAME_COMPARATOR)
                 .forEach(craftableItem -> {

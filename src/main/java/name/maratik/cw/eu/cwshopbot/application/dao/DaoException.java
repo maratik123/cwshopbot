@@ -20,6 +20,8 @@ package name.maratik.cw.eu.cwshopbot.application.dao;
  */
 @SuppressWarnings("WeakerAccess")
 public class DaoException extends Exception {
+    private static final long serialVersionUID = 1593915462475497036L;
+
     public DaoException(String message, Throwable cause) {
         super(message, cause);
     }

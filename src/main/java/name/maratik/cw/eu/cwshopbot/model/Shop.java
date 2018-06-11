@@ -103,7 +103,7 @@ public class Shop {
         private int maxOffersCount;
         private String shopCommand;
         private int shopNumber;
-        private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
+        private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
         private Builder setUserId(long userId) {
             this.userId = userId;

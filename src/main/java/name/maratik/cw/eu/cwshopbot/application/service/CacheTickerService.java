@@ -13,37 +13,29 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.mock;
+package name.maratik.cw.eu.cwshopbot.application.service;
 
-import org.telegram.telegrambots.api.objects.MessageEntity;
+import com.google.common.base.Ticker;
+import org.springframework.stereotype.Service;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class MockMessageEntity extends MessageEntity {
-    private static final long serialVersionUID = -7927225285130441258L;
-    private final String type;
-    private final int offset;
-    private final int length;
+@Service
+class CacheTickerService extends Ticker {
+    private final Instant ZERO = Instant.ofEpochSecond(0);
+    private final Clock clock;
 
-    public MockMessageEntity(String type, int offset, int length) {
-        this.type = type;
-        this.offset = offset;
-        this.length = length;
+    CacheTickerService(Clock clock) {
+        this.clock = clock;
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public Integer getOffset() {
-        return offset;
-    }
-
-    @Override
-    public Integer getLength() {
-        return length;
+    public long read() {
+        return ZERO.until(clock.instant(), ChronoUnit.NANOS);
     }
 }

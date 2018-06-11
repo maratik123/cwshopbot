@@ -19,6 +19,8 @@ package name.maratik.cw.eu.cwshopbot.parser;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class ParseException extends RuntimeException {
+    private static final long serialVersionUID = 2208033791334596945L;
+
     public ParseException(String message) {
         super(message);
     }

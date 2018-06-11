@@ -116,7 +116,7 @@ public class ParsedShopEdit {
         private int shopNumber;
         private String shopCommand;
         private ShopPublishStatus shopPublishStatus;
-        private ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
+        private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
 
         public Builder setShopName(String shopName) {
             this.shopName = shopName;

@@ -41,12 +41,22 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public class Utils {
     public static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
         Comparator.comparingInt(MessageEntity::getOffset);
+    public static final Object[] EMPTY = new Object[0];
+
     private static final int MAX_PREFIX_LEN = extractMaxPropLenFromMessageType(MessageType::getPrefix);
     private static final int MAX_POSTFIX_LEN = extractMaxPropLenFromMessageType(MessageType::getPostfix);
     private static final int MESSAGE_ENTITY_OVERHEAD = MAX_PREFIX_LEN + MAX_POSTFIX_LEN;
 
     public static int endOfEntity(MessageEntity messageEntity) {
         return messageEntity.getOffset() + messageEntity.getLength();
+    }
+
+    public static String createCommandLink(String commandPrefix, Item item) {
+        return appendCommandLink(new StringBuilder(), commandPrefix, item).toString();
+    }
+
+    public static String createCommandLink(String commandPrefix, String id) {
+        return appendCommandLink(new StringBuilder(), commandPrefix, id).toString();
     }
 
     public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, Item item) {
@@ -172,6 +182,7 @@ public class Utils {
     @SuppressWarnings("ReturnOfNull")
     private static class TextMessageEntity extends MessageEntity {
         private static final String type = MessageType.TEXT.getCode();
+        private static final long serialVersionUID = -1361075071106423195L;
         private final int offset;
         private final int length;
 

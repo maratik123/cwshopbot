@@ -33,6 +33,7 @@ import com.google.common.cache.Cache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -51,6 +52,7 @@ public class AdminController extends ShopController {
 
     private final StatsService statsService;
     private final DefaultAbsSender client;
+    private final MessageSourceAccessor messageSourceAccessor;
     private final long devUserId;
 
     public AdminController(Clock clock, Duration forwardStale,
@@ -60,21 +62,22 @@ public class AdminController extends ShopController {
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
                            StatsService statsService, TelegramBotService telegramBotService,
-                           ChatWarsAuthService chatWarsAuthService,
-                           @Value("${cwusername}") String cwUserName
+                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName,
+                           MessageSourceAccessor messageSourceAccessor
     ) {
         super(clock, forwardStale, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
             devUserId, devUserName, chatWarsAuthService, cwUserName);
         this.devUserId = devUserId;
         this.statsService = statsService;
         this.client = telegramBotService.getClient();
+        this.messageSourceAccessor = messageSourceAccessor;
     }
 
     @PostConstruct
     public void init() throws TelegramApiException {
         client.execute(new SendMessage()
             .setChatId(devUserId)
-            .setText("Bot is up")
+            .setText(messageSourceAccessor.getMessage("Bot is up"))
         );
     }
 

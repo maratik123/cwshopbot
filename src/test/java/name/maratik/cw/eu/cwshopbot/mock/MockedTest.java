@@ -52,6 +52,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -86,7 +87,16 @@ public abstract class MockedTest {
     private Map<Object, Consumer<Object>> mocks;
 
     @Before
-    public void resetMocks() {
+    public void init() {
+        setupLocale();
+        resetMocks();
+    }
+
+    private static void setupLocale() {
+        Locale.setDefault(new Locale("en"));
+    }
+
+    private void resetMocks() {
         mocks.forEach((mock, resetAction) -> {
             reset(mock);
             resetAction.accept(mock);

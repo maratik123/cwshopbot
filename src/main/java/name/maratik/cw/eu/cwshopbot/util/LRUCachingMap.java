@@ -20,6 +20,8 @@ import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheStats;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,7 +34,8 @@ import java.util.concurrent.ConcurrentMap;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class LRUCachingMap<K, V> extends LRUMap<K, V> {
-    private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(LRUCachingMap.class);
+    private static final long serialVersionUID = 1378663091316250420L;
 
     @SuppressWarnings("InstanceVariableMayNotBeInitializedByReadObject")
     private final transient Cache<K, V> cache;
@@ -41,12 +44,17 @@ public class LRUCachingMap<K, V> extends LRUMap<K, V> {
 
     public LRUCachingMap(int maxEntries, Duration expireDuration, Ticker ticker) {
         super(0, maxEntries);
+        _jdkSerializeMaxEntries = maxEntries;
         _map.clear();
         cache = CacheBuilder.newBuilder()
             .ticker(ticker)
             .recordStats()
             .maximumSize(maxEntries)
             .expireAfterAccess(expireDuration)
+            .removalListener(notification -> logger.debug(
+                "Removed object {} from cache due to {}, evicted = {}",
+                notification::toString, notification::getCause, notification::wasEvicted
+            ))
             .build();
         cacheMap = cache.asMap();
     }
