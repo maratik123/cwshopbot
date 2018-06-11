@@ -173,7 +173,7 @@ public abstract class TelegramBotService implements AutoCloseable {
             .forEach(method -> sb
                 .append(method.getCommand())
                 .append(' ')
-                .append(method.getDescription())
+                .append(beanFactory.resolveEmbeddedValue(method.getDescription()))
                 .append('\n')
             );
         return sb.toString();

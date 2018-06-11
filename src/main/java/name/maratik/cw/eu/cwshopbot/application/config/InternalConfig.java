@@ -19,6 +19,7 @@ import name.maratik.cw.eu.cwshopbot.application.dao.AssetsDao;
 import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.util.LRUCachingMap;
+import name.maratik.cw.eu.cwshopbot.util.Localizable;
 import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
 import name.maratik.cw.eu.spring.config.TelegramBotType;
 
@@ -37,11 +38,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
@@ -124,8 +123,8 @@ public class InternalConfig {
     }
 
     @Bean
-    public MessageSourceAccessor messageSourceAccessor(ApplicationContext applicationContext) {
-        return new MessageSourceAccessor(applicationContext);
+    public Localizable loc() {
+        return new Localizable();
     }
 
     @Configuration

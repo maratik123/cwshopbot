@@ -24,7 +24,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public abstract class Localizable implements ApplicationContextAware {
+public class Localizable implements ApplicationContextAware {
     private MessageSourceAccessor messageSourceAccessor;
 
     @Override

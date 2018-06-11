@@ -33,7 +33,6 @@ import com.google.common.cache.Cache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.support.MessageSourceAccessor;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -52,7 +51,6 @@ public class AdminController extends ShopController {
 
     private final StatsService statsService;
     private final DefaultAbsSender client;
-    private final MessageSourceAccessor messageSourceAccessor;
     private final long devUserId;
 
     public AdminController(Clock clock, Duration forwardStale,
@@ -62,22 +60,20 @@ public class AdminController extends ShopController {
                            @Value("${name.maratik.cw.eu.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.eu.cwshopbot.dev.username}") String devUserName,
                            StatsService statsService, TelegramBotService telegramBotService,
-                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName,
-                           MessageSourceAccessor messageSourceAccessor
+                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName
     ) {
         super(clock, forwardStale, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
             devUserId, devUserName, chatWarsAuthService, cwUserName);
         this.devUserId = devUserId;
         this.statsService = statsService;
         this.client = telegramBotService.getClient();
-        this.messageSourceAccessor = messageSourceAccessor;
     }
 
     @PostConstruct
     public void init() throws TelegramApiException {
         client.execute(new SendMessage()
             .setChatId(devUserId)
-            .setText(messageSourceAccessor.getMessage("Bot is up"))
+            .setText(t("ac.BOT.UP"))
         );
     }
 
@@ -86,21 +82,21 @@ public class AdminController extends ShopController {
         try {
             client.execute(new SendMessage()
                 .setChatId(devUserId)
-                .setText("Bot is going down")
+                .setText(t("ac.BOT.DOWN"))
             );
         } catch (TelegramApiException e) {
             logger.error("Can not send goodbye", e);
         }
     }
 
-    @TelegramCommand(commands = "/stats", description = "Get statistics")
+    @TelegramCommand(commands = "/stats", description = "#{@loc.t('ac.STATS.COMMON')}")
     public SendMessage getStat(long userId) {
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getStats());
     }
 
-    @TelegramCommand(commands = "/stats_cache", description = "Get caches statistics")
+    @TelegramCommand(commands = "/stats_cache", description = "#{@loc.t('ac.STATS.CACHES')}")
     public SendMessage getCacheStats(long userId) {
         return new SendMessage()
             .setChatId(userId)
@@ -108,12 +104,12 @@ public class AdminController extends ShopController {
     }
 
     @SuppressWarnings("MethodMayBeStatic")
-    @TelegramCommand(commands = "/send", description = "Send message")
+    @TelegramCommand(commands = "/send", description = "#{@loc.t('ac.SEND_MESSAGE')}")
     public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client) {
         String[] args = messageCommand.getArgument()
             .map(arg -> arg.split(" ", 2))
             .filter(arr -> arr.length == 2)
-            .orElseGet(() -> new String[] {Long.toString(userId), "Something wrong with your command"});
+            .orElseGet(() -> new String[] {Long.toString(userId), t("ac.SEND_MESSAGE.WRONG_COMMAND")});
 
         try {
             client.execute(new SendMessage()
@@ -122,12 +118,12 @@ public class AdminController extends ShopController {
             );
             return new SendMessage()
                 .setChatId(userId)
-                .setText("Message sent");
+                .setText(t("ac.SEND_MESSAGE.SUCCESS"));
         } catch (TelegramApiException e) {
             logger.error("Send message wrong", e);
             return new SendMessage()
                 .setChatId(userId)
-                .setText("Message did not send. Reason: " + e.getMessage());
+                .setText(t("ac.SEND_MESSAGE.ERROR", e.getMessage()));
         }
     }
 }
