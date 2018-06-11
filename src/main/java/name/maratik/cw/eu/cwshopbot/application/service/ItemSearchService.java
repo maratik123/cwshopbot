@@ -161,7 +161,7 @@ public class ItemSearchService extends Localizable {
             Map<String, Integer> recipe = craftableItem.getRecipe();
             StringBuilder sb = new StringBuilder(t("iss.RECIPE.HEADER",
                 craftableItem.getName(), createCommandLink(T_PREFIX, craftableItem), craftableItem.getMana()
-            )).append("\n\n");
+            )).append('\n');
             recipe.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
                     assets.getAllItems().get(entry.getKey()),
@@ -207,13 +207,12 @@ public class ItemSearchService extends Localizable {
             public StringBuilder visit(Item item) {
                 sb.append(t("iss.MESSAGE.ITEM.COMMON",
                     item.getId(), item.getName(), item.getItemLocation().getButtonText()
-                )).append('\n');
+                ));
                 if (item.isTradeable()) {
-                    sb.append(t("iss.MESSAGE.ITEM.TRADEABLE", createCommandLink(T_PREFIX, item))).append('\n');
+                    sb.append(t("iss.MESSAGE.ITEM.TRADEABLE", createCommandLink(T_PREFIX, item)));
                 }
                 if (assets.getCraftableItemsByRecipe().containsKey(item.getId())) {
-                    sb.append(t("iss.MESSAGE.ITEM.RECIPES_WITH_ITEM", createCommandLink(RVIEW_PREFIX, item)))
-                        .append('\n');
+                    sb.append(t("iss.MESSAGE.ITEM.RECIPES_WITH_ITEM", createCommandLink(RVIEW_PREFIX, item)));
                 }
                 return sb;
             }
@@ -230,7 +229,7 @@ public class ItemSearchService extends Localizable {
                         craftableItem.getMana(),
                         createCommandLink(CRAFTBOOK_PREFIX, craftbook.getCode()),
                         createCommandLink(SHOP_SEARCH_PREFIX, craftableItem)
-                    )).append('\n');
+                    ));
                 }
                 return sb;
             }
@@ -257,7 +256,7 @@ public class ItemSearchService extends Localizable {
                 }
                 return sb.append(t("iss.MESSAGE.WEARABLE_ITEM",
                     wearableItem.getBodyPart().getCode(), wearableItem.getItemType().getCode()
-                )).append('\n');
+                ));
             }
         }
     }
@@ -288,7 +287,7 @@ public class ItemSearchService extends Localizable {
             optionalItem.ifPresent(item ->
                 sb.append(t("iss.RECIPE_LIST.HEADER",
                     item.getName(), createCommandLink(T_PREFIX, item)
-                )).append("\n\n")
+                )).append('\n')
             );
             items.stream()
                 .sorted(ITEM_NAME_COMPARATOR)
