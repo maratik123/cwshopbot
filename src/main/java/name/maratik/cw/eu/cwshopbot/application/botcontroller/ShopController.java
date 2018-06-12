@@ -25,13 +25,13 @@ import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.util.Localizable;
 import name.maratik.cw.eu.cwshopbot.util.MessageType;
-import name.maratik.cw.eu.spring.annotation.TelegramBot;
-import name.maratik.cw.eu.spring.annotation.TelegramCommand;
-import name.maratik.cw.eu.spring.annotation.TelegramForward;
-import name.maratik.cw.eu.spring.annotation.TelegramHelp;
-import name.maratik.cw.eu.spring.annotation.TelegramMessage;
 
 import com.google.common.cache.Cache;
+import maratik.name.spring.telegram.annotation.TelegramBot;
+import maratik.name.spring.telegram.annotation.TelegramCommand;
+import maratik.name.spring.telegram.annotation.TelegramForward;
+import maratik.name.spring.telegram.annotation.TelegramHelp;
+import maratik.name.spring.telegram.annotation.TelegramMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,8 +50,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
-import static name.maratik.cw.eu.spring.TelegramBotService.PATTERN_COMMAND_SUFFIX;
-
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
@@ -66,6 +64,7 @@ public class ShopController extends Localizable {
     public static final String CRAFTBOOK_PREFIX = "/craftbook_";
     public static final String SHOP_SEARCH_PREFIX = "/shop_";
     public static final String SHOP_COMMAND_PREFIX = "/ws_";
+    public static final String PATTERN_COMMAND_SUFFIX = "*";
 
     private final Clock clock;
     private final Duration forwardStale;

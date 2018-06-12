@@ -20,8 +20,6 @@ import name.maratik.cw.eu.cwshopbot.model.ForwardKey;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.eu.cwshopbot.util.LRUCachingMap;
 import name.maratik.cw.eu.cwshopbot.util.Localizable;
-import name.maratik.cw.eu.spring.config.TelegramBotBuilder;
-import name.maratik.cw.eu.spring.config.TelegramBotType;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
@@ -33,6 +31,8 @@ import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import maratik.name.spring.telegram.config.TelegramBotBuilder;
+import maratik.name.spring.telegram.config.TelegramBotType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;

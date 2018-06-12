@@ -27,8 +27,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -107,22 +105,6 @@ public class Utils {
 
     public static Optional<MessageEntity> extractBotCommand(Iterator<MessageEntity> it) {
         return extractByType(MessageType.BOT_COMMAND, it).filter(cmd -> cmd.getText().startsWith("/"));
-    }
-
-    public static OptionalLong optionalOf(Long l) {
-        return toOptionalLong(Optional.ofNullable(l));
-    }
-
-    public static OptionalInt optionalOf(Integer i) {
-        return toOptionalInt(Optional.ofNullable(i));
-    }
-
-    public static OptionalLong toOptionalLong(Optional<Long> optional) {
-        return optional.map(OptionalLong::of).orElseGet(OptionalLong::empty);
-    }
-
-    public static OptionalInt toOptionalInt(Optional<Integer> optional) {
-        return optional.map(OptionalInt::of).orElseGet(OptionalInt::empty);
     }
 
     public static String reformatMessage(Message message) {
