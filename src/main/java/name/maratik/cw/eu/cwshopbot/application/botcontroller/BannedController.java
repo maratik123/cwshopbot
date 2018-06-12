@@ -15,9 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.botcontroller;
 
-import maratik.name.spring.telegram.annotation.TelegramBot;
-import maratik.name.spring.telegram.annotation.TelegramForward;
-import maratik.name.spring.telegram.annotation.TelegramMessage;
+import name.maratik.spring.telegram.annotation.TelegramBot;
+import name.maratik.spring.telegram.annotation.TelegramForward;
+import name.maratik.spring.telegram.annotation.TelegramMessage;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>

@@ -80,7 +80,7 @@ dependencies {
     compile "org.apache.lucene:lucene-core:${luceneVersion}"
     compile "org.apache.lucene:lucene-analyzers-common:${luceneVersion}"
     compile "org.apache.lucene:lucene-queryparser:${luceneVersion}"
-    compile 'com.github.maratik123:spring-telegram:1.8'
+    compile 'com.github.maratik123:spring-telegram:1.9'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "com.amazonaws:DynamoDBLocal:${awsDynamodbLocalVersion}"

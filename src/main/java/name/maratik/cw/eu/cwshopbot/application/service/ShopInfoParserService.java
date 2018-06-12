@@ -15,9 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.service;
 
-import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.Castle;
 import name.maratik.cw.eu.cwshopbot.model.Profession;
+import name.maratik.cw.eu.cwshopbot.model.ShopState;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.eu.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.eu.cwshopbot.parser.LoggingErrorListener;

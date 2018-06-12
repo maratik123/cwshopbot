@@ -15,8 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.eu.cwshopbot.application.config;
 
+import name.maratik.spring.telegram.TelegramBotService;
+
 import com.rabbitmq.client.Channel;
-import maratik.name.spring.telegram.TelegramBotService;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
