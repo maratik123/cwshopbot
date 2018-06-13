@@ -23,18 +23,18 @@ import java.util.Objects;
  */
 public class WearableItem extends CraftableItem {
     private final ItemType itemType;
-    private final BodyPart bodyPart;
+    private final InventorySlot inventorySlot;
     private final int attack;
     private final int defence;
     private final int manaboost;
 
     @SuppressWarnings("WeakerAccess")
     protected WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<String, Integer> recipe,
-                           int mana, Craftbook craftbook, ItemType itemType, BodyPart bodyPart, int attack, int defence,
+                           int mana, Craftbook craftbook, ItemType itemType, InventorySlot inventorySlot, int attack, int defence,
                            int manaboost) {
         super(id, name, itemLocation, tradeable, recipe, mana, craftbook);
         this.itemType = Objects.requireNonNull(itemType);
-        this.bodyPart = Objects.requireNonNull(bodyPart);
+        this.inventorySlot = Objects.requireNonNull(inventorySlot);
         this.attack = attack;
         this.defence = defence;
         this.manaboost = manaboost;
@@ -44,8 +44,8 @@ public class WearableItem extends CraftableItem {
         return itemType;
     }
 
-    public BodyPart getBodyPart() {
-        return bodyPart;
+    public InventorySlot getInventorySlot() {
+        return inventorySlot;
     }
 
     public int getAttack() {
@@ -79,7 +79,7 @@ public class WearableItem extends CraftableItem {
     public String toString() {
         return "WearableItem{" +
             "itemType=" + itemType +
-            ", bodyPart=" + bodyPart +
+            ", inventorySlot=" + inventorySlot +
             ", attack=" + attack +
             ", defence=" + defence +
             ", manaboost=" + manaboost +
@@ -100,7 +100,7 @@ public class WearableItem extends CraftableItem {
         @Override
         public WearableItem build() {
             return new WearableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, craftbook, itemType,
-                bodyPart, attack, defence, manaboost);
+                inventorySlot, attack, defence, manaboost);
         }
     }
 
@@ -109,7 +109,7 @@ public class WearableItem extends CraftableItem {
         @SuppressWarnings("WeakerAccess")
         protected ItemType itemType;
         @SuppressWarnings("WeakerAccess")
-        protected BodyPart bodyPart;
+        protected InventorySlot inventorySlot;
         @SuppressWarnings("WeakerAccess")
         protected int attack;
         @SuppressWarnings("WeakerAccess")
@@ -122,8 +122,8 @@ public class WearableItem extends CraftableItem {
             return getThis();
         }
 
-        public T setBodyPart(BodyPart bodyPart) {
-            this.bodyPart = bodyPart;
+        public T setInventorySlot(InventorySlot inventorySlot) {
+            this.inventorySlot = inventorySlot;
             return getThis();
         }
 

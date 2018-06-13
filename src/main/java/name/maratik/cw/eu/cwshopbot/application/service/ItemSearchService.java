@@ -255,7 +255,7 @@ public class ItemSearchService extends Localizable {
                     sb.append('\n');
                 }
                 return sb.append(t("ItemSearchService.MESSAGE.WEARABLE_ITEM",
-                    t(wearableItem.getBodyPart()), t(wearableItem.getItemType())
+                    t(wearableItem.getInventorySlot()), t(wearableItem.getItemType())
                 ));
             }
         }

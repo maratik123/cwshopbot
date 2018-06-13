@@ -27,20 +27,20 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum BodyPart implements EnumWithCode, LocalizableValue {
-    BODY("body", ItemClass.ARMOR, "BodyPart.BODY"),
-    HANDS("hands", ItemClass.ARMOR, "BodyPart.HANDS"),
-    LEGS("legs", ItemClass.ARMOR, "BodyPart.LEGS"),
-    HEAD("head", ItemClass.ARMOR, "BodyPart.HEAD"),
-    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON, "BodyPart.HAND.PRIMARY"),
-    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "BodyPart.HAND.SECONDARY");
+public enum InventorySlot implements EnumWithCode, LocalizableValue {
+    BODY("body", ItemClass.ARMOR, "InventorySlot.BODY"),
+    HANDS("hands", ItemClass.ARMOR, "InventorySlot.HANDS"),
+    LEGS("legs", ItemClass.ARMOR, "InventorySlot.LEGS"),
+    HEAD("head", ItemClass.ARMOR, "InventorySlot.HEAD"),
+    PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON, "InventorySlot.HAND.PRIMARY"),
+    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "InventorySlot.HAND.SECONDARY");
 
     private final String code;
     private final ItemClass itemClass;
     private final String translationTag;
-    private static final Map<String, BodyPart> cache = Util.createCache(values());
+    private static final Map<String, InventorySlot> cache = Util.createCache(values());
 
-    BodyPart(String code, ItemClass itemClass, String translationTag) {
+    InventorySlot(String code, ItemClass itemClass, String translationTag) {
         this.code = code;
         this.itemClass = itemClass;
         this.translationTag = translationTag;
@@ -53,7 +53,7 @@ public enum BodyPart implements EnumWithCode, LocalizableValue {
     }
 
     @JsonCreator
-    public static Optional<BodyPart> findByCode(String code) {
+    public static Optional<InventorySlot> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }
 

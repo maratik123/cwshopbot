@@ -16,7 +16,7 @@
 package name.maratik.cw.eu.cwshopbot.application.dao;
 
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Assets;
-import name.maratik.cw.eu.cwshopbot.model.cwasset.BodyPart;
+import name.maratik.cw.eu.cwshopbot.model.cwasset.InventorySlot;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Craftbook;
 import name.maratik.cw.eu.cwshopbot.model.cwasset.Item;
@@ -149,7 +149,7 @@ public class AssetsDao {
             .setAttack(resourceItem.getAtt())
             .setDefence(resourceItem.getDef())
             .setManaboost(resourceItem.getManaboost())
-            .setBodyPart(resourceItem.getWear())
+            .setInventorySlot(resourceItem.getWear())
             .setItemType(itemType);
     }
 
@@ -262,7 +262,7 @@ public class AssetsDao {
         @JsonProperty
         private ItemType type;
         @JsonProperty
-        private BodyPart wear;
+        private InventorySlot wear;
         @JsonProperty(defaultValue = "0")
         private int att;
         @JsonProperty(defaultValue = "0")
@@ -313,11 +313,11 @@ public class AssetsDao {
         }
 
         @SuppressWarnings("WeakerAccess")
-        public BodyPart getWear() {
+        public InventorySlot getWear() {
             return wear;
         }
 
-        public void setWear(BodyPart wear) {
+        public void setWear(InventorySlot wear) {
             this.wear = wear;
         }
 

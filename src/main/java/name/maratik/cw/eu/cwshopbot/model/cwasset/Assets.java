@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.mapping;
 public class Assets {
     private final Map<String, Item> allItems;
     private final Map<ItemLocation, Set<Item>> itemsByItemLocation;
-    private final Map<BodyPart, Set<WearableItem>> itemsByBodyPart;
+    private final Map<InventorySlot, Set<WearableItem>> itemsByBodyPart;
     private final Map<ItemType, Set<WearableItem>> itemsByItemType;
     private final Map<Craftbook, Set<CraftableItem>> itemsByCraftbook;
     private final Map<String, CraftableItem> craftableItems;
@@ -48,7 +48,7 @@ public class Assets {
     private final Map<String, Item> itemsByNameLowerCase;
 
     private Assets(Map<String, Item> allItems, Map<ItemLocation, Set<Item>> itemsByItemLocation,
-                   Map<BodyPart, Set<WearableItem>> itemsByBodyPart, Map<ItemType, Set<WearableItem>> itemsByItemType,
+                   Map<InventorySlot, Set<WearableItem>> itemsByBodyPart, Map<ItemType, Set<WearableItem>> itemsByItemType,
                    Map<Craftbook, Set<CraftableItem>> itemsByCraftbook, Map<String, CraftableItem> craftableItems,
                    Map<String, WearableItem> wearableItems, Map<String, Set<CraftableItem>> craftableItemsByRecipe,
                    Map<String, Item> itemsByName, Map<String, Item> itemsByNameLowerCase) {
@@ -72,7 +72,7 @@ public class Assets {
         return itemsByItemLocation;
     }
 
-    public Map<BodyPart, Set<WearableItem>> getItemsByBodyPart() {
+    public Map<InventorySlot, Set<WearableItem>> getItemsByBodyPart() {
         return itemsByBodyPart;
     }
 
@@ -127,7 +127,7 @@ public class Assets {
             Map<String, Item> allItems = allItemList.stream()
                 .collect(toImmutableMap(Item::getId, item -> item));
             Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder = new EnumMap<>(ItemLocation.class);
-            Map<BodyPart, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder = new EnumMap<>(BodyPart.class);
+            Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder = new EnumMap<>(InventorySlot.class);
             Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder = new EnumMap<>(ItemType.class);
             Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder = new EnumMap<>(Craftbook.class);
             ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder = ImmutableMap.builder();
@@ -175,7 +175,7 @@ public class Assets {
             private final String id;
             private final Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder;
             private final Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder;
-            private final Map<BodyPart, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder;
+            private final Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder;
             private final Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder;
             private final ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder;
             private final ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder;
@@ -184,7 +184,7 @@ public class Assets {
 
             private BuilderFiller(String id, Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder,
                                   Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder,
-                                  Map<BodyPart, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder,
+                                  Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByBodyPartBuilder,
                                   Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder,
                                   ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder,
                                   ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder,
@@ -230,8 +230,8 @@ public class Assets {
                 Item.Visitor.super.visit(wearableItem);
 
                 itemsByBodyPartBuilder.computeIfAbsent(
-                    wearableItem.getBodyPart(),
-                    bodyPart -> ImmutableSet.builder()
+                    wearableItem.getInventorySlot(),
+                    inventorySlot -> ImmutableSet.builder()
                 ).add(wearableItem);
                 itemsByItemTypeBuilder.computeIfAbsent(
                     wearableItem.getItemType(),
