@@ -151,7 +151,7 @@ public class AssetsTest extends MockedTest {
         assets.getWearableItems().values()
             .forEach(wearableItem -> assertEquals(wearableItem + " failed",
                 wearableItem.getItemType().getItemClass(),
-                wearableItem.getBodyPart().getItemClass()
+                wearableItem.getInventorySlot().getItemClass()
             ));
     }
 
