@@ -13,25 +13,38 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.eu.cwshopbot.application.cwapi;
+package name.maratik.cw.eu.cwshopbot.model.cwapi;
 
-import name.maratik.cw.eu.cwshopbot.model.cwapi.Deal;
+import name.maratik.cw.eu.cwshopbot.util.EnumWithCode;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
-public class DealsListener {
-    private static final Logger logger = LogManager.getLogger(DealsListener.class);
+public enum Operation implements EnumWithCode {
+    GET_USER_PROFILE("GetUserProfile"),
+    GET_STOCK("GetStock");
 
-    @SuppressWarnings("MethodMayBeStatic")
-    @RabbitListener(queues = "${spring.rabbitmq.username}_deals")
-    public void processDealsAnnounce(Deal data) {
-        logger.debug("Received message: {}", data);
+    private static final Map<String, Operation> cache = Util.createCache(values());
+    private final String code;
+
+    Operation(String code) {
+        this.code = code;
+    }
+
+    @JsonValue
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @JsonCreator
+    public static Optional<Operation> findByCode(String code) {
+        return Optional.ofNullable(cache.get(code));
     }
 }
