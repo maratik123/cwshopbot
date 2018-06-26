@@ -1,0 +1,12 @@
+CASTLE_SIGN=1
+WORDS=2
+MUL_WS=3
+MUL=4
+BRACKET_OPEN=5
+BRACKET_CLOSE=6
+NL=7
+'* '=3
+'*'=4
+'['=5
+']'=6
+'\n'=7

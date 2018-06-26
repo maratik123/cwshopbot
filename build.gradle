@@ -24,11 +24,11 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.spotbugs' version '1.6.1'
+    id 'com.github.spotbugs' version '1.6.2'
     id 'net.researchgate.release' version '2.6.0'
 }
 
-group 'name.maratik.cw.eu'
+group 'name.maratik.cw'
 version = version
 
 repositories {
@@ -53,7 +53,7 @@ apply plugin: 'net.researchgate.release'
 sourceCompatibility = 1.8
 
 wrapper {
-    gradleVersion = '4.7'
+    gradleVersion = '4.8'
     distributionType = 'ALL'
 }
 
@@ -80,7 +80,7 @@ dependencies {
     compile "org.apache.lucene:lucene-core:${luceneVersion}"
     compile "org.apache.lucene:lucene-analyzers-common:${luceneVersion}"
     compile "org.apache.lucene:lucene-queryparser:${luceneVersion}"
-    compile 'com.github.maratik123:spring-telegram:1.9'
+    compile "com.github.maratik123:spring-telegram:${springTelegramVersion}"
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "com.amazonaws:DynamoDBLocal:${awsDynamodbLocalVersion}"
@@ -113,7 +113,7 @@ generateGrammarSource {
     maxHeapSize = '64m'
     arguments += [
             '-long-messages',
-            '-lib', 'src/main/antlr/name/maratik/cw/eu/cwshopbot/parser/generated'
+            '-lib', 'src/main/antlr/name/maratik/cw/cwshopbot/parser/generated'
     ]
 }
 
