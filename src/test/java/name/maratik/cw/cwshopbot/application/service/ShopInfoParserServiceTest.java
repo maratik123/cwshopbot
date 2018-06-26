@@ -23,15 +23,6 @@ import name.maratik.cw.cwshopbot.model.Profession;
 import name.maratik.cw.cwshopbot.model.ShopState;
 import name.maratik.cw.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
-import name.maratik.cw.cwshopbot.utils.SamePropertyValuesAsExcept;
-import name.maratik.cw.cwshopbot.mock.MockMessage;
-import name.maratik.cw.cwshopbot.mock.MockMessageEntity;
-import name.maratik.cw.cwshopbot.mock.MockedTest;
-import name.maratik.cw.cwshopbot.model.Castle;
-import name.maratik.cw.cwshopbot.model.Profession;
-import name.maratik.cw.cwshopbot.model.ShopState;
-import name.maratik.cw.cwshopbot.model.cwasset.Assets;
-import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
 
 import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matchers;
@@ -107,7 +98,7 @@ public class ShopInfoParserServiceTest extends MockedTest {
             )
             .build();
 
-        assertThat(parsedShopInfo, SamePropertyValuesAsExcept.samePropertyValuesAsExcept(expected, "shopLines"));
+        assertThat(parsedShopInfo, samePropertyValuesAsExcept(expected, "shopLines"));
         assertThat(parsedShopInfo.getShopLines(), contains(expected.getShopLines().stream()
             .map(Matchers::samePropertyValuesAs)
             .collect(toImmutableList())

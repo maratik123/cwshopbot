@@ -15,11 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.parser;
 
-import name.maratik.cw.cwshopbot.application.botcontroller.ShopController;
-import name.maratik.cw.cwshopbot.model.ShopPublishStatus;
-import name.maratik.cw.cwshopbot.model.cwasset.Item;
-import name.maratik.cw.cwshopbot.parser.ParseException;
-import name.maratik.cw.cwshopbot.parser.ParserUtils;
 import name.maratik.cw.cwshopbot.model.ShopPublishStatus;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.parser.ParseException;
@@ -53,7 +48,7 @@ public class ParsedShopEdit {
         this.maxOffersCount = maxOffersCount;
         this.shopNumber = shopNumber;
         this.shopCommand = Objects.requireNonNull(shopCommand, "shopCommand");
-        if (!shopCommand.startsWith(ShopController.SHOP_COMMAND_PREFIX)) {
+        if (!shopCommand.startsWith(SHOP_COMMAND_PREFIX)) {
             throw new ParseException("Shop command has unexpected format: " + shopCommand);
         }
         this.shopCode = Objects.requireNonNull(shopCode, "shopCode");
@@ -159,7 +154,7 @@ public class ParsedShopEdit {
         }
 
         public ParsedShopEdit build() {
-            String shopCode = ParserUtils.extractShopCodeFromShopCommand(shopCommand);
+            String shopCode = extractShopCodeFromShopCommand(shopCommand);
             return new ParsedShopEdit(shopName, offersCount, maxOffersCount, shopNumber, shopCode, shopCommand,
                 shopPublishStatus, shopLines.build()
             );
@@ -174,7 +169,7 @@ public class ParsedShopEdit {
         private ShopLine(Item item, int mana, int price) {
             this.item = Objects.requireNonNull(item, "item");
             this.mana = mana;
-            ParserUtils.verifyItem(item, mana);
+            verifyItem(item, mana);
             this.price = price;
         }
 

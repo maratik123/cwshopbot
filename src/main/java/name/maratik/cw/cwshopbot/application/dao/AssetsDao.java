@@ -16,9 +16,9 @@
 package name.maratik.cw.cwshopbot.application.dao;
 
 import name.maratik.cw.cwshopbot.model.cwasset.Assets;
-import name.maratik.cw.cwshopbot.model.cwasset.InventorySlot;
 import name.maratik.cw.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.cwshopbot.model.cwasset.Craftbook;
+import name.maratik.cw.cwshopbot.model.cwasset.InventorySlot;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.model.cwasset.ItemLocation;
 import name.maratik.cw.cwshopbot.model.cwasset.ItemType;

@@ -15,7 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.tms;
 
-import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 

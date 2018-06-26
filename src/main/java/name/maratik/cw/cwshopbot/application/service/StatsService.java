@@ -16,8 +16,6 @@
 package name.maratik.cw.cwshopbot.application.service;
 
 import name.maratik.cw.cwshopbot.application.config.ForwardUser;
-import name.maratik.cw.cwshopbot.util.LRUCachingMap;
-import name.maratik.cw.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 

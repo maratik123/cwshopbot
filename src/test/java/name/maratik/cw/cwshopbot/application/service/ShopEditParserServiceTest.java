@@ -16,10 +16,6 @@
 package name.maratik.cw.cwshopbot.application.service;
 
 import name.maratik.cw.cwshopbot.mock.MockMessage;
-import name.maratik.cw.cwshopbot.mock.MockedTest;
-import name.maratik.cw.cwshopbot.model.ShopPublishStatus;
-import name.maratik.cw.cwshopbot.model.cwasset.Assets;
-import name.maratik.cw.cwshopbot.mock.MockMessage;
 import name.maratik.cw.cwshopbot.mock.MockMessageEntity;
 import name.maratik.cw.cwshopbot.mock.MockedTest;
 import name.maratik.cw.cwshopbot.model.ShopPublishStatus;

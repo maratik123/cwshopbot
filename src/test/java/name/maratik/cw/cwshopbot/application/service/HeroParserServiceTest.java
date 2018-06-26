@@ -20,11 +20,6 @@ import name.maratik.cw.cwshopbot.mock.MockMessageEntity;
 import name.maratik.cw.cwshopbot.mock.MockedTest;
 import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
-import name.maratik.cw.cwshopbot.mock.MockMessage;
-import name.maratik.cw.cwshopbot.mock.MockMessageEntity;
-import name.maratik.cw.cwshopbot.mock.MockedTest;
-import name.maratik.cw.cwshopbot.model.Castle;
-import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;

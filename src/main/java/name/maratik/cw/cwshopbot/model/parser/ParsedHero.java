@@ -16,7 +16,6 @@
 package name.maratik.cw.cwshopbot.model.parser;
 
 import name.maratik.cw.cwshopbot.model.Castle;
-import name.maratik.cw.cwshopbot.model.Castle;
 
 import java.util.Objects;
 import java.util.Optional;

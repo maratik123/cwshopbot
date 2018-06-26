@@ -19,12 +19,6 @@ import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.parser.LoggingErrorListener;
 import name.maratik.cw.cwshopbot.parser.ParseException;
-import name.maratik.cw.cwshopbot.parser.ParserUtils;
-import name.maratik.cw.cwshopbot.util.Utils;
-import name.maratik.cw.cwshopbot.model.Castle;
-import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
-import name.maratik.cw.cwshopbot.parser.LoggingErrorListener;
-import name.maratik.cw.cwshopbot.parser.ParseException;
 import name.maratik.cw.cwshopbot.parser.generated.HeroLexer;
 import name.maratik.cw.cwshopbot.parser.generated.HeroParser;
 import name.maratik.cw.cwshopbot.parser.generated.HeroParserBaseListener;
@@ -53,7 +47,7 @@ public class HeroParserService implements CWParser<ParsedHero> {
 
     @Override
     public Optional<ParsedHero> parse(Message message) {
-        String formattedMessage = Utils.reformatMessage(message);
+        String formattedMessage = reformatMessage(message);
         int firstNewLine = formattedMessage.indexOf('\n');
         if (firstNewLine == -1) {
             return Optional.empty();
@@ -66,7 +60,7 @@ public class HeroParserService implements CWParser<ParsedHero> {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         HeroParser parser = new HeroParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
-        return ParserUtils.catchParseErrors(() -> {
+        return catchParseErrors(() -> {
             ParsedHero.Builder builder = ParsedHero.builder();
             ParseTreeWalker.DEFAULT.walk(new HeroParserListenerImpl(builder), parser.hero());
             return Optional.of(builder.build());

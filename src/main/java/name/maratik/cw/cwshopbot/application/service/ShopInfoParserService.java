@@ -18,12 +18,6 @@ package name.maratik.cw.cwshopbot.application.service;
 import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.Profession;
 import name.maratik.cw.cwshopbot.model.ShopState;
-import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
-import name.maratik.cw.cwshopbot.parser.ParseException;
-import name.maratik.cw.cwshopbot.util.Utils;
-import name.maratik.cw.cwshopbot.model.Castle;
-import name.maratik.cw.cwshopbot.model.Profession;
-import name.maratik.cw.cwshopbot.model.ShopState;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
 import name.maratik.cw.cwshopbot.parser.LoggingErrorListener;
@@ -63,7 +57,7 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
     @Override
     public Optional<ParsedShopInfo> parse(Message message) {
-        String formattedMessage = Utils.reformatMessage(message);
+        String formattedMessage = reformatMessage(message);
         CodePointCharStream messageCharStream = CharStreams.fromString(formattedMessage);
         ShopInfoLexer lexer = new ShopInfoLexer(messageCharStream);
         lexer.removeErrorListeners();

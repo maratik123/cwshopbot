@@ -15,8 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.dao;
 
-import name.maratik.cw.cwshopbot.model.Shop;
-import name.maratik.cw.cwshopbot.model.ShopLine;
 import name.maratik.cw.cwshopbot.mock.MockedTest;
 import name.maratik.cw.cwshopbot.model.Shop;
 import name.maratik.cw.cwshopbot.model.ShopLine;

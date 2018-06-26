@@ -15,8 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.service;
 
-import name.maratik.cw.cwshopbot.parser.ParseException;
-import name.maratik.cw.cwshopbot.util.Utils;
 import name.maratik.cw.cwshopbot.model.ShopPublishStatus;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopEdit;
@@ -57,7 +55,7 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
 
     @Override
     public Optional<ParsedShopEdit> parse(Message message) {
-        String formattedMessage = Utils.reformatMessage(message);
+        String formattedMessage = reformatMessage(message);
         CodePointCharStream messageCharStream = CharStreams.fromString(formattedMessage);
         ShopEditLexer lexer = new ShopEditLexer(messageCharStream);
         lexer.removeErrorListeners();

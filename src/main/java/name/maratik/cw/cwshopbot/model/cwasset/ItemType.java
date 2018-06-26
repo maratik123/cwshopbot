@@ -15,7 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwasset;
 
-import name.maratik.cw.cwshopbot.util.LocalizableValue;
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 import name.maratik.cw.cwshopbot.util.LocalizableValue;
 

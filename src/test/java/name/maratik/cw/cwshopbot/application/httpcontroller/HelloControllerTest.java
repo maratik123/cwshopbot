@@ -16,7 +16,6 @@
 package name.maratik.cw.cwshopbot.application.httpcontroller;
 
 import name.maratik.cw.cwshopbot.mock.MockedTest;
-import name.maratik.cw.cwshopbot.mock.MockedTest;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

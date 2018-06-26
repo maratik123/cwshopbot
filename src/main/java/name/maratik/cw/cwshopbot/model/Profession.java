@@ -16,7 +16,6 @@
 package name.maratik.cw.cwshopbot.model;
 
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
-import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
