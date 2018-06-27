@@ -101,7 +101,7 @@ public class YellowPages {
         private final int mana;
 
         public Offer(
-            @JsonProperty(value = "item") String item,
+            @JsonProperty("item") String item,
             @JsonProperty("price") int price,
             @JsonProperty("mana") int mana
         ) {

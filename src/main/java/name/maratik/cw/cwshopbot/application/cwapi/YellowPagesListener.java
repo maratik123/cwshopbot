@@ -22,6 +22,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
@@ -31,7 +33,7 @@ public class YellowPagesListener {
 
     @SuppressWarnings("MethodMayBeStatic")
     @RabbitListener(queues = "${spring.rabbitmq.username}_yellow_pages")
-    public void processYellowPagesAnnounce(YellowPages data) {
+    public void processYellowPagesAnnounce(List<YellowPages> data) {
         logger.debug("Received next: {}", data);
     }
 }
