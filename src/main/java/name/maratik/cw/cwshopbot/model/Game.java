@@ -15,10 +15,14 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model;
 
+import name.maratik.cw.cwshopbot.parser.generated.HeroLexer;
+import name.maratik.cw.cwshopbot.parser.generated.HeroLexerRu;
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Lexer;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,8 +31,18 @@ import java.util.Optional;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public enum Game implements EnumWithCode {
-    RU2("RU2"),
-    EN("EN");
+    RU2("RU2") {
+        @Override
+        public Lexer createHeroLexer(CharStream messageCharStream) {
+            return new HeroLexerRu(messageCharStream);
+        }
+    },
+    EN("EN") {
+        @Override
+        public HeroLexer createHeroLexer(CharStream messageCharStream) {
+            return new HeroLexer(messageCharStream);
+        }
+    };
 
     private final String code;
     private static final Map<String, Game> cache = Util.createCache(values());
@@ -47,4 +61,6 @@ public enum Game implements EnumWithCode {
     public static Optional<Game> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }
+
+    public abstract Lexer createHeroLexer(CharStream messageCharStream);
 }

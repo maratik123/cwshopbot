@@ -17,6 +17,7 @@ package name.maratik.cw.cwshopbot.application.config;
 
 import name.maratik.cw.cwshopbot.application.dao.AssetsDao;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
+import name.maratik.cw.cwshopbot.model.Game;
 import name.maratik.cw.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 import name.maratik.cw.cwshopbot.util.Localizable;
@@ -62,6 +63,8 @@ public class InternalConfig {
     private String token;
     @Value("${forwardStale}")
     private String forwardStaleStr;
+    @Value("${game:EN}")
+    private String game;
 
     @Bean
     public TelegramBotType telegramBotType() {
@@ -125,6 +128,11 @@ public class InternalConfig {
     @Bean
     public Localizable loc() {
         return new Localizable();
+    }
+
+    @Bean
+    public Game game() {
+        return Game.findByCode(game).orElse(Game.EN);
     }
 
     @Configuration

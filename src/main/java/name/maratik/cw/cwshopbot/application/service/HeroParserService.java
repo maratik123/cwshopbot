@@ -16,10 +16,10 @@
 package name.maratik.cw.cwshopbot.application.service;
 
 import name.maratik.cw.cwshopbot.model.Castle;
+import name.maratik.cw.cwshopbot.model.Game;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.parser.LoggingErrorListener;
 import name.maratik.cw.cwshopbot.parser.ParseException;
-import name.maratik.cw.cwshopbot.parser.generated.HeroLexer;
 import name.maratik.cw.cwshopbot.parser.generated.HeroParser;
 import name.maratik.cw.cwshopbot.parser.generated.HeroParserBaseListener;
 
@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +46,12 @@ import static name.maratik.cw.cwshopbot.util.Utils.reformatMessage;
 public class HeroParserService implements CWParser<ParsedHero> {
     private static final Logger logger = LogManager.getLogger(HeroParserService.class);
 
+    private final Game game;
+
+    public HeroParserService(Game game) {
+        this.game = game;
+    }
+
     @Override
     public Optional<ParsedHero> parse(Message message) {
         String formattedMessage = reformatMessage(message);
@@ -54,7 +61,7 @@ public class HeroParserService implements CWParser<ParsedHero> {
         }
         formattedMessage = formattedMessage.substring(0, firstNewLine + 1);
         CodePointCharStream messageCharStream = CharStreams.fromString(formattedMessage);
-        HeroLexer lexer = new HeroLexer(messageCharStream);
+        Lexer lexer = game.createHeroLexer(messageCharStream);
         lexer.removeErrorListeners();
         lexer.addErrorListener(new LoggingErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);

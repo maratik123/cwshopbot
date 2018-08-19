@@ -40,6 +40,9 @@ repositories {
     maven {
         url 'https://jitpack.io'
     }
+    maven {
+        url 'https://repo.spring.io/libs-release'
+    }
 }
 
 apply plugin: 'antlr'
@@ -53,7 +56,7 @@ apply plugin: 'net.researchgate.release'
 sourceCompatibility = 1.8
 
 wrapper {
-    gradleVersion = '4.8'
+    gradleVersion = '4.9'
     distributionType = 'ALL'
 }
 
@@ -61,6 +64,12 @@ configurations {
     compile.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     compile.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     compile.exclude group: 'com.vaadin.external.google', module: 'android-json'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.data:spring-data-releasetrain:${springDataRelease}"
+    }
 }
 
 dependencies {
@@ -81,6 +90,7 @@ dependencies {
     compile "org.apache.lucene:lucene-analyzers-common:${luceneVersion}"
     compile "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     compile "com.github.maratik123:spring-telegram:${springTelegramVersion}"
+    compile "com.github.derjust:spring-data-dynamodb:${springDataDynamoDBVersion}"
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "com.amazonaws:DynamoDBLocal:${awsDynamodbLocalVersion}"
