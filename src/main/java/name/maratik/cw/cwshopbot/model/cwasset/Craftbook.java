@@ -26,11 +26,13 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum Craftbook implements EnumWithCode {
+public enum Craftbook implements EnumWithCode, Book {
     CRAFTBOOK_1("1", true),
     CRAFTBOOK_2("2", true),
     CRAFTBOOK_3("3", true),
     CRAFTBOOK_X("x", false);
+
+    public static final String COMMAND_PREFIX = "/craftbook_";
 
     private final String code;
     private final boolean visible;
@@ -49,6 +51,11 @@ public enum Craftbook implements EnumWithCode {
 
     public boolean isVisible() {
         return visible;
+    }
+
+    @Override
+    public String getCommandPrefix() {
+        return COMMAND_PREFIX;
     }
 
     @JsonCreator

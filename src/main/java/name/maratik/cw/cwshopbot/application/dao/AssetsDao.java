@@ -61,9 +61,10 @@ public class AssetsDao {
                 .registerModule(new Jdk8Module())
                 .readValue(is, AssetsDto.class);
         }
-        logger.info("Assets successfully loaded, assets parts size: {}, craftbooks: {}",
+        logger.info("Assets successfully loaded, assets parts size: {}, craftbooks: {}, alchbooks: {}",
             () -> assetsDto.getAssetsPartMap().size(),
-            () -> assetsDto.getCraftbook().size()
+            () -> assetsDto.getCraftbook().size(),
+            () -> assetsDto.getAlchbook().size()
         );
     }
 
@@ -75,6 +76,11 @@ public class AssetsDao {
     public Assets createAssets() {
         logger.info("Decoding assets");
         Map<String, String> reverseCraftbookMap = assetsDto.getCraftbook().entrySet().stream()
+            .flatMap(entry -> entry.getValue().getItems().stream()
+                .map(id -> new AbstractMap.SimpleImmutableEntry<>(id, entry.getKey()))
+            )
+            .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, String> reverseAlchbookMap = assetsDto.getAlchbook().entrySet().stream()
             .flatMap(entry -> entry.getValue().getItems().stream()
                 .map(id -> new AbstractMap.SimpleImmutableEntry<>(id, entry.getKey()))
             )
@@ -156,6 +162,8 @@ public class AssetsDao {
     public static class AssetsDto {
         @JsonProperty(required = true)
         private Map<String, CraftbookDto> craftbook;
+        @JsonProperty(required = true)
+        private Map<String, CraftbookDto> alchbook;
         private final Map<String, AssetsPartDto> assetsPartMap = new HashMap<>();
 
         public Map<String, CraftbookDto> getCraftbook() {
@@ -164,6 +172,14 @@ public class AssetsDao {
 
         public void setCraftbook(Map<String, CraftbookDto> craftbook) {
             this.craftbook = craftbook;
+        }
+
+        public Map<String, CraftbookDto> getAlchbook() {
+            return alchbook;
+        }
+
+        public void setAlchbook(Map<String, CraftbookDto> alchbook) {
+            this.alchbook = alchbook;
         }
 
         @SuppressWarnings("WeakerAccess")
@@ -180,6 +196,7 @@ public class AssetsDao {
         public String toString() {
             return "AssetsDto{" +
                 "craftbook=" + craftbook +
+                ", alchbook=" + alchbook +
                 ", assetsPartMap=" + assetsPartMap +
                 '}';
         }

@@ -70,6 +70,7 @@ public class AssetsTest extends MockedTest {
     @Before
     @Override
     public void init() {
+        super.init();
         anyOfAllItems = anyOf(assets.getAllItems().keySet().stream()
             .map(Matchers::equalTo)
             .collect(toImmutableList())

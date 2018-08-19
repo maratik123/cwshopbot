@@ -100,7 +100,7 @@ public abstract class MockedTest {
     }
 
     private static void setupLocale() {
-        Locale.setDefault(new Locale("en"));
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     @After

@@ -35,6 +35,11 @@ stock:
     name: Cloth
   10:
     name: Silver Ore
+  11:
+    name: Bauxite
+  12:
+    name: Cord
+    tradeable: false
   13:
     name: Magic Stone
   14:
@@ -101,11 +106,32 @@ stock:
       23: 2
       10: 2
       22: 2
+  29:
+    name: Blacksmith frame
+    tradeable: false
+    recipe:
+      11: 5
+      24: 3
+      28: 1
+  30:
+    name: Artisan frame
+    tradeable: false
+    recipe:
+      11: 5
+      24: 3
+      27: 1
   31:
     name: Rope
     recipe:
       22: 1
       01: 4
+  32:
+    name: Silver frame
+    tradeable: false
+    recipe:
+      25: 3
+      10: 5
+      07: 5
   33:
     name: Metal plate
     recipe:
@@ -125,6 +151,91 @@ stock:
   xxx:
     name: xxx
     tradeable: false
+alchemy:
+  39:
+    name: Stinky Sumac
+  40:
+    name: Mercy Sassafras
+  41:
+    name: Cliff Rue
+  42:
+    name: Love Creeper
+  43:
+    name: Wolf Root
+  44:
+    name: Swamp Lavender
+  45:
+    name: White Blossom
+  46:
+    name: Ilaves
+  47:
+    name: Ephijora
+  48:
+    name: Storm Hyssop
+  49:
+    name: Cave Garlic
+  50:
+    name: Yellow Seed
+  51:
+    name: Tecceagrass
+  52:
+    name: Spring Bay Leaf
+  53:
+    name: Ash Rosemary
+  54:
+    name: Sanguine Parsley
+  55:
+    name: Sun Tarragon
+  56:
+    name: Maccunut
+  57:
+    name: Dragon Seed
+  58:
+    name: Queen's Pepper
+  59:
+    name: Plasma of abyss
+    recipe:
+      41: 1
+      55: 1
+      49: 1
+  60:
+    name: Ultramarine dust
+    recipe:
+      51: 1
+      39: 1
+      48: 1
+  61:
+    name: Ethereal bone
+    recipe:
+      50: 1
+      47: 1
+      56: 1
+      46: 1
+  62:
+    name: Itacory
+    recipe:
+      44: 1
+      53: 1
+  63:
+    name: Assassin Vine
+    recipe:
+      45: 1
+      54: 1
+  64:
+    name: Kloliarway
+    recipe:
+      40: 1
+      58: 1
+  65:
+    name: Astrulic
+  66:
+    name: Flammia Nut
+  67:
+    name: Plexisop
+  68:
+    name: Mammoth Dill
+  69:
+    name: Silver dust
 crafting:
   tradeable: false
   r01:
@@ -550,3 +661,13 @@ craftbook:
     items:
       - 34
       - 35
+alchbook:
+  1:
+    mana: 10
+    items:
+  2:
+    mana: 15
+    items:
+  3:
+    mana: 30
+    items:

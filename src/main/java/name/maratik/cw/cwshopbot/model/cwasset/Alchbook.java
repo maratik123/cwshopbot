@@ -16,7 +16,6 @@
 package name.maratik.cw.cwshopbot.model.cwasset;
 
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
-import name.maratik.cw.cwshopbot.util.LocalizableValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -27,35 +26,39 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public enum ItemLocation implements EnumWithCode, LocalizableValue {
-    STOCK("stock", "ItemLocation.RESOURCES"),
-    ALCHEMY("alchemy", "ItemLocation.ALCHEMY"),
-    CRAFTING("crafting", "ItemLocation.CRAFTING"),
-    MISC("misc", "ItemLocation.MISC"),
-    EQUIPMENT("equipment", "ItemLocation.EQUIPMENT");
+public enum Alchbook implements EnumWithCode, Book {
+    ALCHBOOK_1("1", true),
+    ALCHBOOK_2("2", true),
+    ALCHBOOK_3("3", true);
+
+    public static final String COMMAND_PREFIX = "/alchbook_";
 
     private final String code;
-    private final String translationTag;
-    private static final Map<String, ItemLocation> cache = Util.createCache(values());
+    private final boolean visible;
+    private static final Map<String, Alchbook> cache = Util.createCache(values());
 
-    ItemLocation(String code, String translationTag) {
+    Alchbook(String code, boolean visible) {
         this.code = code;
-        this.translationTag = translationTag;
+        this.visible = visible;
     }
 
-    @Override
     @JsonValue
+    @Override
     public String getCode() {
         return code;
     }
 
-    @JsonCreator
-    public static Optional<ItemLocation> findByCode(String code) {
-        return Optional.ofNullable(cache.get(code));
+    public boolean isVisible() {
+        return visible;
     }
 
     @Override
-    public String getTranslationTag() {
-        return translationTag;
+    public String getCommandPrefix() {
+        return COMMAND_PREFIX;
+    }
+
+    @JsonCreator
+    public static Optional<Alchbook> findByCode(String code) {
+        return Optional.ofNullable(cache.get(code));
     }
 }
