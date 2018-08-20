@@ -128,18 +128,22 @@ public class WearableItem extends CraftableItem {
         }
 
         public T setAttack(int attack) {
-            this.attack = attack;
+            this.attack = clampToMax(attack);
             return getThis();
         }
 
         public T setDefence(int defence) {
-            this.defence = defence;
+            this.defence = clampToMax(defence);
             return getThis();
         }
 
         public T setManaboost(int manaboost) {
-            this.manaboost = manaboost;
+            this.manaboost = clampToMax(manaboost);
             return getThis();
+        }
+
+        private static int clampToMax(int value) {
+            return value >= 0 ? value : Integer.MAX_VALUE;
         }
     }
 }

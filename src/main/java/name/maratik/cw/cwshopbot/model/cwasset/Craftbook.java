@@ -30,6 +30,7 @@ public enum Craftbook implements EnumWithCode {
     CRAFTBOOK_1("1", true),
     CRAFTBOOK_2("2", true),
     CRAFTBOOK_3("3", true),
+    CRAFTBOOK_4("4", true),
     CRAFTBOOK_X("x", false);
 
     private final String code;
