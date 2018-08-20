@@ -449,6 +449,14 @@ equipment:
     recipe:
       02: 4
       19: 1
+  513:
+    name: Silver arrows pack
+    type: arrows pack
+    wear: secondary hand
+    recipe:
+      10: 5
+      07: 5
+      02: 7
   a27:
     name: Order Armor
     type: heavy armor
@@ -1393,6 +1401,7 @@ craftbook:
       - 32
       - 34
       - 35
+      - 513
       - a27
       - a28
       - a29
