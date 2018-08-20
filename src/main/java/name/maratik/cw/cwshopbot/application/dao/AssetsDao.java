@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -234,6 +235,9 @@ public class AssetsDao {
 
         @SuppressWarnings("WeakerAccess")
         public Set<String> getItems() {
+            if (items == null) {
+                items = new HashSet<>();
+            }
             return items;
         }
 

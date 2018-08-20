@@ -33,7 +33,8 @@ public enum InventorySlot implements EnumWithCode, LocalizableValue {
     LEGS("legs", ItemClass.ARMOR, "InventorySlot.LEGS"),
     HEAD("head", ItemClass.ARMOR, "InventorySlot.HEAD"),
     PRIMARY_HAND("primary hand", ItemClass.PRIMARY_WEAPON, "InventorySlot.HAND.PRIMARY"),
-    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "InventorySlot.HAND.SECONDARY");
+    SECONDARY_HAND("secondary hand", ItemClass.SECONDARY_WEAPON, "InventorySlot.HAND.SECONDARY"),
+    UNKNOWN("xxx", ItemClass.UNKNOWN, "InventorySlot.XXX");
 
     private final String code;
     private final ItemClass itemClass;

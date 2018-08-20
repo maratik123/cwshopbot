@@ -175,7 +175,9 @@ public class ShopController extends Localizable {
     }
 
     @TelegramCommand(
-        commands = { CRAFTBOOK_PREFIX + '1', CRAFTBOOK_PREFIX + '2', CRAFTBOOK_PREFIX + '3' },
+        commands = {
+            CRAFTBOOK_PREFIX + '1', CRAFTBOOK_PREFIX + '2', CRAFTBOOK_PREFIX + '3', CRAFTBOOK_PREFIX + '4'
+        },
         description = "#{@loc.t('ShopController.COMMAND.CRAFTBOOK.DESC')}"
     )
     public SendMessage showCraftbook(long userId, Message message) {

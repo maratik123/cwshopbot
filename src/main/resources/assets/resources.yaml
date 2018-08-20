@@ -111,6 +111,7 @@ stock:
       22: 2
   29:
     name: Blacksmith Frame
+    mana: 50
     tradeable: false
     recipe:
       11: 5
@@ -118,6 +119,7 @@ stock:
       28: 1
   30:
     name: Artisan Frame
+    mana: 50
     tradeable: false
     recipe:
       11: 5
@@ -131,6 +133,7 @@ stock:
   32:
     name: Silver Frame
     tradeable: false
+    mana: 30
     recipe:
       10: 5
       07: 5
@@ -143,20 +146,19 @@ stock:
       02: 3
   34:
     name: Metallic fiber
+    mana: 30
     tradeable: false
     recipe:
       10: 15
       12: 2
   35:
     name: Crafted leather
+    mana: 30
     tradeable: false
     recipe:
       20: 4
       05: 4
       12: 1
-  xxx:
-    name: xxx
-    tradeable: false
 crafting:
   tradeable: false
   r01:
@@ -1171,7 +1173,7 @@ equipment:
     name: Doomblade Sword
     type: sword
     wear: primary hand
-    att: xxx
+    att: -1
     recipe:
       r20: 1
       k20: 5
@@ -1185,7 +1187,7 @@ equipment:
     name: Eclipse
     type: sword
     wear: primary hand
-    att: xxx
+    att: -1
     recipe:
       r21: 1
       k21: 5
@@ -1214,8 +1216,8 @@ equipment:
     name: King's Defender
     type: spear
     wear: primary hand
-    att: xxx
-    def: xxx
+    att: -1
+    def: -1
     recipe:
       r23: 1
       k23: 5
@@ -1229,8 +1231,8 @@ equipment:
     name: Raging Lance
     type: spear
     wear: primary hand
-    att: xxx
-    def: xxx
+    att: -1
+    def: -1
     recipe:
       r24: 1
       k24: 5
@@ -1259,8 +1261,8 @@ equipment:
     name: Lightning Bow
     type: bow
     wear: primary hand
-    att: xxx
-    def: xxx
+    att: -1
+    def: -1
     recipe:
       r26: 1
       k26: 5
@@ -1274,8 +1276,8 @@ equipment:
     name: Hailstorm Bow
     type: bow
     wear: primary hand
-    att: xxx
-    def: xxx
+    att: -1
+    def: -1
     recipe:
       r27: 1
       k27: 5
@@ -1386,13 +1388,11 @@ craftbook:
       - 502
       - 511
   3:
-    mana: 30
+    mana: 150
     items:
       - 32
       - 34
       - 35
-    mana: 150
-    items:
       - a27
       - a28
       - a29
@@ -1412,12 +1412,10 @@ craftbook:
       - w31
       - w32
   4:
-    mana: 50
+    mana: 500
     items:
       - 29
       - 30
-    mana: 500
-    items:
       - a45
       - a46
       - a47
@@ -1464,5 +1462,3 @@ craftbook:
   x:
     mana: 0
     items:
-      - 34
-      - 35
