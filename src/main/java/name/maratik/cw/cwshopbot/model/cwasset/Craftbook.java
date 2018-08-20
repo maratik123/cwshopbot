@@ -49,6 +49,7 @@ public enum Craftbook implements EnumWithCode, Book {
         return code;
     }
 
+    @Override
     public boolean isVisible() {
         return visible;
     }

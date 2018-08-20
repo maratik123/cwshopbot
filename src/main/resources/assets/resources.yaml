@@ -40,6 +40,9 @@ stock:
   12:
     name: Cord
     tradeable: false
+    recipe:
+      01: 7
+      19: 1
   13:
     name: Magic Stone
   14:
@@ -140,14 +143,15 @@ stock:
       02: 3
   34:
     name: Metallic fiber
-    tradeable: false
     recipe:
-      xxx: 1
+      12: 2
+      10: 15
   35:
     name: Crafted leather
-    tradeable: false
     recipe:
-      xxx: 1
+      12: 1
+      05: 4
+      20: 4
   xxx:
     name: xxx
     tradeable: false

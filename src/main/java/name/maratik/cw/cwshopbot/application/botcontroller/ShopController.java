@@ -20,6 +20,8 @@ import name.maratik.cw.cwshopbot.application.service.CWParser;
 import name.maratik.cw.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
+import name.maratik.cw.cwshopbot.model.cwasset.Alchbook;
+import name.maratik.cw.cwshopbot.model.cwasset.Craftbook;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
@@ -61,7 +63,6 @@ public class ShopController extends Localizable {
     public static final String RVIEW_PREFIX = "/rview_";
     public static final String A_PREFIX = "/a_";
     public static final String T_PREFIX = "/t_";
-    public static final String CRAFTBOOK_PREFIX = "/craftbook_";
     public static final String SHOP_SEARCH_PREFIX = "/shop_";
     public static final String SHOP_COMMAND_PREFIX = "/ws_";
     public static final String PATTERN_COMMAND_SUFFIX = "*";
@@ -175,11 +176,27 @@ public class ShopController extends Localizable {
     }
 
     @TelegramCommand(
-        commands = { CRAFTBOOK_PREFIX + '1', CRAFTBOOK_PREFIX + '2', CRAFTBOOK_PREFIX + '3' },
+        commands = {
+            Craftbook.COMMAND_PREFIX + '1', Craftbook.COMMAND_PREFIX + '2', Craftbook.COMMAND_PREFIX + '3'
+        },
         description = "#{@loc.t('ShopController.COMMAND.CRAFTBOOK.DESC')}"
     )
     public SendMessage showCraftbook(long userId, Message message) {
-        Optional<String> result = itemSearchService.getCraftbook(getCommandSuffix(message, CRAFTBOOK_PREFIX.length()));
+        Optional<String> result = itemSearchService.getCraftbook(message.getText());
+        return new SendMessage()
+            .setChatId(userId)
+            .enableMarkdown(true)
+            .setText(getMessage(result));
+    }
+
+    @TelegramCommand(
+        commands = {
+            Alchbook.COMMAND_PREFIX + '1', Alchbook.COMMAND_PREFIX + '2', Alchbook.COMMAND_PREFIX + '3'
+        },
+        description = "#{@loc.t('ShopController.COMMAND.CRAFTBOOK.DESC')}"
+    )
+    public SendMessage showAlchbook(long userId, Message message) {
+        Optional<String> result = itemSearchService.getAlchbook(message.getText());
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)

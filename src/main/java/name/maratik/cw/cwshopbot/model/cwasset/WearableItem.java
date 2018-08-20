@@ -30,9 +30,9 @@ public class WearableItem extends CraftableItem {
 
     @SuppressWarnings("WeakerAccess")
     protected WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<String, Integer> recipe,
-                           int mana, Craftbook craftbook, ItemType itemType, InventorySlot inventorySlot, int attack, int defence,
+                           int mana, Book book, ItemType itemType, InventorySlot inventorySlot, int attack, int defence,
                            int manaboost) {
-        super(id, name, itemLocation, tradeable, recipe, mana, craftbook);
+        super(id, name, itemLocation, tradeable, recipe, mana, book);
         this.itemType = Objects.requireNonNull(itemType, "itemType");
         this.inventorySlot = Objects.requireNonNull(inventorySlot, "inventorySlot");
         this.attack = attack;
@@ -99,7 +99,7 @@ public class WearableItem extends CraftableItem {
 
         @Override
         public WearableItem build() {
-            return new WearableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, craftbook, itemType,
+            return new WearableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, book, itemType,
                 inventorySlot, attack, defence, manaboost);
         }
     }

@@ -15,9 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwasset;
 
+import name.maratik.cw.cwshopbot.util.EnumWithCode;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public interface Book {
+public interface Book extends EnumWithCode {
     String getCommandPrefix();
+    boolean isVisible();
 }

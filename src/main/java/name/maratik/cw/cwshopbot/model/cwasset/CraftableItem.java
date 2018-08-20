@@ -26,15 +26,15 @@ import java.util.Objects;
 public class CraftableItem extends Item {
     private final Map<String, Integer> recipe;
     private final int mana;
-    private final Craftbook craftbook;
+    private final Book book;
 
     @SuppressWarnings("WeakerAccess")
     protected CraftableItem(String id, String name, ItemLocation itemLocation, boolean tradeable,
-                            Map<String, Integer> recipe, int mana, Craftbook craftbook) {
+                            Map<String, Integer> recipe, int mana, Book book) {
         super(id, name, itemLocation, tradeable);
         this.recipe = Objects.requireNonNull(recipe, "recipe");
         this.mana = mana;
-        this.craftbook = Objects.requireNonNull(craftbook, "craftbook");
+        this.book = Objects.requireNonNull(book, "book");
     }
 
     public Map<String, Integer> getRecipe() {
@@ -45,8 +45,8 @@ public class CraftableItem extends Item {
         return mana;
     }
 
-    public Craftbook getCraftbook() {
-        return craftbook;
+    public Book getBook() {
+        return book;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class CraftableItem extends Item {
         return "CraftableItem{" +
             "recipe=" + recipe +
             ", mana=" + mana +
-            ", craftbook=" + craftbook +
+            ", book=" + book +
             "} " + super.toString();
     }
 
@@ -85,7 +85,7 @@ public class CraftableItem extends Item {
 
         @Override
         public CraftableItem build() {
-            return new CraftableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, craftbook);
+            return new CraftableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, book);
         }
     }
 
@@ -94,7 +94,7 @@ public class CraftableItem extends Item {
         @SuppressWarnings("WeakerAccess")
         protected final ImmutableMap.Builder<String, Integer> recipeBuilder = ImmutableMap.builder();
         protected int mana;
-        protected Craftbook craftbook;
+        protected Book book;
 
         @SuppressWarnings("unused")
         public T putRecipeItem(String id, int quantity) {
@@ -112,8 +112,8 @@ public class CraftableItem extends Item {
             return getThis();
         }
 
-        public T setCraftbook(Craftbook craftbook) {
-            this.craftbook = craftbook;
+        public T setBook(Book book) {
+            this.book = book;
             return getThis();
         }
 

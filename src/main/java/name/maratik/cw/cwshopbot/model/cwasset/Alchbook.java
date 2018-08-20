@@ -48,6 +48,7 @@ public enum Alchbook implements EnumWithCode, Book {
         return code;
     }
 
+    @Override
     public boolean isVisible() {
         return visible;
     }

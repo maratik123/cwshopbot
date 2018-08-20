@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +41,7 @@ public class Assets {
     private final Map<ItemLocation, Set<Item>> itemsByItemLocation;
     private final Map<InventorySlot, Set<WearableItem>> itemsByInventorySlot;
     private final Map<ItemType, Set<WearableItem>> itemsByItemType;
-    private final Map<Craftbook, Set<CraftableItem>> itemsByCraftbook;
+    private final Map<Book, Set<CraftableItem>> itemsByBook;
     private final Map<String, CraftableItem> craftableItems;
     private final Map<String, WearableItem> wearableItems;
     private final Map<String, Set<CraftableItem>> craftableItemsByRecipe;
@@ -49,14 +50,14 @@ public class Assets {
 
     private Assets(Map<String, Item> allItems, Map<ItemLocation, Set<Item>> itemsByItemLocation,
                    Map<InventorySlot, Set<WearableItem>> itemsByInventorySlot, Map<ItemType, Set<WearableItem>> itemsByItemType,
-                   Map<Craftbook, Set<CraftableItem>> itemsByCraftbook, Map<String, CraftableItem> craftableItems,
+                   Map<Book, Set<CraftableItem>> itemsByBook, Map<String, CraftableItem> craftableItems,
                    Map<String, WearableItem> wearableItems, Map<String, Set<CraftableItem>> craftableItemsByRecipe,
                    Map<String, Item> itemsByName, Map<String, Item> itemsByNameLowerCase) {
         this.allItems = Objects.requireNonNull(allItems, "allItems");
         this.itemsByItemLocation = Objects.requireNonNull(itemsByItemLocation, "itemsByItemLocation");
         this.itemsByInventorySlot = Objects.requireNonNull(itemsByInventorySlot, "itemsByInventorySlot");
         this.itemsByItemType = Objects.requireNonNull(itemsByItemType, "itemsByItemType");
-        this.itemsByCraftbook = Objects.requireNonNull(itemsByCraftbook, "itemsByCraftbook");
+        this.itemsByBook = Objects.requireNonNull(itemsByBook, "itemsByBook");
         this.craftableItems = Objects.requireNonNull(craftableItems, "craftableItems");
         this.wearableItems = Objects.requireNonNull(wearableItems, "wearableItems");
         this.craftableItemsByRecipe = Objects.requireNonNull(craftableItemsByRecipe, "craftableItemsByRecipe");
@@ -80,8 +81,8 @@ public class Assets {
         return itemsByItemType;
     }
 
-    public Map<Craftbook, Set<CraftableItem>> getItemsByCraftbook() {
-        return itemsByCraftbook;
+    public Map<Book, Set<CraftableItem>> getItemsByBook() {
+        return itemsByBook;
     }
 
     public Map<String, CraftableItem> getCraftableItems() {
@@ -129,13 +130,13 @@ public class Assets {
             Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder = new EnumMap<>(ItemLocation.class);
             Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByInventorySlotBuilder = new EnumMap<>(InventorySlot.class);
             Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder = new EnumMap<>(ItemType.class);
-            Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder = new EnumMap<>(Craftbook.class);
+            ImmutableMap.Builder<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByBookBuilder = ImmutableMap.builder();
             ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder = ImmutableMap.builder();
             ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder = ImmutableMap.builder();
             ImmutableMap.Builder<String, Item> itemsByNameBuilder = ImmutableMap.builder();
             ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder = ImmutableMap.builder();
             allItems.forEach((id, item) -> item.apply(
-                new BuilderFiller(id, itemsByItemLocationBuilder, itemsByCraftbookBuilder, itemsByInventorySlotBuilder,
+                new BuilderFiller(id, itemsByItemLocationBuilder, itemsByBookBuilder, itemsByInventorySlotBuilder,
                     itemsByItemTypeBuilder, craftableItemsBuilder, wearableItemsBuilder, itemsByNameBuilder,
                     itemsByNameLowerCaseBuilder
                 )
@@ -157,8 +158,7 @@ public class Assets {
                     .collect(createImmutableMapCollector()),
                 itemsByItemTypeBuilder.entrySet().stream()
                     .collect(createImmutableMapCollector()),
-                itemsByCraftbookBuilder.entrySet().stream()
-                    .collect(createImmutableMapCollector()),
+                itemsByBookBuilder.build(),
                 craftableItems,
                 wearableItemsBuilder.build(),
                 craftableItemsByRecipe,
@@ -174,7 +174,7 @@ public class Assets {
         private static class BuilderFiller implements Item.Visitor<Void> {
             private final String id;
             private final Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder;
-            private final Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder;
+            private final ImmutableMap.Builder<Book, ImmutableSet.Builder<CraftableItem>> itemsByBookBuilder;
             private final Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByInventorySlotBuilder;
             private final Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder;
             private final ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder;
@@ -183,7 +183,7 @@ public class Assets {
             private final ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder;
 
             private BuilderFiller(String id, Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder,
-                                  Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder,
+                                  ImmutableMap.Builder<Book, ImmutableSet.Builder<CraftableItem>> itemsByBookBuilder,
                                   Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByInventorySlotBuilder,
                                   Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder,
                                   ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder,
@@ -192,7 +192,7 @@ public class Assets {
                                   ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder) {
                 this.id = id;
                 this.itemsByItemLocationBuilder = itemsByItemLocationBuilder;
-                this.itemsByCraftbookBuilder = itemsByCraftbookBuilder;
+                this.itemsByBookBuilder = itemsByBookBuilder;
                 this.itemsByInventorySlotBuilder = itemsByInventorySlotBuilder;
                 this.itemsByItemTypeBuilder = itemsByItemTypeBuilder;
                 this.craftableItemsBuilder = craftableItemsBuilder;
