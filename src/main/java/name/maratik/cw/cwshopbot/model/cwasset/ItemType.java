@@ -39,7 +39,7 @@ public enum ItemType implements EnumWithCode, LocalizableValue {
     DAGGER("dagger", ItemClass.SECONDARY_WEAPON, "ItemType.DAGGER"),
     TOOL("tool", ItemClass.SECONDARY_WEAPON, "ItemType.TOOL"),
     ARROWS_PACK("arrows pack", ItemClass.SECONDARY_WEAPON, "ItemType.ARROWS_PACK"),
-    UNKNOWN("xxx", ItemClass.UNKNOWN, "ItemType.XXX");
+    CLOAK("cloak", ItemClass.CLOAK, "ItemType.CLOAK");
 
     private final String code;
     private final ItemClass itemClass;

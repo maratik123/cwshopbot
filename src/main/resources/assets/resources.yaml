@@ -1040,8 +1040,8 @@ equipment:
       15: 5
   a71:
     name: Storm Cloak
-    type: xxx
-    wear: xxx
+    type: cloak
+    wear: cloak
     att: 4
     def: 3
     recipe:
@@ -1055,8 +1055,8 @@ equipment:
       15: 1
   a72:
     name: Durable Cloak
-    type: xxx
-    wear: xxx
+    type: cloak
+    wear: cloak
     att: 3
     def: 4
     recipe:
@@ -1070,8 +1070,8 @@ equipment:
       15: 1
   a73:
     name: Blessed Cloak
-    type: xxx
-    wear: xxx
+    type: cloak
+    wear: cloak
     att: 2
     def: 2
     manaboost: 50
