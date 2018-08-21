@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static name.maratik.cw.cwshopbot.application.botcontroller.ShopController.A_PREFIX;
 import static name.maratik.cw.cwshopbot.application.botcontroller.ShopController.CRAFTBOOK_PREFIX;
@@ -53,7 +54,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
  */
 @Service
 public class ItemSearchService extends Localizable {
-    private static final Comparator<Item> ITEM_NAME_COMPARATOR = Comparator.comparing(Item::getName);
+    private static final Comparator<Item> ITEM_NAME_COMPARATOR = Comparator.comparing(Item::getLowerName)
+        .thenComparing(Item::getName)
+        .thenComparing(Item::getId);
     private static final Comparator<Map.Entry<Item, ?>> ITEM_NAME_IN_KEY_COMPARATOR =
         Comparator.comparing(Map.Entry::getKey, ITEM_NAME_COMPARATOR);
     private static final int LIST_LIMIT = 30;
@@ -97,15 +100,20 @@ public class ItemSearchService extends Localizable {
 
     @SuppressWarnings("WeakerAccess")
     public Optional<String> findItemByName(String name) {
-        List<Item> items = findItemByNameList(name, true, true);
-        switch (items.size()) {
-            case 0:
-                return Optional.empty();
-            case 1:
-                return Optional.of(new ItemOutput(items.get(0)).getMessage());
-            default:
-                return Optional.of(new ListOutput(items).getMessage());
-        }
+        return output(() -> {
+            List<Item> items = findItemByNameList(name, true, true);
+            switch (items.size()) {
+                case 0:
+                    return Optional.empty();
+                case 1:
+                    return items.stream()
+                        .findAny()
+                        .map(ItemOutput::new);
+                default:
+                    return Optional.of(items)
+                        .map(ListOutput::new);
+            }
+        });
     }
 
     public Optional<String> findByCode(String code) {
@@ -134,20 +142,26 @@ public class ItemSearchService extends Localizable {
     }
 
     public Optional<String> findRecipeByIncludedItem(String code) {
-        Set<CraftableItem> items = Optional.ofNullable(assets.getCraftableItemsByRecipe().get(code))
-            .orElseGet(Collections::emptySet);
-        switch (items.size()) {
-            case 0:
-                return Optional.empty();
-            case 1:
-                return items.stream()
-                    .findAny()
-                    .map(RecipeOutput::new)
-                    .map(SearchOutput::getMessage);
-            default:
-                Optional<Item> item = Optional.ofNullable(assets.getAllItems().get(code));
-                return Optional.of(new ListRecipes(item, items).getMessage());
-        }
+        return output(() -> {
+            Set<CraftableItem> items = Optional.ofNullable(assets.getCraftableItemsByRecipe().get(code))
+                .orElseGet(Collections::emptySet);
+            switch (items.size()) {
+                case 0:
+                    return Optional.empty();
+                case 1:
+                    return items.stream()
+                        .findAny()
+                        .map(RecipeOutput::new);
+                default:
+                    Optional<Item> item = Optional.ofNullable(assets.getAllItems().get(code));
+                    return Optional.of(new ListRecipes(item, items));
+            }
+        });
+    }
+
+    private static Optional<String> output(Supplier<Optional<? extends SearchOutput>> searchOutputSupplier) {
+        return searchOutputSupplier.get()
+            .map(SearchOutput::getMessage);
     }
 
     private interface SearchOutput {
@@ -240,15 +254,18 @@ public class ItemSearchService extends Localizable {
 
                 boolean needNewLine = false;
                 if (wearableItem.getAttack() > 0) {
-                    sb.append(SWORDS + ": +").append(wearableItem.getAttack()).append(' ');
+                    sb.append(SWORDS + ": ");
+                    appendPlusNumOrUnknown(wearableItem.getAttack()).append(' ');
                     needNewLine = true;
                 }
                 if (wearableItem.getDefence() > 0) {
-                    sb.append(SHIELD + ": +").append(wearableItem.getDefence()).append(' ');
+                    sb.append(SHIELD + ": ");
+                    appendPlusNumOrUnknown(wearableItem.getDefence()).append(' ');
                     needNewLine = true;
                 }
                 if (wearableItem.getManaboost() > 0) {
-                    sb.append(MANA + ": +").append(wearableItem.getManaboost()).append(' ');
+                    sb.append(MANA + ": ");
+                    appendPlusNumOrUnknown(wearableItem.getManaboost()).append(' ');
                     needNewLine = true;
                 }
                 if (needNewLine) {
@@ -257,6 +274,13 @@ public class ItemSearchService extends Localizable {
                 return sb.append(t("ItemSearchService.MESSAGE.WEARABLE_ITEM",
                     t(wearableItem.getInventorySlot()), t(wearableItem.getItemType())
                 ));
+            }
+
+            private StringBuilder appendPlusNumOrUnknown(int value) {
+                if (value == Integer.MAX_VALUE) {
+                    return sb.append("unknown");
+                }
+                return sb.append('+').append(value);
             }
         }
     }
