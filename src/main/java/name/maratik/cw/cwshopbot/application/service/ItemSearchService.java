@@ -278,7 +278,7 @@ public class ItemSearchService extends Localizable {
 
             private StringBuilder appendPlusNumOrUnknown(int value) {
                 if (value == Integer.MAX_VALUE) {
-                    return sb.append("unknown");
+                    return sb.append(t("ItemSearchService.MESSAGE.STATS.UNKNOWN"));
                 }
                 return sb.append('+').append(value);
             }
