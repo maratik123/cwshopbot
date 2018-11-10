@@ -1181,7 +1181,8 @@ equipment:
     name: Doomblade Sword
     type: sword
     wear: primary hand
-    att: -1
+    att: 36
+    def: 1
     recipe:
       r20: 1
       k20: 5
@@ -1195,7 +1196,7 @@ equipment:
     name: Eclipse
     type: sword
     wear: primary hand
-    att: -1
+    att: 37
     recipe:
       r21: 1
       k21: 5
@@ -1224,8 +1225,8 @@ equipment:
     name: King's Defender
     type: spear
     wear: primary hand
-    att: -1
-    def: -1
+    att: 18
+    def: 17
     recipe:
       r23: 1
       k23: 5
@@ -1239,8 +1240,8 @@ equipment:
     name: Raging Lance
     type: spear
     wear: primary hand
-    att: -1
-    def: -1
+    att: 19
+    def: 16
     recipe:
       r24: 1
       k24: 5
@@ -1269,8 +1270,8 @@ equipment:
     name: Lightning Bow
     type: bow
     wear: primary hand
-    att: -1
-    def: -1
+    att: 27
+    def: 8
     recipe:
       r26: 1
       k26: 5
@@ -1284,8 +1285,8 @@ equipment:
     name: Hailstorm Bow
     type: bow
     wear: primary hand
-    att: -1
-    def: -1
+    att: 24
+    def: 11
     recipe:
       r27: 1
       k27: 5
