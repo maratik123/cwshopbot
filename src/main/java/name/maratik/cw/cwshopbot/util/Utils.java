@@ -18,9 +18,9 @@ package name.maratik.cw.cwshopbot.util;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 
 import com.google.common.collect.ImmutableList;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.MessageEntity;
-import org.telegram.telegrambots.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.Arrays;
 import java.util.Comparator;

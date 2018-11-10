@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import static name.maratik.cw.cwshopbot.utils.SamePropertyValuesAsExcept.samePropertyValuesAsExcept;
 

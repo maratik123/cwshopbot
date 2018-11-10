@@ -18,8 +18,8 @@ package name.maratik.cw.cwshopbot.model;
 import name.maratik.cw.cwshopbot.util.MessageType;
 
 import com.google.common.collect.ImmutableSet;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import java.time.Instant;
 import java.util.Objects;
