@@ -32,17 +32,24 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Service
 public class StatsService {
+    private static final Comparator<Map.Entry<String, LongAdder>> COMPARING_BY_KEY = Map.Entry.comparingByKey();
     private final OffsetDateTime startTime;
     private final Clock clock;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
     private final LRUCachingMap<Object, JavaType> unifiedObjectMapperCache;
     private final Cache<ForwardKey, Long> forwardUserCache;
+    private final ConcurrentMap<String, LongAdder> commandCounter;
 
     public StatsService(Clock clock, LRUCachingMap<Object, JavaType> unifiedObjectMapperCache,
                         @ForwardUser Cache<ForwardKey, Long> forwardUserCache) {
@@ -50,6 +57,7 @@ public class StatsService {
         startTime = clock.instant().atOffset(ZoneOffset.UTC);
         this.unifiedObjectMapperCache = unifiedObjectMapperCache;
         this.forwardUserCache = forwardUserCache;
+        commandCounter = new ConcurrentHashMap<>();
     }
 
     public String getStats() {
@@ -68,6 +76,19 @@ public class StatsService {
             "Total classes loaded is " + classLoadingMXBean.getTotalLoadedClassCount() + '\n' +
             "Unloaded classes is " + classLoadingMXBean.getUnloadedClassCount() + '\n' +
             "System load average is " + ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+    }
+
+    public void incrementForCommand(String command) {
+        commandCounter.computeIfAbsent(command, key -> new LongAdder()).increment();
+    }
+
+    public String getCommandStats() {
+        StringBuilder sb = new StringBuilder();
+        commandCounter.entrySet()
+            .stream()
+            .sorted(COMPARING_BY_KEY)
+            .forEach(entry -> sb.append(entry.getKey()).append(": ").append(entry.getValue().sum()).append('\n'));
+        return sb.toString();
     }
 
     private static GCStats getGCStats() {

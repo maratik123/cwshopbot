@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.botcontroller;
 
+import name.maratik.cw.cwshopbot.application.service.StatsService;
 import name.maratik.spring.telegram.annotation.TelegramBot;
 import name.maratik.spring.telegram.annotation.TelegramForward;
 import name.maratik.spring.telegram.annotation.TelegramMessage;
@@ -24,11 +25,19 @@ import name.maratik.spring.telegram.annotation.TelegramMessage;
  */
 @TelegramBot("${name.maratik.cw.cwshopbot.ban}")
 public class BannedController {
+    private final StatsService statsService;
+
+    public BannedController(StatsService statsService) {
+        this.statsService = statsService;
+    }
+
     @TelegramMessage
     public void message() {
+        statsService.incrementForCommand("banned.message");
     }
 
     @TelegramForward
     public void forward() {
+        statsService.incrementForCommand("banned.forward");
     }
 }

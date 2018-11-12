@@ -63,7 +63,7 @@ public class AdminController extends ShopController {
                            ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName
     ) {
         super(clock, forwardStale, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
-            devUserId, devUserName, chatWarsAuthService, cwUserName);
+            devUserId, devUserName, chatWarsAuthService, cwUserName, statsService);
         this.devUserId = devUserId;
         this.statsService = statsService;
         this.client = telegramBotService.getClient();
@@ -91,6 +91,7 @@ public class AdminController extends ShopController {
 
     @TelegramCommand(commands = "/stats", description = "#{@loc.t('AdminController.STATS.COMMON')}")
     public SendMessage getStat(long userId) {
+        statsService.incrementForCommand("admin.stats");
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getStats());
@@ -98,13 +99,23 @@ public class AdminController extends ShopController {
 
     @TelegramCommand(commands = "/stats_cache", description = "#{@loc.t('AdminController.STATS.CACHES')}")
     public SendMessage getCacheStats(long userId) {
+        statsService.incrementForCommand("admin.stats_cache");
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getCacheStats());
     }
 
+    @TelegramCommand(commands = "/stats_commands", description = "#{@loc.t('AdminController.STATS.COMMANDS')}")
+    public SendMessage getCommandsStats(long userId) {
+        statsService.incrementForCommand("admin.stats.commands");
+        return new SendMessage()
+            .setChatId(userId)
+            .setText(statsService.getCommandStats());
+    }
+
     @TelegramCommand(commands = "/send", description = "#{@loc.t('AdminController.SEND_MESSAGE')}")
     public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client) {
+        statsService.incrementForCommand("admin.send");
         String[] args = messageCommand.getArgument()
             .map(arg -> arg.split(" ", 2))
             .filter(arr -> arr.length == 2)
