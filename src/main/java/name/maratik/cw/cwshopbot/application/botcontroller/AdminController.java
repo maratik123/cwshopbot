@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
@@ -90,32 +91,40 @@ public class AdminController extends ShopController {
     }
 
     @TelegramCommand(commands = "/stats", description = "#{@loc.t('AdminController.STATS.COMMON')}")
-    public SendMessage getStat(long userId) {
-        statsService.incrementForCommand("admin.stats");
+    public SendMessage getStat(long userId, User user) {
+        statsService.updateStats("admin.stats", user);
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getStats());
     }
 
     @TelegramCommand(commands = "/stats_cache", description = "#{@loc.t('AdminController.STATS.CACHES')}")
-    public SendMessage getCacheStats(long userId) {
-        statsService.incrementForCommand("admin.stats_cache");
+    public SendMessage getCacheStats(long userId, User user) {
+        statsService.updateStats("admin.stats.cache", user);
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getCacheStats());
     }
 
     @TelegramCommand(commands = "/stats_commands", description = "#{@loc.t('AdminController.STATS.COMMANDS')}")
-    public SendMessage getCommandsStats(long userId) {
-        statsService.incrementForCommand("admin.stats.commands");
+    public SendMessage getCommandsStats(long userId, User user) {
+        statsService.updateStats("admin.stats.commands", user);
         return new SendMessage()
             .setChatId(userId)
             .setText(statsService.getCommandStats());
     }
 
+    @TelegramCommand(commands = "/stats_users", description = "#{@loc.t('AdminController.STATS.USERS')}")
+    public SendMessage getUsersStats(long userId, User user) {
+        statsService.updateStats("admin.stats.users", user);
+        return new SendMessage()
+            .setChatId(userId)
+            .setText(statsService.getUsersStats());
+    }
+
     @TelegramCommand(commands = "/send", description = "#{@loc.t('AdminController.SEND_MESSAGE')}")
-    public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client) {
-        statsService.incrementForCommand("admin.send");
+    public SendMessage sendMessage(TelegramMessageCommand messageCommand, long userId, DefaultAbsSender client, User user) {
+        statsService.updateStats("admin.send", user);
         String[] args = messageCommand.getArgument()
             .map(arg -> arg.split(" ", 2))
             .filter(arr -> arr.length == 2)

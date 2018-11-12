@@ -104,8 +104,8 @@ public class ShopController extends Localizable {
     }
 
     @TelegramMessage
-    public BotApiMethod<?> message(long userId, Message message, DefaultAbsSender client) {
-        statsService.incrementForCommand("shop.message");
+    public BotApiMethod<?> message(long userId, Message message, DefaultAbsSender client, User user) {
+        statsService.updateStats("shop.message", user);
         if (Optional.ofNullable(message.getEntities())
             .map(Collection::stream)
             .filter(stream -> stream.anyMatch(messageEntity ->
@@ -137,16 +137,16 @@ public class ShopController extends Localizable {
     }
 
     @TelegramCommand(commands = "/start", description = "#{@loc.t('ShopController.COMMAND.START.DESC')}", hidden = true)
-    public SendMessage startCommand(long userId) {
-        statsService.incrementForCommand("shop.start");
+    public SendMessage startCommand(long userId, User user) {
+        statsService.updateStats("shop.start", user);
         return new SendMessage()
             .setChatId(userId)
             .setText(t("ShopController.COMMAND.START.REPLY"));
     }
 
     @TelegramCommand(commands = "/auth", description = "#{@loc.t('ShopController.COMMAND.AUTH.DESC')}", hidden = true)
-    public SendMessage authCommand(long userId) {
-        statsService.incrementForCommand("shop.auth");
+    public SendMessage authCommand(long userId, User user) {
+        statsService.updateStats("shop.auth", user);
         return new SendMessage()
             .setChatId(userId)
             .setText(t("ShopController.COMMAND.AUTH.REPLY", cwUserName));
@@ -157,8 +157,8 @@ public class ShopController extends Localizable {
         description = "#{@loc.t('ShopController.COMMAND.REGISTER.DESC')}",
         hidden = true
     )
-    public SendMessage registerCommand(long userId) {
-        statsService.incrementForCommand("shop.register");
+    public SendMessage registerCommand(long userId, User user) {
+        statsService.updateStats("shop.register", user);
         return new SendMessage()
             .setChatId(userId)
             .setText(t("ShopController.COMMAND.REGISTER.REPLY"));
@@ -168,8 +168,8 @@ public class ShopController extends Localizable {
         commands = T_PREFIX + PATTERN_COMMAND_SUFFIX,
         description = "#{@loc.t('ShopController.COMMAND.T.DESC')}"
     )
-    public SendMessage itemInfo(long userId, Message message) {
-        statsService.incrementForCommand("shop.t");
+    public SendMessage itemInfo(long userId, Message message, User user) {
+        statsService.updateStats("shop.t", user);
         return itemInfo(userId, message, T_PREFIX.length());
     }
 
@@ -178,8 +178,8 @@ public class ShopController extends Localizable {
         description = "#{@loc.t('ShopController.COMMAND.T.DESC')}",
         hidden = true
     )
-    public SendMessage itemInfoA(long userId, Message message) {
-        statsService.incrementForCommand("shop.a");
+    public SendMessage itemInfoA(long userId, Message message, User user) {
+        statsService.updateStats("shop.a", user);
         return itemInfo(userId, message, A_PREFIX.length());
     }
 
@@ -190,8 +190,8 @@ public class ShopController extends Localizable {
         },
         description = "#{@loc.t('ShopController.COMMAND.CRAFTBOOK.DESC')}"
     )
-    public SendMessage showCraftbook(long userId, Message message) {
-        statsService.incrementForCommand("shop.craftbook");
+    public SendMessage showCraftbook(long userId, Message message, User user) {
+        statsService.updateStats("shop.craftbook", user);
         Optional<String> result = itemSearchService.getCraftbook(getCommandSuffix(message, CRAFTBOOK_PREFIX.length()));
         return new SendMessage()
             .setChatId(userId)
@@ -203,8 +203,8 @@ public class ShopController extends Localizable {
         commands = VIEW_PREFIX + PATTERN_COMMAND_SUFFIX,
         description = "#{@loc.t('ShopController.COMMAND.VIEW.DESC')}"
     )
-    public SendMessage recipeView(long userId, Message message) {
-        statsService.incrementForCommand("shop.view");
+    public SendMessage recipeView(long userId, Message message, User user) {
+        statsService.updateStats("shop.view", user);
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
@@ -215,8 +215,8 @@ public class ShopController extends Localizable {
         commands = RVIEW_PREFIX + PATTERN_COMMAND_SUFFIX,
         description = "#{@loc.t('ShopController.COMMAND.RVIEW.DESC')}"
     )
-    public SendMessage reverseRecipeSearch(long userId, Message message) {
-        statsService.incrementForCommand("shop.rview");
+    public SendMessage reverseRecipeSearch(long userId, Message message, User user) {
+        statsService.updateStats("shop.rview", user);
         return new SendMessage()
             .setChatId(userId)
             .enableMarkdown(true)
@@ -229,7 +229,7 @@ public class ShopController extends Localizable {
     public SendMessage forward(
         Update update, String messageText, User user, long userId, Instant forwardTime, Message message
     ) {
-        statsService.incrementForCommand("shop.forward");
+        statsService.updateStats("shop.forward", user);
         logger.info("Accepted incoming forward data: {}", messageText);
 
         if (messageIsStale(forwardTime)) {
@@ -279,7 +279,7 @@ public class ShopController extends Localizable {
 
     @TelegramForward
     public SendMessage defaultForward(long userId, User user) {
-        statsService.incrementForCommand("shop.forward.default");
+        statsService.updateStats("shop.forward.default", user);
         logger.info("Accepted unsupported forward data from user: ", userId);
         return new SendMessage()
             .setChatId(userId)
@@ -287,8 +287,8 @@ public class ShopController extends Localizable {
     }
 
     @TelegramCommand(commands = "/license", description = "#{@loc.t('ShopController.COMMAND.LICENSE.DESC')}")
-    public SendMessage license(long userId) {
-        statsService.incrementForCommand("shop.license");
+    public SendMessage license(long userId, User user) {
+        statsService.updateStats("shop.license", user);
         return new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)
@@ -300,8 +300,8 @@ public class ShopController extends Localizable {
         description = "#{@loc.t('ShopController.COMMAND.SOURCE.DESC')}",
         hidden = true
     )
-    public SendMessage source(long userId) {
-        statsService.incrementForCommand("shop.source");
+    public SendMessage source(long userId, User user) {
+        statsService.updateStats("shop.source", user);
         return new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)

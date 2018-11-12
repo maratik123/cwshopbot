@@ -20,6 +20,8 @@ import name.maratik.spring.telegram.annotation.TelegramBot;
 import name.maratik.spring.telegram.annotation.TelegramForward;
 import name.maratik.spring.telegram.annotation.TelegramMessage;
 
+import org.telegram.telegrambots.meta.api.objects.User;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
@@ -32,12 +34,12 @@ public class BannedController {
     }
 
     @TelegramMessage
-    public void message() {
-        statsService.incrementForCommand("banned.message");
+    public void message(User user) {
+        statsService.updateStats("banned.message", user);
     }
 
     @TelegramForward
-    public void forward() {
-        statsService.incrementForCommand("banned.forward");
+    public void forward(User user) {
+        statsService.updateStats("banned.forward", user);
     }
 }

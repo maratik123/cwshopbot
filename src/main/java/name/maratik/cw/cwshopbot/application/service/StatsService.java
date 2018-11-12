@@ -22,6 +22,7 @@ import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.cache.Cache;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
@@ -44,12 +45,21 @@ import java.util.concurrent.atomic.LongAdder;
 @Service
 public class StatsService {
     private static final Comparator<Map.Entry<String, LongAdder>> COMPARING_BY_KEY = Map.Entry.comparingByKey();
+    private static final Comparator<UserStats> USER_STATS_COMPARATOR =
+        Comparator.comparing(
+            UserStats::getCounter,
+            Comparator.comparingLong(LongAdder::sum)
+        ).thenComparing(
+            UserStats::getUser,
+            Comparator.comparing(User::getId)
+        );
     private final OffsetDateTime startTime;
     private final Clock clock;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
     private final LRUCachingMap<Object, JavaType> unifiedObjectMapperCache;
     private final Cache<ForwardKey, Long> forwardUserCache;
     private final ConcurrentMap<String, LongAdder> commandCounter;
+    private final ConcurrentMap<Integer, UserStats> userCounter;
 
     public StatsService(Clock clock, LRUCachingMap<Object, JavaType> unifiedObjectMapperCache,
                         @ForwardUser Cache<ForwardKey, Long> forwardUserCache) {
@@ -58,6 +68,7 @@ public class StatsService {
         this.unifiedObjectMapperCache = unifiedObjectMapperCache;
         this.forwardUserCache = forwardUserCache;
         commandCounter = new ConcurrentHashMap<>();
+        userCounter = new ConcurrentHashMap<>();
     }
 
     public String getStats() {
@@ -78,8 +89,9 @@ public class StatsService {
             "System load average is " + ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
     }
 
-    public void incrementForCommand(String command) {
+    public void updateStats(String command, User user) {
         commandCounter.computeIfAbsent(command, key -> new LongAdder()).increment();
+        userCounter.computeIfAbsent(user.getId(), key -> new UserStats(user)).getCounter().increment();
     }
 
     public String getCommandStats() {
@@ -88,6 +100,21 @@ public class StatsService {
             .stream()
             .sorted(COMPARING_BY_KEY)
             .forEach(entry -> sb.append(entry.getKey()).append(": ").append(entry.getValue().sum()).append('\n'));
+        return sb.toString();
+    }
+
+    public String getUsersStats() {
+        StringBuilder sb = new StringBuilder("Unique users: ")
+            .append(userCounter.size()).append('\n');
+        userCounter.values().stream()
+            .sorted(USER_STATS_COMPARATOR)
+            .limit(30)
+            .forEach(userStats ->
+                sb.append('@').append(userStats.getUser().getUserName())
+                    .append(" (").append(userStats.getUser().getId()).append("): ")
+                    .append(userStats.getCounter().sum())
+                    .append('\n')
+            );
         return sb.toString();
     }
 
@@ -127,6 +154,23 @@ public class StatsService {
 
         private long getTime() {
             return time;
+        }
+    }
+
+    private static class UserStats {
+        private final LongAdder counter = new LongAdder();
+        private final User user;
+
+        private UserStats(User user) {
+            this.user = user;
+        }
+
+        private LongAdder getCounter() {
+            return counter;
+        }
+
+        private User getUser() {
+            return user;
         }
     }
 }
