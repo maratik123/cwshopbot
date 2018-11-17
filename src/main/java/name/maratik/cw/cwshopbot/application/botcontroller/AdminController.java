@@ -137,6 +137,7 @@ public class AdminController extends ShopController {
         statsService.updateStats("admin.stats.users", user);
         PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(0);
         return new SendMessage()
+            .enableMarkdown(true)
             .setChatId(userId)
             .setText(pagedResponse.getResponse())
             .setReplyMarkup(getKeysForStatsUsers(pagedResponse, 0));
@@ -199,6 +200,7 @@ public class AdminController extends ShopController {
                         int currentPage = pagedRequest.getPage();
                         PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(currentPage);
                         client.execute(new EditMessageText()
+                            .enableMarkdown(true)
                             .setChatId(userId)
                             .setMessageId(message.getMessageId())
                             .setText(pagedResponse.getResponse())
