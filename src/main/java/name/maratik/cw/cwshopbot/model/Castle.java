@@ -20,9 +20,11 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.Sets;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static name.maratik.cw.cwshopbot.util.Emoji.AUBERGINE;
 import static name.maratik.cw.cwshopbot.util.Emoji.BAT;
@@ -55,19 +57,20 @@ public enum Castle implements EnumWithCode {
     STRONGHOLD("Оплот", SHAMROCK, Game.RU2),
     CLIFF("Скала", BLACK_HEART, Game.RU2),
     DAWN_CASTLE("Замок Рассвета", ROSE, Game.RU2),
-    FARM("Ферма", AUBERGINE, Game.RU2);
+    FARM("Ферма", AUBERGINE, Game.RU2),
+    URN("Urn", Emoji.URN, Game.EN, Game.RU2);
 
     private final String code;
     private final String castleName;
     private final String emoji;
-    private final Game game;
+    private final Set<Game> games;
     private static final Map<String, Castle> cache = Util.createCache(values());
 
-    Castle(String code, String emoji, Game game) {
+    Castle(String code, String emoji, Game game, Game... otherGames) {
         this.code = code;
         this.castleName = emoji + code;
         this.emoji = emoji;
-        this.game = game;
+        this.games = Sets.immutableEnumSet(game, otherGames);
     }
 
     @JsonValue
@@ -84,8 +87,8 @@ public enum Castle implements EnumWithCode {
         return emoji;
     }
 
-    public Game getGame() {
-        return game;
+    public Set<Game> getGames() {
+        return games;
     }
 
     @JsonCreator

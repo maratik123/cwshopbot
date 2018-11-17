@@ -55,6 +55,7 @@ import javax.annotation.PreDestroy;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static name.maratik.cw.cwshopbot.util.Emoji.LEFTWARDS_ARROW;
@@ -145,8 +146,11 @@ public class AdminController extends ShopController {
         ImmutableList.Builder<InlineKeyboardButton> keyboardBuilder = ImmutableList.builder();
         backwardButton(currentPage).ifPresent(keyboardBuilder::add);
         forwardButton(pagedResponse, currentPage).ifPresent(keyboardBuilder::add);
-        return new InlineKeyboardMarkup()
-            .setKeyboard(Collections.singletonList(keyboardBuilder.build()));
+        List<InlineKeyboardButton> buttons = keyboardBuilder.build();
+        return buttons.isEmpty()
+            ? null
+            : new InlineKeyboardMarkup()
+                .setKeyboard(Collections.singletonList(buttons));
     }
 
     private static Optional<InlineKeyboardButton> backwardButton(int currentPage) {

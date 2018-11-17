@@ -41,7 +41,8 @@ public enum CastleByEmoji implements EnumWithCode {
     STRONGHOLD(Castle.STRONGHOLD),
     CLIFF(Castle.CLIFF),
     DAWN_CASTLE(Castle.DAWN_CASTLE),
-    FARM(Castle.FARM);
+    FARM(Castle.FARM),
+    URN(Castle.URN);
 
     private final Castle castle;
     private static final Map<String, CastleByEmoji> cache = Util.createCache(values());
