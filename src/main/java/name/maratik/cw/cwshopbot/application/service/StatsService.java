@@ -117,7 +117,7 @@ public class StatsService extends Localizable {
         int viewSize = view.size();
         StringBuilder sb = new StringBuilder(t("StatsService.UNIQUE_USERS", viewSize));
         view.sort(USER_STATS_COMPARATOR);
-        for (UserStatsView userStats : view.subList(from, from + size)) {
+        for (UserStatsView userStats : view.subList(from, Math.min(view.size(), from + size))) {
             appendUserLink(sb, userStats.getUser()).append(": ").append(userStats.getCounter()).append('\n');
         }
         return new PagedResponse<>(sb.toString(), viewSize);
