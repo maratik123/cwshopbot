@@ -57,13 +57,58 @@ public class Utils {
         return appendCommandLink(new StringBuilder(), commandPrefix, id).toString();
     }
 
+    public static String createCommandLink(String commandPrefix, int id) {
+        return appendCommandLink(new StringBuilder(), commandPrefix, id).toString();
+    }
+
+    public static String createCommandLink(String commandPrefix, long id) {
+        return appendCommandLink(new StringBuilder(), commandPrefix, id).toString();
+    }
+
     public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, Item item) {
         return appendCommandLink(sb, commandPrefix, item.getId());
+    }
+
+    public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, int id) {
+        return appendCommandLink(sb, commandPrefix, Integer.toString(id));
+    }
+
+    public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, long id) {
+        return appendCommandLink(sb, commandPrefix, Long.toString(id));
     }
 
     public static StringBuilder appendCommandLink(StringBuilder sb, String commandPrefix, String id) {
         return sb.append('[').append(commandPrefix).append(id).append("](")
             .append(commandPrefix).append(id).append(')');
+    }
+
+    public static String createUserLink(User user) {
+        return appendUserLink(new StringBuilder(), user).toString();
+    }
+
+    public static StringBuilder appendUserLink(StringBuilder sb, User user) {
+        long userId = user.getId();
+        return appendUserName(sb.append("[@"), user).append(" (").append(userId).append(")](tg://user?id=")
+            .append(userId).append(')');
+    }
+
+    private static StringBuilder appendUserName(StringBuilder sb, User user) {
+        String userName = user.getUserName();
+        if (userName != null) {
+            return sb.append(userName);
+        }
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        if (firstName == null) {
+            if (lastName == null) {
+                return sb.append(user.getId());
+            }
+            return sb.append(lastName);
+        }
+        if (lastName == null) {
+            return sb.append(firstName);
+        }
+        return sb.append(firstName).append(' ').append(lastName);
     }
 
     public static int indexOfNth(String str, @SuppressWarnings("SameParameterValue") int ch, int startFrom,

@@ -16,7 +16,7 @@
 package name.maratik.cw.cwshopbot.model.cwasset;
 
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
-import name.maratik.cw.cwshopbot.util.LocalizableValue;
+import name.maratik.spring.telegram.util.LocalizableValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

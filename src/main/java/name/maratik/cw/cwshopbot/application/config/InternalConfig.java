@@ -19,9 +19,9 @@ import name.maratik.cw.cwshopbot.application.dao.AssetsDao;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.cwshopbot.util.LRUCachingMap;
-import name.maratik.cw.cwshopbot.util.Localizable;
 import name.maratik.spring.telegram.config.TelegramBotBuilder;
 import name.maratik.spring.telegram.config.TelegramBotType;
+import name.maratik.spring.telegram.util.Localizable;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;

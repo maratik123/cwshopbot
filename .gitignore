@@ -18,6 +18,9 @@ gradle-app.setting
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
+# Generated file dir
+/generated/
+
 # idea
 .idea/
 *.iml

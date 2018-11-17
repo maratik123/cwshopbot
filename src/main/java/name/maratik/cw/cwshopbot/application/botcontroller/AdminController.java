@@ -21,27 +21,44 @@ import name.maratik.cw.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.application.service.StatsService;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
+import name.maratik.cw.cwshopbot.model.PagedResponse;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.cwshopbot.packer.Packer;
+import name.maratik.cw.cwshopbot.proto.ReplyData;
 import name.maratik.spring.telegram.TelegramBotService;
 import name.maratik.spring.telegram.annotation.TelegramBot;
+import name.maratik.spring.telegram.annotation.TelegramCallbackQuery;
 import name.maratik.spring.telegram.annotation.TelegramCommand;
+import name.maratik.spring.telegram.model.CallbackQueryId;
 import name.maratik.spring.telegram.model.TelegramMessageCommand;
 
 import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.Optional;
+
+import static name.maratik.cw.cwshopbot.util.Emoji.LEFTWARDS_ARROW;
+import static name.maratik.cw.cwshopbot.util.Emoji.RIGHTWARDS_ARROW;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -117,9 +134,82 @@ public class AdminController extends ShopController {
     @TelegramCommand(commands = "/stats_users", description = "#{@loc.t('AdminController.STATS.USERS')}")
     public SendMessage getUsersStats(long userId, User user) {
         statsService.updateStats("admin.stats.users", user);
+        PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(0);
         return new SendMessage()
             .setChatId(userId)
-            .setText(statsService.getUsersStats());
+            .setText(pagedResponse.getResponse())
+            .setReplyMarkup(getKeysForStatsUsers(pagedResponse, 0));
+    }
+
+    private static InlineKeyboardMarkup getKeysForStatsUsers(PagedResponse<String> pagedResponse, int currentPage) {
+        ImmutableList.Builder<InlineKeyboardButton> keyboardBuilder = ImmutableList.builder();
+        backwardButton(currentPage).ifPresent(keyboardBuilder::add);
+        forwardButton(pagedResponse, currentPage).ifPresent(keyboardBuilder::add);
+        return new InlineKeyboardMarkup()
+            .setKeyboard(Collections.singletonList(keyboardBuilder.build()));
+    }
+
+    private static Optional<InlineKeyboardButton> backwardButton(int currentPage) {
+        if (currentPage <= 0) {
+            return Optional.empty();
+        }
+        return Packer.packData(
+            ReplyData.PagedRequest.newBuilder()
+                .setPage(currentPage - 1)
+                .setRequestType(ReplyData.RequestType.STATS_USERS)
+                .build(),
+            64
+        )
+            .map(data -> new InlineKeyboardButton()
+                .setCallbackData(data)
+                .setText(LEFTWARDS_ARROW)
+            );
+    }
+
+    private static Optional<InlineKeyboardButton> forwardButton(PagedResponse<String> pagedResponse, int currentPage) {
+        if ((currentPage + 1) * PAGE_SIZE > pagedResponse.getCount()) {
+            return Optional.empty();
+        }
+        return Packer.packData(
+            ReplyData.PagedRequest.newBuilder()
+                .setPage(currentPage + 1)
+                .setRequestType(ReplyData.RequestType.STATS_USERS)
+                .build(),
+            64
+        )
+            .map(data -> new InlineKeyboardButton()
+                .setCallbackData(data)
+                .setText(RIGHTWARDS_ARROW)
+            );
+    }
+
+    @TelegramCallbackQuery
+    public AnswerCallbackQuery getUsersStatsPaged(long userId, User user, String data, CallbackQueryId queryId,
+                                                  DefaultAbsSender client, Message message, Update update) {
+        statsService.updateStats("admin.stats.users.paged", user);
+        if (message != null) {
+            Packer.unpackData(data).ifPresent(pagedRequest -> {
+                try {
+                    int currentPage = pagedRequest.getPage();
+                    PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(currentPage);
+                    client.execute(new EditMessageText()
+                        .setChatId(userId)
+                        .setMessageId(message.getMessageId())
+                        .setText(pagedResponse.getResponse())
+                        .setReplyMarkup(getKeysForStatsUsers(pagedResponse, currentPage))
+                    );
+                } catch (TelegramApiException e) {
+                    logger.error("Can not process execute on request: {}", update, e);
+                }
+            });
+        }
+
+        return new AnswerCallbackQuery()
+            .setCallbackQueryId(queryId.getId());
+    }
+
+    private PagedResponse<String> getUsersStatsPagedHelper(int page) {
+        return statsService.getUsersStats(page * PAGE_SIZE, PAGE_SIZE);
     }
 
     @TelegramCommand(commands = "/send", description = "#{@loc.t('AdminController.SEND_MESSAGE')}")
@@ -128,7 +218,7 @@ public class AdminController extends ShopController {
         String[] args = messageCommand.getArgument()
             .map(arg -> arg.split(" ", 2))
             .filter(arr -> arr.length == 2)
-            .orElseGet(() -> new String[] {Long.toString(userId), t("AdminController.SEND_MESSAGE.WRONG_COMMAND")});
+            .orElseGet(() -> new String[]{Long.toString(userId), t("AdminController.SEND_MESSAGE.WRONG_COMMAND")});
 
         try {
             client.execute(new SendMessage()

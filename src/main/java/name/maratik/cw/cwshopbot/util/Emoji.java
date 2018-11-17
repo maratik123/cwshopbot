@@ -44,4 +44,6 @@ public class Emoji {
     public static final String BLACK_HEART = "\uD83D\uDDA4";
     public static final String ROSE = "\uD83C\uDF39";
     public static final String AUBERGINE = "\uD83C\uDF46";
+    public static final String LEFTWARDS_ARROW = "\u2b05\ufe0f";
+    public static final String RIGHTWARDS_ARROW = "\u27a1\ufe0f";
 }

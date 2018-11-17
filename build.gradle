@@ -20,6 +20,7 @@ buildscript {
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "com.google.protobuf:protobuf-gradle-plugin:${protobufGradlePluginVersion}"
     }
 }
 
@@ -49,6 +50,7 @@ apply plugin: 'com.github.spotbugs'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'net.researchgate.release'
+apply plugin: 'com.google.protobuf'
 
 sourceCompatibility = 1.8
 
@@ -81,6 +83,7 @@ dependencies {
     compile "org.apache.lucene:lucene-analyzers-common:${luceneVersion}"
     compile "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     compile "com.github.maratik123:spring-telegram:${springTelegramVersion}"
+    compile "com.google.protobuf:protobuf-java:${protobufJavaVersion}"
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "com.amazonaws:DynamoDBLocal:${awsDynamodbLocalVersion}"
@@ -116,9 +119,18 @@ generateGrammarSource {
             '-lib', 'src/main/antlr/name/maratik/cw/cwshopbot/parser/generated'
     ]
 }
+protobuf {
+    generatedFilesBaseDir = project.file("generated").absolutePath
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protocVersion}"
+    }
+}
+
+clean.delete << protobuf.generatedFilesBaseDir
 
 idea {
     module {
         sourceDirs += generateGrammarSource.outputDirectory
+        sourceDirs += project.file("${protobuf.generatedFilesBaseDir}/main/java")
     }
 }

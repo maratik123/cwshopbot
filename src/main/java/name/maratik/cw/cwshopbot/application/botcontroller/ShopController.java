@@ -24,13 +24,13 @@ import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
-import name.maratik.cw.cwshopbot.util.Localizable;
 import name.maratik.cw.cwshopbot.util.MessageType;
 import name.maratik.spring.telegram.annotation.TelegramBot;
 import name.maratik.spring.telegram.annotation.TelegramCommand;
 import name.maratik.spring.telegram.annotation.TelegramForward;
 import name.maratik.spring.telegram.annotation.TelegramHelp;
 import name.maratik.spring.telegram.annotation.TelegramMessage;
+import name.maratik.spring.telegram.util.Localizable;
 
 import com.google.common.cache.Cache;
 import org.apache.logging.log4j.LogManager;
@@ -58,6 +58,7 @@ import java.util.concurrent.ConcurrentMap;
 public class ShopController extends Localizable {
     private static final Logger logger = LogManager.getLogger(ShopController.class);
 
+    public static final int PAGE_SIZE = 30;
     public static final String VIEW_PREFIX = "/view_";
     public static final String RVIEW_PREFIX = "/rview_";
     public static final String A_PREFIX = "/a_";
@@ -328,7 +329,7 @@ public class ShopController extends Localizable {
         return message.orElseGet(() -> t("ShopController.404"));
     }
 
-    private static String getCommandSuffix(Message message, int prefixLen) {
+    protected static String getCommandSuffix(Message message, int prefixLen) {
         return message.getText().substring(prefixLen);
     }
 }

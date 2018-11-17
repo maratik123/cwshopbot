@@ -20,7 +20,7 @@ import name.maratik.cw.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.cwshopbot.model.cwasset.Craftbook;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.model.cwasset.WearableItem;
-import name.maratik.cw.cwshopbot.util.Localizable;
+import name.maratik.spring.telegram.util.Localizable;
 
 import org.springframework.stereotype.Service;
 

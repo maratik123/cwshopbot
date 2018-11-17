@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package name.maratik.cw.cwshopbot.proto;
+
+option java_package = "name.maratik.cw.cwshopbot.proto";
+option java_outer_classname = "ReplyData";
+
+enum RequestType {
+    SEARCH_QUERY = 0;
+    STATS_USERS = 1;
+}
+
+message PagedRequest {
+    int32 page = 1;
+    RequestType request_type = 2;
+    string query = 3;
+}

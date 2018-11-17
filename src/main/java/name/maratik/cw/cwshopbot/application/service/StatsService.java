@@ -17,7 +17,9 @@ package name.maratik.cw.cwshopbot.application.service;
 
 import name.maratik.cw.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
+import name.maratik.cw.cwshopbot.model.PagedResponse;
 import name.maratik.cw.cwshopbot.util.LRUCachingMap;
+import name.maratik.spring.telegram.util.Localizable;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.cache.Cache;
@@ -33,24 +35,29 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
+
+import static name.maratik.cw.cwshopbot.util.Utils.appendUserLink;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Service
-public class StatsService {
+public class StatsService extends Localizable {
     private static final Comparator<Map.Entry<String, LongAdder>> COMPARING_BY_KEY = Map.Entry.comparingByKey();
-    private static final Comparator<UserStats> USER_STATS_COMPARATOR =
-        Comparator.comparing(
-            UserStats::getCounter,
-            Comparator.comparingLong(LongAdder::sum)
-        ).thenComparing(
-            UserStats::getUser,
+    private static final Comparator<UserStatsView> USER_STATS_COMPARATOR =
+        Comparator.comparingLong(
+            UserStatsView::getCounter
+        ).reversed()
+        .thenComparing(
+            UserStatsView::getUser,
             Comparator.comparing(User::getId)
         );
     private final OffsetDateTime startTime;
@@ -103,19 +110,17 @@ public class StatsService {
         return sb.toString();
     }
 
-    public String getUsersStats() {
-        StringBuilder sb = new StringBuilder("Unique users: ")
-            .append(userCounter.size()).append('\n');
-        userCounter.values().stream()
-            .sorted(USER_STATS_COMPARATOR)
-            .limit(30)
-            .forEach(userStats ->
-                sb.append('@').append(userStats.getUser().getUserName())
-                    .append(" (").append(userStats.getUser().getId()).append("): ")
-                    .append(userStats.getCounter().sum())
-                    .append('\n')
-            );
-        return sb.toString();
+    public PagedResponse<String> getUsersStats(int from, int size) {
+        List<UserStatsView> view = userCounter.values().stream()
+            .map(UserStats::toView)
+            .collect(Collectors.toCollection(ArrayList::new));
+        int viewSize = view.size();
+        StringBuilder sb = new StringBuilder(t("StatsService.UNIQUE_USERS", viewSize));
+        view.sort(USER_STATS_COMPARATOR);
+        for (UserStatsView userStats : view.subList(from, from + size)) {
+            appendUserLink(sb, userStats.getUser()).append(": ").append(userStats.getCounter()).append('\n');
+        }
+        return new PagedResponse<>(sb.toString(), viewSize);
     }
 
     private static GCStats getGCStats() {
@@ -170,6 +175,28 @@ public class StatsService {
         }
 
         private User getUser() {
+            return user;
+        }
+
+        private UserStatsView toView() {
+            return new UserStatsView(getCounter().sum(), user);
+        }
+    }
+
+    private static class UserStatsView {
+        private final long counter;
+        private final User user;
+
+        private UserStatsView(long counter, User user) {
+            this.counter = counter;
+            this.user = user;
+        }
+
+        public long getCounter() {
+            return counter;
+        }
+
+        public User getUser() {
             return user;
         }
     }
