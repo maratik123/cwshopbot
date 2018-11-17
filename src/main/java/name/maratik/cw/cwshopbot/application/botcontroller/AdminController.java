@@ -188,20 +188,22 @@ public class AdminController extends ShopController {
                                                   DefaultAbsSender client, Message message, Update update) {
         statsService.updateStats("admin.stats.users.paged", user);
         if (message != null) {
-            Packer.unpackData(data).ifPresent(pagedRequest -> {
-                try {
-                    int currentPage = pagedRequest.getPage();
-                    PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(currentPage);
-                    client.execute(new EditMessageText()
-                        .setChatId(userId)
-                        .setMessageId(message.getMessageId())
-                        .setText(pagedResponse.getResponse())
-                        .setReplyMarkup(getKeysForStatsUsers(pagedResponse, currentPage))
-                    );
-                } catch (TelegramApiException e) {
-                    logger.error("Can not process execute on request: {}", update, e);
-                }
-            });
+            Packer.unpackData(data)
+                .filter(pagedRequest -> pagedRequest.getRequestType() == ReplyData.RequestType.STATS_USERS)
+                .ifPresent(pagedRequest -> {
+                    try {
+                        int currentPage = pagedRequest.getPage();
+                        PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(currentPage);
+                        client.execute(new EditMessageText()
+                            .setChatId(userId)
+                            .setMessageId(message.getMessageId())
+                            .setText(pagedResponse.getResponse())
+                            .setReplyMarkup(getKeysForStatsUsers(pagedResponse, currentPage))
+                        );
+                    } catch (TelegramApiException e) {
+                        logger.error("Can not process execute on request: {}", update, e);
+                    }
+                });
         }
 
         return new AnswerCallbackQuery()
