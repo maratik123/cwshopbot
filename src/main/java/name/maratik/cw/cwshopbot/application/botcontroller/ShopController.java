@@ -84,6 +84,7 @@ public class ShopController extends Localizable {
     public static final String CRAFTBOOK_PREFIX = "/craftbook_";
     public static final String SHOP_SEARCH_PREFIX = "/shop_";
     public static final String SHOP_COMMAND_PREFIX = "/ws_";
+    public static final String YP_PREFIX = "/yp_";
     public static final String PATTERN_COMMAND_SUFFIX = "*";
 
     private final Clock clock;
@@ -330,15 +331,25 @@ public class ShopController extends Localizable {
     }
 
     @TelegramCommand(
+        commands = YP_PREFIX + PATTERN_COMMAND_SUFFIX,
+        description = "#{@loc.t('ShopController.COMMAND.YP.DESC')}"
+    )
+    public SendMessage workshop(long userId, Message message, User user) {
+        statsService.updateStats("shop.ws", user);
+        return yellowPagesHelper(userId, getCommandSuffix(message, YP_PREFIX.length()));
+    }
+
+    @TelegramCommand(
         commands = "/yp",
         description = "#{@loc.t('ShopController.COMMAND.YP.DESC')}"
     )
     public SendMessage yellowPages(long userId, User user, TelegramMessageCommand command) {
         statsService.updateStats("shop.yellow.pages", user);
-        Optional<Map.Entry<String, String>> response = yellowPagesService.formattedYellowPages(
-            command.getArgument()
-                .orElse(null)
-        );
+        return yellowPagesHelper(userId, command.getArgument().orElse(null));
+    }
+
+    private SendMessage yellowPagesHelper(long userId, String key) {
+        Optional<Map.Entry<String, String>> response = yellowPagesService.formattedYellowPages(key);
         return new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)
@@ -375,7 +386,11 @@ public class ShopController extends Localizable {
             .setCallbackQueryId(queryId.getId());
     }
 
+    @SuppressWarnings("ReturnOfNull")
     private InlineKeyboardMarkup getKeysForYellowPages(String key) {
+        if (key == null) {
+            return null;
+        }
         ImmutableList.Builder<InlineKeyboardButton> keyboardBuilder = ImmutableList.builder();
         backwardYellowPagesButton(key).ifPresent(keyboardBuilder::add);
         forwardYellowPagesButton(key).ifPresent(keyboardBuilder::add);

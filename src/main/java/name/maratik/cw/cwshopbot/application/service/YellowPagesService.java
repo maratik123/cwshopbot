@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
  */
 @Service
 public class YellowPagesService extends Localizable {
-    private NavigableMap<String, YellowPages> yellowPagesStorage = new ConcurrentSkipListMap<>();
-    private Set<String> activeStores = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final NavigableMap<String, YellowPages> yellowPagesStorage = new ConcurrentSkipListMap<>();
+    private final Set<String> activeStores = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public void storeYellowPages(List<YellowPages> yellowPagesList) {
         activeStores.clear();
@@ -61,7 +61,7 @@ public class YellowPagesService extends Localizable {
                 );
             }
 
-            return new AbstractMap.SimpleImmutableEntry<>(key, sb.toString());
+            return new AbstractMap.SimpleImmutableEntry<>(yellowPages.getLink(), sb.toString());
         });
     }
 
@@ -84,10 +84,6 @@ public class YellowPagesService extends Localizable {
 
     public Optional<String> nextKey(String key) {
         return Optional.ofNullable(key)
-            .map(yellowPagesStorage::higherKey)
-            .map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(yellowPagesStorage.firstEntry())
-                .map(Map.Entry::getKey)
-            );
+            .map(yellowPagesStorage::higherKey);
     }
 }
