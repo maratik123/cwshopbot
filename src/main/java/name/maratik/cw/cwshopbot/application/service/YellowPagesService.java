@@ -83,6 +83,8 @@ public class YellowPagesService extends Localizable {
         return Optional.ofNullable(key)
             .map(yellowPagesStorage::higherKey)
             .map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(yellowPagesStorage.firstKey()));
+            .orElseGet(() -> Optional.ofNullable(yellowPagesStorage.firstEntry())
+                .map(Map.Entry::getKey)
+            );
     }
 }
