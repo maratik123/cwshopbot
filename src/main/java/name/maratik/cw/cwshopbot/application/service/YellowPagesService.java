@@ -14,12 +14,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Service
 public class YellowPagesService extends Localizable {
+    private static final Pattern UNDERSCORE = Pattern.compile("_", Pattern.LITERAL);
     private final NavigableMap<String, YellowPages> yellowPagesStorage = new ConcurrentSkipListMap<>();
     private final Set<String> activeStores = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -36,8 +38,8 @@ public class YellowPagesService extends Localizable {
             StringBuilder sb = new StringBuilder();
             sb.append(t("YellowPages.INFO",
                 yellowPages.getLink(),
-                yellowPages.getName(),
-                yellowPages.getOwnerName(),
+                UNDERSCORE.matcher(yellowPages.getName()).replaceAll("\\_"),
+                UNDERSCORE.matcher(yellowPages.getOwnerName()).replaceAll("\\_"),
                 yellowPages.getOwnerCastle().getCode(),
                 yellowPages.getKind().getCode(),
                 yellowPages.getMana(),
