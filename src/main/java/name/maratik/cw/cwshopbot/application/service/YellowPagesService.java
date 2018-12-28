@@ -41,7 +41,10 @@ public class YellowPagesService extends Localizable {
                 yellowPages.getOwnerCastle().getCode(),
                 yellowPages.getKind().getCode(),
                 yellowPages.getMana(),
-                activeStores.contains(yellowPages.getLink()) ? "YellowPages.INFO.ACTIVE" : "YellowPages.INFO.INACTIVE"
+                t(activeStores.contains(yellowPages.getLink())
+                    ? "YellowPages.INFO.ACTIVE"
+                    : "YellowPages.INFO.INACTIVE"
+                )
             ))
                 .append('\n');
 
