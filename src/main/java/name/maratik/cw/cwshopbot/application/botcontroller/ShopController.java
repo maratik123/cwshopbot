@@ -331,7 +331,7 @@ public class ShopController extends Localizable {
 
     @TelegramCommand(
         commands = "/yp",
-        description = "#[@loc.t('ShopController.COMMAND.YP.DESC')}"
+        description = "#{@loc.t('ShopController.COMMAND.YP.DESC')}"
     )
     public SendMessage yellowPages(long userId, User user, TelegramMessageCommand command) {
         statsService.updateStats("shop.yellow.pages", user);
