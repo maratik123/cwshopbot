@@ -8,6 +8,7 @@ option java_outer_classname = "ReplyData";
 enum RequestType {
     SEARCH_QUERY = 0;
     STATS_USERS = 1;
+    YELLOW_PAGES = 2;
 }
 
 message PagedRequest {

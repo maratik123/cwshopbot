@@ -17,8 +17,10 @@ package name.maratik.cw.cwshopbot.model.cwapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ public class YellowPages {
     private final ProfessionByEmoji kind;
     private final int mana;
     private final List<Offer> offers;
+    private final Map<String, Integer> specialization;
 
     public YellowPages(
         @JsonProperty("link") String link,
@@ -41,7 +44,8 @@ public class YellowPages {
         @JsonProperty("ownerCastle") CastleByEmoji ownerCastle,
         @JsonProperty("kind") ProfessionByEmoji kind,
         @JsonProperty("mana") int mana,
-        @JsonProperty("offers") List<Offer> offers
+        @JsonProperty("offers") List<Offer> offers,
+        @JsonProperty("specialization") Map<String, Integer> specialization
     ) {
         this.link = Objects.requireNonNull(link, "link");
         this.name = Objects.requireNonNull(name, "name");
@@ -52,6 +56,9 @@ public class YellowPages {
         this.offers = Optional.ofNullable(offers)
             .map(ImmutableList::copyOf)
             .orElseGet(ImmutableList::of);
+        this.specialization = Optional.ofNullable(specialization)
+            .map(ImmutableMap::copyOf)
+            .orElseGet(ImmutableMap::of);
     }
 
     public String getLink() {
@@ -82,6 +89,10 @@ public class YellowPages {
         return offers;
     }
 
+    public Map<String, Integer> getSpecialization() {
+        return specialization;
+    }
+
     @Override
     public String toString() {
         return "YellowPages{" +
@@ -92,6 +103,7 @@ public class YellowPages {
             ", kind=" + kind +
             ", mana=" + mana +
             ", offers=" + offers +
+            ", specialization=" + specialization +
             '}';
     }
 

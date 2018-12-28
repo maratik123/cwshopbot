@@ -20,6 +20,7 @@ import name.maratik.cw.cwshopbot.application.service.CWParser;
 import name.maratik.cw.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.application.service.StatsService;
+import name.maratik.cw.cwshopbot.application.service.YellowPagesService;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.model.PagedResponse;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
@@ -29,7 +30,6 @@ import name.maratik.cw.cwshopbot.packer.Packer;
 import name.maratik.cw.cwshopbot.proto.ReplyData;
 import name.maratik.spring.telegram.TelegramBotService;
 import name.maratik.spring.telegram.annotation.TelegramBot;
-import name.maratik.spring.telegram.annotation.TelegramCallbackQuery;
 import name.maratik.spring.telegram.annotation.TelegramCommand;
 import name.maratik.spring.telegram.model.CallbackQueryId;
 import name.maratik.spring.telegram.model.TelegramMessageCommand;
@@ -79,10 +79,11 @@ public class AdminController extends ShopController {
                            @Value("${name.maratik.cw.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.cwshopbot.dev.username}") String devUserName,
                            StatsService statsService, TelegramBotService telegramBotService,
-                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName
+                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName,
+                           YellowPagesService yellowPagesService
     ) {
         super(clock, forwardStale, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
-            devUserId, devUserName, chatWarsAuthService, cwUserName, statsService);
+            devUserId, devUserName, chatWarsAuthService, cwUserName, statsService, yellowPagesService);
         this.devUserId = devUserId;
         this.statsService = statsService;
         this.client = telegramBotService.getClient();
@@ -188,14 +189,14 @@ public class AdminController extends ShopController {
             );
     }
 
-    @TelegramCallbackQuery
-    public AnswerCallbackQuery getUsersStatsPaged(long userId, User user, String data, CallbackQueryId queryId,
+    @Override
+    public AnswerCallbackQuery callbackQuery(long userId, User user, String data, CallbackQueryId queryId,
                                                   DefaultAbsSender client, Message message, Update update) {
-        statsService.updateStats("admin.stats.users.paged", user);
         if (message != null) {
             Packer.unpackData(data)
                 .filter(pagedRequest -> pagedRequest.getRequestType() == ReplyData.RequestType.STATS_USERS)
                 .ifPresent(pagedRequest -> {
+                    statsService.updateStats("admin.stats.users.paged", user);
                     try {
                         int currentPage = pagedRequest.getPage();
                         PagedResponse<String> pagedResponse = getUsersStatsPagedHelper(currentPage);
@@ -212,8 +213,7 @@ public class AdminController extends ShopController {
                 });
         }
 
-        return new AnswerCallbackQuery()
-            .setCallbackQueryId(queryId.getId());
+        return super.callbackQuery(userId, user, data, queryId, client, message, update);
     }
 
     private PagedResponse<String> getUsersStatsPagedHelper(int page) {

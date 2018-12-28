@@ -20,36 +20,54 @@ import name.maratik.cw.cwshopbot.application.service.CWParser;
 import name.maratik.cw.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.application.service.StatsService;
+import name.maratik.cw.cwshopbot.application.service.YellowPagesService;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
+import name.maratik.cw.cwshopbot.packer.Packer;
+import name.maratik.cw.cwshopbot.proto.ReplyData;
 import name.maratik.cw.cwshopbot.util.MessageType;
 import name.maratik.spring.telegram.annotation.TelegramBot;
+import name.maratik.spring.telegram.annotation.TelegramCallbackQuery;
 import name.maratik.spring.telegram.annotation.TelegramCommand;
 import name.maratik.spring.telegram.annotation.TelegramForward;
 import name.maratik.spring.telegram.annotation.TelegramHelp;
 import name.maratik.spring.telegram.annotation.TelegramMessage;
+import name.maratik.spring.telegram.model.CallbackQueryId;
+import name.maratik.spring.telegram.model.TelegramMessageCommand;
 import name.maratik.spring.telegram.util.Localizable;
 
 import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ForwardMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+
+import static name.maratik.cw.cwshopbot.util.Emoji.LEFTWARDS_ARROW;
+import static name.maratik.cw.cwshopbot.util.Emoji.RIGHTWARDS_ARROW;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -80,6 +98,7 @@ public class ShopController extends Localizable {
     private final ChatWarsAuthService chatWarsAuthService;
     private final String cwUserName;
     private final StatsService statsService;
+    private final YellowPagesService yellowPagesService;
 
     public ShopController(Clock clock, Duration forwardStale,
                           @ForwardUser Cache<ForwardKey, Long> forwardUserCache,
@@ -88,7 +107,7 @@ public class ShopController extends Localizable {
                           @Value("${name.maratik.cw.cwshopbot.dev}") long devUserId,
                           @Value("${name.maratik.cw.cwshopbot.dev.username}") String devUserName,
                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName,
-                          StatsService statsService
+                          StatsService statsService, YellowPagesService yellowPagesService
     ) {
         this.clock = clock;
         this.forwardStale = forwardStale;
@@ -102,6 +121,7 @@ public class ShopController extends Localizable {
         this.chatWarsAuthService = chatWarsAuthService;
         this.cwUserName = cwUserName;
         this.statsService = statsService;
+        this.yellowPagesService = yellowPagesService;
     }
 
     @TelegramMessage
@@ -307,6 +327,93 @@ public class ShopController extends Localizable {
             .enableMarkdown(true)
             .setChatId(userId)
             .setText(t("ShopController.COMMAND.SOURCE.REPLY", "https://github.com/maratik123/cwshopbot"));
+    }
+
+    @TelegramCommand(
+        commands = "/yp",
+        description = "#[@loc.t('ShopController.COMMAND.YP.DESC')}"
+    )
+    public SendMessage yellowPages(long userId, User user, TelegramMessageCommand command) {
+        statsService.updateStats("shop.yellow.pages", user);
+        Optional<Map.Entry<String, String>> response = yellowPagesService.formattedYellowPages(
+            command.getArgument()
+                .orElse(null)
+        );
+        return new SendMessage()
+            .enableMarkdown(true)
+            .setChatId(userId)
+            .setText(getMessage(response.map(Map.Entry::getValue)))
+            .setReplyMarkup(getKeysForYellowPages(response.map(Map.Entry::getKey).orElse(null)));
+
+    }
+
+    @TelegramCallbackQuery
+    public AnswerCallbackQuery callbackQuery(long userId, User user, String data, CallbackQueryId queryId,
+                                             DefaultAbsSender client, Message message, Update update) {
+        statsService.updateStats("shop.callback.query", user);
+        if (message != null) {
+            Packer.unpackData(data)
+                .filter(pagedRequest -> pagedRequest.getRequestType() == ReplyData.RequestType.YELLOW_PAGES)
+                .map(ReplyData.PagedRequest::getQuery)
+                .flatMap(yellowPagesService::formattedYellowPages)
+                .ifPresent(yellowPages -> {
+                    statsService.updateStats("shop.callback.query.yellow.pages", user);
+                    try {
+                        client.execute(new EditMessageText()
+                            .enableMarkdown(true)
+                            .setChatId(userId)
+                            .setMessageId(message.getMessageId())
+                            .setText(yellowPages.getValue())
+                            .setReplyMarkup(getKeysForYellowPages(yellowPages.getKey()))
+                        );
+                    } catch (TelegramApiException e) {
+                        logger.error("Can not process execute on request: {}", update, e);
+                    }
+                });
+        }
+
+        return new AnswerCallbackQuery()
+            .setCallbackQueryId(queryId.getId());
+    }
+
+    private InlineKeyboardMarkup getKeysForYellowPages(String key) {
+        ImmutableList.Builder<InlineKeyboardButton> keyboardBuilder = ImmutableList.builder();
+        backwardYellowPagesButton(key).ifPresent(keyboardBuilder::add);
+        forwardYellowPagesButton(key).ifPresent(keyboardBuilder::add);
+        List<InlineKeyboardButton> buttons = keyboardBuilder.build();
+        return buttons.isEmpty()
+            ? null
+            : new InlineKeyboardMarkup().setKeyboard(Collections.singletonList(buttons));
+    }
+
+    private Optional<InlineKeyboardButton> backwardYellowPagesButton(String key) {
+        return yellowPagesService.previousKey(key).
+            flatMap(previousKey -> Packer.packData(
+                ReplyData.PagedRequest.newBuilder()
+                    .setRequestType(ReplyData.RequestType.YELLOW_PAGES)
+                    .setQuery(previousKey)
+                    .build(),
+                64
+            ))
+            .map(data -> new InlineKeyboardButton()
+                .setCallbackData(data)
+                .setText(LEFTWARDS_ARROW)
+            );
+    }
+
+    private Optional<InlineKeyboardButton> forwardYellowPagesButton(String key) {
+        return yellowPagesService.nextKey(key)
+            .flatMap(nextKey -> Packer.packData(
+                ReplyData.PagedRequest.newBuilder()
+                    .setRequestType(ReplyData.RequestType.YELLOW_PAGES)
+                    .setQuery(nextKey)
+                    .build(),
+                64
+            ))
+            .map(data -> new InlineKeyboardButton()
+                .setCallbackData(data)
+                .setText(RIGHTWARDS_ARROW)
+            );
     }
 
     @TelegramHelp
