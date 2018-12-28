@@ -45,21 +45,21 @@ public class YellowPagesService extends Localizable {
                     ? "YellowPages.INFO.ACTIVE"
                     : "YellowPages.INFO.INACTIVE"
                 )
-            ))
-                .append('\n');
+            ));
 
             if (!yellowPages.getOffers().isEmpty()) {
                 yellowPages.getOffers().forEach(offer ->
                     sb.append(t("YellowPages.OFFER", offer.getItem(), offer.getMana(), offer.getPrice()))
-                        .append('\n')
                 );
                 sb.append('\n');
             }
 
-            yellowPages.getSpecialization().forEach((kind, value) ->
-                sb.append(t("YellowPages.SPECIALIZATION", kind, value))
-                    .append('\n')
-            );
+            if (!yellowPages.getSpecialization().isEmpty()) {
+                sb.append(t("YellowPages.SPECIALIZATION.HEADER"));
+                yellowPages.getSpecialization().forEach((kind, value) ->
+                    sb.append(t("YellowPages.SPECIALIZATION", kind, value))
+                );
+            }
 
             return new AbstractMap.SimpleImmutableEntry<>(key, sb.toString());
         });

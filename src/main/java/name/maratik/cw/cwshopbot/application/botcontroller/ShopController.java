@@ -344,7 +344,6 @@ public class ShopController extends Localizable {
             .setChatId(userId)
             .setText(getMessage(response.map(Map.Entry::getValue)))
             .setReplyMarkup(getKeysForYellowPages(response.map(Map.Entry::getKey).orElse(null)));
-
     }
 
     @TelegramCallbackQuery
