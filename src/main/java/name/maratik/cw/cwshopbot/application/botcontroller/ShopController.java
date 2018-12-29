@@ -351,6 +351,7 @@ public class ShopController extends Localizable {
     private SendMessage yellowPagesHelper(long userId, String key) {
         Optional<Map.Entry<String, String>> response = yellowPagesService.formattedYellowPages(key);
         return new SendMessage()
+            .enableMarkdown(true)
             .setChatId(userId)
             .setText(getMessage(response.map(Map.Entry::getValue)))
             .setReplyMarkup(getKeysForYellowPages(response.map(Map.Entry::getKey).orElse(null)));
@@ -369,6 +370,7 @@ public class ShopController extends Localizable {
                     statsService.updateStats("shop.callback.query.yellow.pages", user);
                     try {
                         client.execute(new EditMessageText()
+                            .enableMarkdown(true)
                             .setChatId(userId)
                             .setMessageId(message.getMessageId())
                             .setText(yellowPages.getValue())
