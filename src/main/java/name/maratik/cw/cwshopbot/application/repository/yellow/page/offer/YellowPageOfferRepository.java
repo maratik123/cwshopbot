@@ -22,6 +22,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
@@ -38,7 +39,8 @@ public interface YellowPageOfferRepository extends Repository<YellowPageOfferEnt
     @Transactional
     @Query("" +
         "UPDATE yellow_page_offer" +
-        "   SET active = FALSE")
+        "   SET active = FALSE" +
+        " WHERE yellow_page IN (:yellowPages)")
     @Modifying
-    void setAllInactive();
+    void setInactiveForYellowPages(Collection<String> yellowPages);
 }

@@ -32,6 +32,7 @@ import static name.maratik.cw.cwshopbot.application.repository.yellow.page.Yello
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageSpecializationEntity;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -139,7 +140,7 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
                 .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_specialization"));
             assertEquals(100, yellowPageSpecializationContent.getValue());
 
-            yellowPageSpecializationRepository.zeroAllValues();
+            yellowPageSpecializationRepository.zeroValueForYellowPages(singleton(yellowPageEntity.getLink()));
             yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_specialization"));

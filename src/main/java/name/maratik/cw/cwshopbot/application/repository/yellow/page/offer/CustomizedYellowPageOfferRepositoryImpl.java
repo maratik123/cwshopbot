@@ -51,6 +51,9 @@ public class CustomizedYellowPageOfferRepositoryImpl implements CustomizedYellow
 
     @Override
     public void saveAll(List<YellowPageOfferEntity> yellowPageOfferEntities) {
+        if (yellowPageOfferEntities.isEmpty()) {
+            return;
+        }
         jdbcTemplate.batchUpdate(SAVE_YELLOW_PAGE_OFFER, yellowPageOfferEntities.stream()
             .map(yellowPageOfferEntity -> new Object[]{
                 yellowPageOfferEntity.getYellowPage(), yellowPageOfferEntity.getItem(),

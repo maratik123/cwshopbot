@@ -56,6 +56,9 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
 
     @Override
     public void saveAll(List<YellowPageEntity> yellowPageEntities) {
+        if (yellowPageEntities.isEmpty()) {
+            return;
+        }
         jdbcTemplate.batchUpdate(SAVE_YELLOW_PAGE, yellowPageEntities.stream()
             .map(yellowPageEntity -> new Object[]{
                 yellowPageEntity.getLink(), yellowPageEntity.getName(), yellowPageEntity.getOwnerName(),

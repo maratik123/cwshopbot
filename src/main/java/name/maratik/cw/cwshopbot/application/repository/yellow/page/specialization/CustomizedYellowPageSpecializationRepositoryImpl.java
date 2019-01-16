@@ -50,6 +50,9 @@ public class CustomizedYellowPageSpecializationRepositoryImpl implements Customi
 
     @Override
     public void saveAll(List<YellowPageSpecializationEntity> yellowPageSpecializationEntities) {
+        if (yellowPageSpecializationEntities.isEmpty()) {
+            return;
+        }
         jdbcTemplate.batchUpdate(SAVE_YELLOW_PAGE_SPECIALIZATION, yellowPageSpecializationEntities.stream()
             .map(yellowPageSpecializationEntity -> new Object[]{
                 yellowPageSpecializationEntity.getYellowPage(), yellowPageSpecializationEntity.getSpecialization(),

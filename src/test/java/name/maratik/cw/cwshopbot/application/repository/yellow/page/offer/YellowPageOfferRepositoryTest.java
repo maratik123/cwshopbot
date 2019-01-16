@@ -32,6 +32,7 @@ import static name.maratik.cw.cwshopbot.application.repository.yellow.page.Yello
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageOfferEntity;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -140,7 +141,7 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
                 .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_offer"));
             assertTrue(yellowPageOfferContent.isActive());
 
-            yellowPageOfferRepository.setAllInactive();
+            yellowPageOfferRepository.setInactiveForYellowPages(singleton(yellowPageEntity.getLink()));
             yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_offer"));

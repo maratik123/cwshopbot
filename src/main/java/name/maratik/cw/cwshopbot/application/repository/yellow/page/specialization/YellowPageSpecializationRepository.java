@@ -22,6 +22,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
@@ -38,7 +39,8 @@ public interface YellowPageSpecializationRepository extends Repository<YellowPag
     @Transactional
     @Query("" +
         "UPDATE yellow_page_specialization" +
-        "   SET value = 0")
+        "   SET value = 0" +
+        " WHERE yellow_page IN (:yellowPages)")
     @Modifying
-    void zeroAllValues();
+    void zeroValueForYellowPages(Collection<String> yellowPages);
 }

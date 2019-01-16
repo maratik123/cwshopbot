@@ -31,9 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -55,8 +57,13 @@ public class YellowPagesStorage {
     @Transactional
     public void saveYellowPages(List<YellowPage> yellowPages) {
         yellowPageRepository.setAllInactive();
-        yellowPageOfferRepository.setAllInactive();
-        yellowPageSpecializationRepository.zeroAllValues();
+        Set<String> links = yellowPages.stream()
+            .map(YellowPage::getLink)
+            .collect(toImmutableSet());
+        if (!links.isEmpty()) {
+            yellowPageOfferRepository.setInactiveForYellowPages(links);
+            yellowPageSpecializationRepository.zeroValueForYellowPages(links);
+        }
 
         yellowPageRepository.saveAll(yellowPages.stream()
             .map(yellowPage -> YellowPageEntity.builder()
