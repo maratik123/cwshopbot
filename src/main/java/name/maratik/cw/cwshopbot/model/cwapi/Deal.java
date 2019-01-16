@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 /**
@@ -31,4 +32,26 @@ public class Deal {
     private final String item;
     private final int qty;
     private final int price;
+
+    public Deal(
+        @JsonProperty("sellerId") String sellerId,
+        @JsonProperty("sellerName") String sellerName,
+        @JsonProperty("sellerCastle") CastleByEmoji sellerCastle,
+        @JsonProperty("buyerId") String buyerId,
+        @JsonProperty("buyerName") String buyerName,
+        @JsonProperty("buyerCastle") CastleByEmoji buyerCastle,
+        @JsonProperty("item") String item,
+        @JsonProperty("qty") int qty,
+        @JsonProperty("price") int price
+    ) {
+        this.sellerId = sellerId;
+        this.sellerName = sellerName;
+        this.sellerCastle = sellerCastle;
+        this.buyerId = buyerId;
+        this.buyerName = buyerName;
+        this.buyerCastle = buyerCastle;
+        this.item = item;
+        this.qty = qty;
+        this.price = price;
+    }
 }
