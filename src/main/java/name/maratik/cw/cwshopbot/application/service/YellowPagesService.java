@@ -52,9 +52,10 @@ public class YellowPagesService extends Localizable {
                 yellowPage.getOwnerCastle().getCode(),
                 yellowPage.getKind().getCode(),
                 yellowPage.getMana(),
-                yellowPage.isActive()
+                t(yellowPage.isActive()
                     ? "YellowPages.INFO.ACTIVE"
                     : "YellowPages.INFO.INACTIVE"
+                )
             ));
 
             if (!yellowPage.getOffers().isEmpty()) {
