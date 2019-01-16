@@ -51,7 +51,7 @@ public class YellowPage {
         @JsonProperty("mana") int mana,
         @JsonProperty("offers") List<Offer> offers,
         @JsonProperty("specialization") Map<String, Integer> specialization,
-        @JsonProperty(value = "active", defaultValue = "true") boolean active
+        @JsonProperty("active") boolean active
     ) {
         this.link = Objects.requireNonNull(link, "link");
         this.name = Objects.requireNonNull(name, "name");
@@ -80,7 +80,7 @@ public class YellowPage {
             @JsonProperty("item") String item,
             @JsonProperty("price") int price,
             @JsonProperty("mana") int mana,
-            @JsonProperty(value = "active", defaultValue = "true") boolean active
+            @JsonProperty("active") boolean active
         ) {
             this.item = Objects.requireNonNull(item, "item");
             this.price = price;
