@@ -108,8 +108,8 @@ bootJar {
 bootRun {
     jvmArgs = [
             '-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager',
-            '-Xms128m',
-            '-Xmx384m',
+            '-Xms64m',
+            '-Xmx128m',
             '-server'
     ]
 }

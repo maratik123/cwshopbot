@@ -40,7 +40,8 @@ public interface YellowPageSpecializationRepository extends Repository<YellowPag
     @Query("" +
         "UPDATE yellow_page_specialization" +
         "   SET value = 0" +
-        " WHERE yellow_page IN (:yellowPages)")
+        " WHERE yellow_page IN (:yellowPages)" +
+        "   AND value != 0")
     @Modifying
     void zeroValueForYellowPages(Collection<String> yellowPages);
 }

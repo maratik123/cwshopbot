@@ -40,7 +40,8 @@ public interface YellowPageOfferRepository extends Repository<YellowPageOfferEnt
     @Query("" +
         "UPDATE yellow_page_offer" +
         "   SET active = FALSE" +
-        " WHERE yellow_page IN (:yellowPages)")
+        " WHERE yellow_page IN (:yellowPages)" +
+        "   AND active")
     @Modifying
     void setInactiveForYellowPages(Collection<String> yellowPages);
 }

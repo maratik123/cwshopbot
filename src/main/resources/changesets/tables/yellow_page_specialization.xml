@@ -35,4 +35,9 @@
         </createTable>
         <addPrimaryKey tableName="yellow_page_specialization" columnNames="yellow_page, specialization"/>
     </changeSet>
+    <changeSet id="yellow_page_specialization_fillfactor" author="maratik">
+        <sql>
+            ALTER TABLE yellow_page_specialization SET (fillfactor = 90)
+        </sql>
+    </changeSet>
 </databaseChangeLog>

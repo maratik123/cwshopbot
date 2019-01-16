@@ -38,7 +38,8 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
     @Transactional
     @Query("" +
         "UPDATE yellow_page" +
-        "   SET active = FALSE")
+        "   SET active = FALSE" +
+        " WHERE active")
     @Modifying
     void setAllInactive();
 
