@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -18,19 +18,18 @@ package name.maratik.cw.cwshopbot.parser;
 import name.maratik.cw.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
 public class CraftableItemVerifier implements Item.Visitor<Void> {
-    private static final Logger logger = LogManager.getLogger(CraftableItemVerifier.class);
     private static final CraftableItemVerifier INSTANCE = new CraftableItemVerifier();
 
     @Override
     public Void visit(Item item) {
-        logger.warn("Item {} is not craftable", item);
+        log.warn("Item {} is not craftable", item);
         return null;
     }
 

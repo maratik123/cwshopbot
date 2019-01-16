@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,6 @@ package name.maratik.cw.cwshopbot.application.botcontroller;
 
 import name.maratik.cw.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.cwshopbot.application.service.CWParser;
-import name.maratik.cw.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.application.service.StatsService;
 import name.maratik.cw.cwshopbot.application.service.YellowPagesService;
@@ -36,8 +35,7 @@ import name.maratik.spring.telegram.model.TelegramMessageCommand;
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -54,19 +52,20 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static name.maratik.cw.cwshopbot.util.Emoji.LEFTWARDS_ARROW;
 import static name.maratik.cw.cwshopbot.util.Emoji.RIGHTWARDS_ARROW;
 
+import static java.util.Collections.singletonList;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @TelegramBot("${name.maratik.cw.cwshopbot.admin}")
+@Log4j2
 public class AdminController extends ShopController {
-    private static final Logger logger = LogManager.getLogger(AdminController.class);
 
     private final StatsService statsService;
     private final DefaultAbsSender client;
@@ -79,11 +78,10 @@ public class AdminController extends ShopController {
                            @Value("${name.maratik.cw.cwshopbot.dev}") long devUserId,
                            @Value("${name.maratik.cw.cwshopbot.dev.username}") String devUserName,
                            StatsService statsService, TelegramBotService telegramBotService,
-                           ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName,
-                           YellowPagesService yellowPagesService
+                           @Value("${cwusername}") String cwUserName, YellowPagesService yellowPagesService
     ) {
         super(clock, forwardStale, forwardUserCache, shopInfoParser, shopEditParser, heroParser, itemSearchService,
-            devUserId, devUserName, chatWarsAuthService, cwUserName, statsService, yellowPagesService);
+            devUserId, devUserName, cwUserName, statsService, yellowPagesService);
         this.devUserId = devUserId;
         this.statsService = statsService;
         this.client = telegramBotService.getClient();
@@ -105,7 +103,7 @@ public class AdminController extends ShopController {
                 .setText(t("AdminController.BOT.DOWN"))
             );
         } catch (TelegramApiException e) {
-            logger.error("Can not send goodbye", e);
+            log.error("Can not send goodbye", e);
         }
     }
 
@@ -152,7 +150,7 @@ public class AdminController extends ShopController {
         return buttons.isEmpty()
             ? null
             : new InlineKeyboardMarkup()
-                .setKeyboard(Collections.singletonList(buttons));
+                .setKeyboard(singletonList(buttons));
     }
 
     private static Optional<InlineKeyboardButton> backwardButton(int currentPage) {
@@ -208,7 +206,7 @@ public class AdminController extends ShopController {
                             .setReplyMarkup(getKeysForStatsUsers(pagedResponse, currentPage))
                         );
                     } catch (TelegramApiException e) {
-                        logger.error("Can not process execute on request: {}", update, e);
+                        log.error("Can not process execute on request: {}", update, e);
                     }
                 });
         }
@@ -237,7 +235,7 @@ public class AdminController extends ShopController {
                 .setChatId(userId)
                 .setText(t("AdminController.SEND_MESSAGE.SUCCESS"));
         } catch (TelegramApiException e) {
-            logger.error("Send message wrong", e);
+            log.error("Send message wrong", e);
             return new SendMessage()
                 .setChatId(userId)
                 .setText(t("AdminController.SEND_MESSAGE.ERROR", e.getMessage()));

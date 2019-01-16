@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,7 @@ import name.maratik.cw.cwshopbot.mock.MockedTest;
 import name.maratik.cw.cwshopbot.model.cwasset.Assets;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +40,8 @@ import static org.junit.Assert.assertThat;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Import(AssetsDaoTest.TestConfig.class)
+@Log4j2
 public class AssetsDaoTest extends MockedTest {
-    private static final Logger logger = LogManager.getLogger(AssetsDaoTest.class);
-
     @Autowired
     private AssetsDao assetsDao;
 
@@ -58,7 +56,7 @@ public class AssetsDaoTest extends MockedTest {
 
     @Test
     public void shouldAssetsDtoLoad() {
-        logger.info("Assets: {}", assetsDto);
+        log.info("Assets: {}", assetsDto);
         assertNotNull(assetsDto);
     }
 
@@ -71,7 +69,7 @@ public class AssetsDaoTest extends MockedTest {
     @Test
     public void shouldCreateAssets() {
         Assets assets = assetsDao.createAssets();
-        logger.info("Assets: {}", assets);
+        log.info("Assets: {}", assets);
         assertNotNull(assets);
     }
 

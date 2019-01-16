@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -20,8 +20,7 @@ import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheStats;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,8 +32,8 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
 public class LRUCachingMap<K, V> extends LRUMap<K, V> {
-    private static final Logger logger = LogManager.getLogger(LRUCachingMap.class);
     private static final long serialVersionUID = 1378663091316250420L;
 
     @SuppressWarnings("InstanceVariableMayNotBeInitializedByReadObject")
@@ -51,7 +50,7 @@ public class LRUCachingMap<K, V> extends LRUMap<K, V> {
             .recordStats()
             .maximumSize(maxEntries)
             .expireAfterAccess(expireDuration)
-            .removalListener(notification -> logger.debug(
+            .removalListener(notification -> log.debug(
                 "Removed object {} from cache due to {}, evicted = {}",
                 notification::toString, notification::getCause, notification::wasEvicted
             ))

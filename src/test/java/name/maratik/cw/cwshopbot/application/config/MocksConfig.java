@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -43,9 +43,10 @@ import static org.mockito.Mockito.mock;
 @Configuration
 @EnableRabbit
 public class MocksConfig {
-    @Bean
-    public Map<Object, Consumer<Object>> mocks() {
-        return new IdentityHashMap<>();
+    private final Map<Object, Consumer<Object>> mocks;
+
+    public MocksConfig(Map<Object, Consumer<Object>> mocks) {
+        this.mocks = mocks;
     }
 
     @Bean
@@ -58,7 +59,7 @@ public class MocksConfig {
     private <T> T resetAndAddToMocks(Class<T> mockedClass, Consumer<? super T> resetAction) {
         T mock = mock(mockedClass, RETURNS_SMART_NULLS);
         resetAction.accept(mock);
-        mocks().put(mock, (Consumer<Object>) resetAction);
+        mocks.put(mock, (Consumer<Object>) resetAction);
         return mock;
     }
 
@@ -100,5 +101,13 @@ public class MocksConfig {
 
     private static void resetFactory(ConnectionFactory factory, Connection connection) {
         given(factory.createConnection()).willReturn(connection);
+    }
+
+    @Configuration
+    public static class Mocks {
+        @Bean
+        public Map<Object, Consumer<Object>> mocks() {
+            return new IdentityHashMap<>();
+        }
     }
 }

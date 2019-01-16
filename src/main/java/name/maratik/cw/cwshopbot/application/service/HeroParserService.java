@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -23,14 +23,13 @@ import name.maratik.cw.cwshopbot.parser.generated.HeroLexer;
 import name.maratik.cw.cwshopbot.parser.generated.HeroParser;
 import name.maratik.cw.cwshopbot.parser.generated.HeroParserBaseListener;
 
+import lombok.extern.log4j.Log4j2;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.Optional;
@@ -41,9 +40,9 @@ import static name.maratik.cw.cwshopbot.util.Utils.reformatMessage;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
+@Service
+@Log4j2
 public class HeroParserService implements CWParser<ParsedHero> {
-    private static final Logger logger = LogManager.getLogger(HeroParserService.class);
 
     @Override
     public Optional<ParsedHero> parse(Message message) {
@@ -61,34 +60,34 @@ public class HeroParserService implements CWParser<ParsedHero> {
         HeroParser parser = new HeroParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
         return catchParseErrors(() -> {
-            ParsedHero.Builder builder = ParsedHero.builder();
+            ParsedHero.ParsedHeroBuilder builder = ParsedHero.builder();
             ParseTreeWalker.DEFAULT.walk(new HeroParserListenerImpl(builder), parser.hero());
             return Optional.of(builder.build());
         }, message);
     }
 
     private static class HeroParserListenerImpl extends HeroParserBaseListener {
-        private final ParsedHero.Builder builder;
+        private final ParsedHero.ParsedHeroBuilder builder;
 
-        private HeroParserListenerImpl(ParsedHero.Builder builder) {
+        private HeroParserListenerImpl(ParsedHero.ParsedHeroBuilder builder) {
             this.builder = builder;
         }
 
         @Override
         public void exitGuildAbbrev(HeroParser.GuildAbbrevContext ctx) {
-            logger.trace("exitGuildAbbrev: {}", ctx::getText);
-            builder.setGuildAbbrev(ctx.getText());
+            log.trace("exitGuildAbbrev: {}", ctx::getText);
+            builder.guildAbbrev(Optional.ofNullable(ctx.getText()));
         }
 
         @Override
         public void exitCharName(HeroParser.CharNameContext ctx) {
-            logger.trace("exitCharName: {}", ctx::getText);
-            builder.setCharName(ctx.getText());
+            log.trace("exitCharName: {}", ctx::getText);
+            builder.charName(ctx.getText());
         }
 
         @Override
         public void exitOfCastleCastle(HeroParser.OfCastleCastleContext ctx) {
-            logger.trace("exitOfCastleCastle: {}", ctx::getText);
+            log.trace("exitOfCastleCastle: {}", ctx::getText);
             String text = ctx.getText();
             String[] textParts = text.split(" ");
             if (textParts.length != 3 ||
@@ -97,7 +96,7 @@ public class HeroParserService implements CWParser<ParsedHero> {
                 throw new ParseException("Unknown castle: " + text);
             }
             String castle = textParts[1];
-            builder.setCastle(Castle.findByCode(castle)
+            builder.castle(Castle.findByCode(castle)
                 .orElseThrow(() -> new ParseException("Unsupported castle: " + castle))
             );
         }

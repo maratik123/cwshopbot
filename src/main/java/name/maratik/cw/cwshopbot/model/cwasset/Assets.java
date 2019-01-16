@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,12 +17,16 @@ package name.maratik.cw.cwshopbot.model.cwasset;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 
@@ -35,81 +39,31 @@ import static java.util.stream.Collectors.mapping;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString(onlyExplicitlyIncluded = true)
 public class Assets {
+    @NonNull
+    @ToString.Include
     private final Map<String, Item> allItems;
+    @NonNull
     private final Map<ItemLocation, Set<Item>> itemsByItemLocation;
+    @NonNull
     private final Map<InventorySlot, Set<WearableItem>> itemsByInventorySlot;
+    @NonNull
     private final Map<ItemType, Set<WearableItem>> itemsByItemType;
+    @NonNull
     private final Map<Craftbook, Set<CraftableItem>> itemsByCraftbook;
+    @NonNull
     private final Map<String, CraftableItem> craftableItems;
+    @NonNull
     private final Map<String, WearableItem> wearableItems;
+    @NonNull
     private final Map<String, Set<CraftableItem>> craftableItemsByRecipe;
+    @NonNull
     private final Map<String, Item> itemsByName;
+    @NonNull
     private final Map<String, Item> itemsByNameLowerCase;
-
-    private Assets(Map<String, Item> allItems, Map<ItemLocation, Set<Item>> itemsByItemLocation,
-                   Map<InventorySlot, Set<WearableItem>> itemsByInventorySlot, Map<ItemType, Set<WearableItem>> itemsByItemType,
-                   Map<Craftbook, Set<CraftableItem>> itemsByCraftbook, Map<String, CraftableItem> craftableItems,
-                   Map<String, WearableItem> wearableItems, Map<String, Set<CraftableItem>> craftableItemsByRecipe,
-                   Map<String, Item> itemsByName, Map<String, Item> itemsByNameLowerCase) {
-        this.allItems = Objects.requireNonNull(allItems, "allItems");
-        this.itemsByItemLocation = Objects.requireNonNull(itemsByItemLocation, "itemsByItemLocation");
-        this.itemsByInventorySlot = Objects.requireNonNull(itemsByInventorySlot, "itemsByInventorySlot");
-        this.itemsByItemType = Objects.requireNonNull(itemsByItemType, "itemsByItemType");
-        this.itemsByCraftbook = Objects.requireNonNull(itemsByCraftbook, "itemsByCraftbook");
-        this.craftableItems = Objects.requireNonNull(craftableItems, "craftableItems");
-        this.wearableItems = Objects.requireNonNull(wearableItems, "wearableItems");
-        this.craftableItemsByRecipe = Objects.requireNonNull(craftableItemsByRecipe, "craftableItemsByRecipe");
-        this.itemsByName = Objects.requireNonNull(itemsByName, "itemsByName");
-        this.itemsByNameLowerCase = Objects.requireNonNull(itemsByNameLowerCase, "itemsByNameLowerCase");
-    }
-
-    public Map<String, Item> getAllItems() {
-        return allItems;
-    }
-
-    public Map<ItemLocation, Set<Item>> getItemsByItemLocation() {
-        return itemsByItemLocation;
-    }
-
-    public Map<InventorySlot, Set<WearableItem>> getItemsByInventorySlot() {
-        return itemsByInventorySlot;
-    }
-
-    public Map<ItemType, Set<WearableItem>> getItemsByItemType() {
-        return itemsByItemType;
-    }
-
-    public Map<Craftbook, Set<CraftableItem>> getItemsByCraftbook() {
-        return itemsByCraftbook;
-    }
-
-    public Map<String, CraftableItem> getCraftableItems() {
-        return craftableItems;
-    }
-
-    public Map<String, WearableItem> getWearableItems() {
-        return wearableItems;
-    }
-
-    public Map<String, Set<CraftableItem>> getCraftableItemsByRecipe() {
-        return craftableItemsByRecipe;
-    }
-
-    public Map<String, Item> getItemsByName() {
-        return itemsByName;
-    }
-
-    public Map<String, Item> getItemsByNameLowerCase() {
-        return itemsByNameLowerCase;
-    }
-
-    @Override
-    public String toString() {
-        return "Assets{" +
-            "allItems=" + allItems +
-            '}';
-    }
 
     public static Builder builder() {
         return new Builder();
@@ -125,7 +79,7 @@ public class Assets {
 
         public Assets build() {
             Map<String, Item> allItems = allItemList.stream()
-                .collect(toImmutableMap(Item::getId, item -> item));
+                .collect(toImmutableMap(Item::getId, t -> t));
             Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder = new EnumMap<>(ItemLocation.class);
             Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByInventorySlotBuilder = new EnumMap<>(InventorySlot.class);
             Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder = new EnumMap<>(ItemType.class);
@@ -152,13 +106,13 @@ public class Assets {
             return new Assets(
                 allItems,
                 itemsByItemLocationBuilder.entrySet().stream()
-                    .collect(createImmutableMapCollector()),
+                    .collect(createImmutableEnumMapCollector()),
                 itemsByInventorySlotBuilder.entrySet().stream()
-                    .collect(createImmutableMapCollector()),
+                    .collect(createImmutableEnumMapCollector()),
                 itemsByItemTypeBuilder.entrySet().stream()
-                    .collect(createImmutableMapCollector()),
+                    .collect(createImmutableEnumMapCollector()),
                 itemsByCraftbookBuilder.entrySet().stream()
-                    .collect(createImmutableMapCollector()),
+                    .collect(createImmutableEnumMapCollector()),
                 craftableItems,
                 wearableItemsBuilder.build(),
                 craftableItemsByRecipe,
@@ -167,10 +121,11 @@ public class Assets {
         }
 
         private static <K extends Enum<K>, V, T extends Map.Entry<K, ImmutableSet.Builder<V>>>
-        Collector<T, ?, ImmutableMap<K, Set<V>>> createImmutableMapCollector() {
+        Collector<T, ?, ImmutableMap<K, Set<V>>> createImmutableEnumMapCollector() {
             return toImmutableEnumMap(Map.Entry::getKey, entry -> entry.getValue().build());
         }
 
+        @RequiredArgsConstructor
         private static class BuilderFiller implements Item.Visitor<Void> {
             private final String id;
             private final Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder;
@@ -181,25 +136,6 @@ public class Assets {
             private final ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder;
             private final ImmutableMap.Builder<String, Item> itemsByNameBuilder;
             private final ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder;
-
-            private BuilderFiller(String id, Map<ItemLocation, ImmutableSet.Builder<Item>> itemsByItemLocationBuilder,
-                                  Map<Craftbook, ImmutableSet.Builder<CraftableItem>> itemsByCraftbookBuilder,
-                                  Map<InventorySlot, ImmutableSet.Builder<WearableItem>> itemsByInventorySlotBuilder,
-                                  Map<ItemType, ImmutableSet.Builder<WearableItem>> itemsByItemTypeBuilder,
-                                  ImmutableMap.Builder<String, CraftableItem> craftableItemsBuilder,
-                                  ImmutableMap.Builder<String, WearableItem> wearableItemsBuilder,
-                                  ImmutableMap.Builder<String, Item> itemsByNameBuilder,
-                                  ImmutableMap.Builder<String, Item> itemsByNameLowerCaseBuilder) {
-                this.id = id;
-                this.itemsByItemLocationBuilder = itemsByItemLocationBuilder;
-                this.itemsByCraftbookBuilder = itemsByCraftbookBuilder;
-                this.itemsByInventorySlotBuilder = itemsByInventorySlotBuilder;
-                this.itemsByItemTypeBuilder = itemsByItemTypeBuilder;
-                this.craftableItemsBuilder = craftableItemsBuilder;
-                this.wearableItemsBuilder = wearableItemsBuilder;
-                this.itemsByNameBuilder = itemsByNameBuilder;
-                this.itemsByNameLowerCaseBuilder = itemsByNameLowerCaseBuilder;
-            }
 
             @Override
             public Void visit(Item item) {

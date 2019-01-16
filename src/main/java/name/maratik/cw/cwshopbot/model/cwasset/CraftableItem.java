@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -16,6 +16,8 @@
 package name.maratik.cw.cwshopbot.model.cwasset;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
 import java.util.Objects;
@@ -23,30 +25,20 @@ import java.util.Objects;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Getter
+@ToString(callSuper = true)
 public class CraftableItem extends Item {
     private final Map<String, Integer> recipe;
     private final int mana;
     private final Craftbook craftbook;
 
     @SuppressWarnings("WeakerAccess")
-    protected CraftableItem(String id, String name, ItemLocation itemLocation, boolean tradeable,
+    protected CraftableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, boolean ingredient,
                             Map<String, Integer> recipe, int mana, Craftbook craftbook) {
-        super(id, name, itemLocation, tradeable);
+        super(id, name, itemLocation, tradeable, ingredient);
         this.recipe = Objects.requireNonNull(recipe, "recipe");
         this.mana = mana;
         this.craftbook = Objects.requireNonNull(craftbook, "craftbook");
-    }
-
-    public Map<String, Integer> getRecipe() {
-        return recipe;
-    }
-
-    public int getMana() {
-        return mana;
-    }
-
-    public Craftbook getCraftbook() {
-        return craftbook;
     }
 
     @Override
@@ -64,15 +56,6 @@ public class CraftableItem extends Item {
         return super.hashCode();
     }
 
-    @Override
-    public String toString() {
-        return "CraftableItem{" +
-            "recipe=" + recipe +
-            ", mana=" + mana +
-            ", craftbook=" + craftbook +
-            "} " + super.toString();
-    }
-
     public static CraftableItemBuilder craftableItemBuilder() {
         return new CraftableItemBuilder();
     }
@@ -85,7 +68,7 @@ public class CraftableItem extends Item {
 
         @Override
         public CraftableItem build() {
-            return new CraftableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, craftbook);
+            return new CraftableItem(id, name, itemLocation, tradeable, ingredient, recipeBuilder.build(), mana, craftbook);
         }
     }
 

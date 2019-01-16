@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,16 @@ import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.cache.Cache;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
+@Service
+@Log4j2
 public class CacheMaintenance {
-    private static final Logger logger = LogManager.getLogger(CacheMaintenance.class);
-
     private final Cache<ForwardKey, Long> forwardUserCache;
     private final LRUCachingMap<Object, JavaType> unifiedObjectMapperCache;
 
@@ -45,7 +43,7 @@ public class CacheMaintenance {
         try {
             forwardUserCache.cleanUp();
         } catch (Exception e) {
-            logger.error("Failed with cleanupForwardUserCache", e);
+            log.error("Failed with cleanupForwardUserCache", e);
         }
     }
 
@@ -54,7 +52,7 @@ public class CacheMaintenance {
         try {
             unifiedObjectMapperCache.cleanUp();
         } catch (Exception e) {
-            logger.error("Failed with cleanupUnifiedObjectMapperCache", e);
+            log.error("Failed with cleanupUnifiedObjectMapperCache", e);
         }
     }
 }

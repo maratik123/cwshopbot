@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -72,28 +72,28 @@ public class ShopInfoParserServiceTest extends MockedTest {
             .orElseThrow(AssertionError::new);
 
         ParsedShopInfo expected = ParsedShopInfo.builder()
-            .setShopName("Drunken Master Shack")
-            .setShopType("Shack")
-            .setShopNumber(56)
-            .setCharName("Forester SM")
-            .setCurrentMana(730)
-            .setMaxMana(730)
-            .setProfession(Profession.BLACKSMITH)
-            .setCastle(Castle.MOONLIGHT)
-            .setShopState(ShopState.CLOSED)
-            .setShopCommand("/ws_lBR02")
-            .addShopLine(ParsedShopInfo.ShopLine.builder()
-                .setItem(assets.getCraftableItems().get("25"))
-                .setMana(15)
-                .setPrice(1)
-                .setCraftCommand("/ws_lBR02_25")
+            .shopName("Drunken Master Shack")
+            .shopType("Shack")
+            .shopNumber(56)
+            .charName("Forester SM")
+            .currentMana(730)
+            .maxMana(730)
+            .profession(Profession.BLACKSMITH)
+            .castle(Castle.MOONLIGHT)
+            .shopState(ShopState.CLOSED)
+            .shopCommand("/ws_lBR02")
+            .shopLine(ParsedShopInfo.ShopLine.builder()
+                .item(assets.getCraftableItems().get("25"))
+                .mana(15)
+                .price(1)
+                .craftCommand("/ws_lBR02_25")
                 .build()
             )
-            .addShopLine(ParsedShopInfo.ShopLine.builder()
-                .setItem(assets.getWearableItems().get("511"))
-                .setMana(120)
-                .setPrice(1)
-                .setCraftCommand("/ws_lBR02_511")
+            .shopLine(ParsedShopInfo.ShopLine.builder()
+                .item(assets.getWearableItems().get("511"))
+                .mana(120)
+                .price(1)
+                .craftCommand("/ws_lBR02_511")
                 .build()
             )
             .build();

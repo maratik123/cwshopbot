@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -19,12 +19,15 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum ChatWarsApiResult implements EnumWithCode {
     OK("Ok"),
     BAD_AMOUNT("BadAmount"),
@@ -46,18 +49,9 @@ public enum ChatWarsApiResult implements EnumWithCode {
     NO_OFFERS_FOUND_BY_PRICE("NoOffersFoundByPrice"),
     UNKNOWN("unknown");
 
+    @Getter(onMethod_ = {@JsonValue})
     private final String code;
     private static final Map<String, ChatWarsApiResult> cache = Util.createCache(values());
-
-    ChatWarsApiResult(String code) {
-        this.code = code;
-    }
-
-    @JsonValue
-    @Override
-    public String getCode() {
-        return code;
-    }
 
     @JsonCreator
     public static ChatWarsApiResult findByCode(String code) {

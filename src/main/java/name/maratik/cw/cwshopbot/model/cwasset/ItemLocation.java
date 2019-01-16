@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,8 @@ import name.maratik.spring.telegram.util.LocalizableValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,34 +29,21 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum ItemLocation implements EnumWithCode, LocalizableValue {
     STOCK("stock", "ItemLocation.RESOURCES"),
     CRAFTING("crafting", "ItemLocation.CRAFTING"),
     MISC("misc", "ItemLocation.MISC"),
     EQUIPMENT("equipment", "ItemLocation.EQUIPMENT");
 
+    @Getter(onMethod_ = {@JsonValue})
     private final String code;
+    @Getter
     private final String translationTag;
     private static final Map<String, ItemLocation> cache = Util.createCache(values());
-
-    ItemLocation(String code, String translationTag) {
-        this.code = code;
-        this.translationTag = translationTag;
-    }
-
-    @Override
-    @JsonValue
-    public String getCode() {
-        return code;
-    }
 
     @JsonCreator
     public static Optional<ItemLocation> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
-    }
-
-    @Override
-    public String getTranslationTag() {
-        return translationTag;
     }
 }

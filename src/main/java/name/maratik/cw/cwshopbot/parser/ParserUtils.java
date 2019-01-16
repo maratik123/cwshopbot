@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,10 +17,9 @@ package name.maratik.cw.cwshopbot.parser;
 
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 
+import lombok.extern.log4j.Log4j2;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.Optional;
@@ -30,9 +29,8 @@ import static name.maratik.cw.cwshopbot.application.botcontroller.ShopController
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
 public class ParserUtils {
-    private static final Logger logger = LogManager.getLogger(ParserUtils.class);
-
     public static void verifyItem(Item item, int mana) {
         item.apply(CraftableItemVerifier.getInstance());
         item.apply(new ManaCostVerifier(mana));
@@ -46,16 +44,16 @@ public class ParserUtils {
         try {
             return parseAction.action();
         } catch (ParseCancellationException e) {
-            logger.error("Failed to parse message {}", message, e);
+            log.error("Failed to parse message {}", message, e);
             if (e.getCause() instanceof RecognitionException) {
                 RecognitionException recognitionException = (RecognitionException) e.getCause();
-                logger.error("Expected tokens: {}, offended one: {}",
+                log.error("Expected tokens: {}, offended one: {}",
                     recognitionException.getExpectedTokens(), recognitionException.getOffendingToken()
                 );
             }
             return Optional.empty();
         } catch (Exception e) {
-            logger.error("Failed to parse message {}", message, e);
+            log.error("Failed to parse message {}", message, e);
             return Optional.empty();
         }
     }

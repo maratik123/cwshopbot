@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -19,6 +19,8 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -26,22 +28,14 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum ShopState implements EnumWithCode {
     OPEN("open"),
     CLOSED("closed");
 
+    @Getter(onMethod_ = {@JsonValue})
     private final String code;
     private static final Map<String, ShopState> cache = Util.createCache(values());
-
-    ShopState(String code) {
-        this.code = code;
-    }
-
-    @Override
-    @JsonValue
-    public String getCode() {
-        return code;
-    }
 
     @JsonCreator
     public static Optional<ShopState> findByCode(String code) {

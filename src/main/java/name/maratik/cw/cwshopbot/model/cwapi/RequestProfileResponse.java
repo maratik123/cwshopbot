@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -16,10 +16,13 @@
 package name.maratik.cw.cwshopbot.model.cwapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@ToString(callSuper = true)
 public class RequestProfileResponse extends ApiResponseBase<RequestProfileResponse.Payload> {
 
     public RequestProfileResponse(
@@ -30,11 +33,8 @@ public class RequestProfileResponse extends ApiResponseBase<RequestProfileRespon
         super(uuid, result, payload);
     }
 
-    @Override
-    public String toString() {
-        return "RequestProfileResponse{} " + super.toString();
-    }
-
+    @ToString(callSuper = true)
+    @Getter
     public static class Payload extends UserIdResponsePayload {
         private final Profile profile;
 
@@ -44,17 +44,6 @@ public class RequestProfileResponse extends ApiResponseBase<RequestProfileRespon
         ) {
             super(userId);
             this.profile = profile;
-        }
-
-        public Profile getProfile() {
-            return profile;
-        }
-
-        @Override
-        public String toString() {
-            return "Payload{" +
-                "profile=" + profile +
-                "} " + super.toString();
         }
     }
 }

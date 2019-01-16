@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ import name.maratik.spring.telegram.util.Localizable;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.cache.Cache;
+import lombok.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 
@@ -144,60 +145,25 @@ public class StatsService extends Localizable {
             "Unified object mapper cache: " + unifiedObjectMapperCache.stats();
     }
 
+    @Value
     private static class GCStats {
-        private final long count;
-        private final long time;
-
-        private GCStats(long count, long time) {
-            this.count = count;
-            this.time = time;
-        }
-
-        private long getCount() {
-            return count;
-        }
-
-        private long getTime() {
-            return time;
-        }
+        long count;
+        long time;
     }
 
+    @Value
     private static class UserStats {
-        private final LongAdder counter = new LongAdder();
-        private final User user;
-
-        private UserStats(User user) {
-            this.user = user;
-        }
-
-        private LongAdder getCounter() {
-            return counter;
-        }
-
-        private User getUser() {
-            return user;
-        }
+        LongAdder counter = new LongAdder();
+        User user;
 
         private UserStatsView toView() {
             return new UserStatsView(getCounter().sum(), user);
         }
     }
 
+    @Value
     private static class UserStatsView {
-        private final long counter;
-        private final User user;
-
-        private UserStatsView(long counter, User user) {
-            this.counter = counter;
-            this.user = user;
-        }
-
-        public long getCounter() {
-            return counter;
-        }
-
-        public User getUser() {
-            return user;
-        }
+        long counter;
+        User user;
     }
 }

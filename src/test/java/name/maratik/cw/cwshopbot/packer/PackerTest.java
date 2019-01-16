@@ -1,6 +1,5 @@
 package name.maratik.cw.cwshopbot.packer;
 
-import name.maratik.cw.cwshopbot.mock.MockedTest;
 import name.maratik.cw.cwshopbot.proto.ReplyData;
 
 import org.junit.Test;
@@ -16,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class PackerTest extends MockedTest {
+public class PackerTest {
 
     @Test
     public void packUnPackData() {

@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,41 +15,18 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
+@Getter
+@ToString
 public abstract class ApiResponseBase<T extends ResponsePayload> implements ApiResponse<T> {
     private final String uuid;
     private final ChatWarsApiResult result;
     private final T payload;
-
-    protected ApiResponseBase(String uuid, ChatWarsApiResult result, T payload) {
-        this.uuid = uuid;
-        this.result = result;
-        this.payload = payload;
-    }
-
-    @Override
-    public String getUuid() {
-        return uuid;
-    }
-
-    @Override
-    public ChatWarsApiResult getResult() {
-        return result;
-    }
-
-    @Override
-    public T getPayload() {
-        return payload;
-    }
-
-    @Override
-    public String toString() {
-        return "ApiResponseBase{" +
-            "uuid='" + uuid + '\'' +
-            ", result=" + result +
-            ", payload=" + payload +
-            '}';
-    }
 }

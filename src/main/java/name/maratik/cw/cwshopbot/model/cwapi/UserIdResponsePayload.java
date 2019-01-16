@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,28 +15,16 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
+@Getter
+@ToString
 public class UserIdResponsePayload implements ResponsePayload {
     private final long userId;
-
-    public UserIdResponsePayload(
-        @JsonProperty("userId") long userId
-    ) {
-        this.userId = userId;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    @Override
-    public String toString() {
-        return "UserIdResponsePayload{" +
-            "userId=" + userId +
-            '}';
-    }
 }

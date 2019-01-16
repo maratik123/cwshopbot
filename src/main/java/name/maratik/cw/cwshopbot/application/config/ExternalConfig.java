@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,13 +17,6 @@ package name.maratik.cw.cwshopbot.application.config;
 
 import name.maratik.spring.telegram.annotation.EnableTelegramBot;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,42 +27,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableTelegramBot
 public class ExternalConfig {
-
-    @Configuration
-    public static class AWSConfiguration {
-        @Value("${name.maratik.cw.cwshopbot.accessKeyId}")
-        private String accessKey;
-        @Value("${name.maratik.cw.cwshopbot.secretAccessKey}")
-        private String secretKey;
-        @Value("${name.maratik.cw.cwshopbot.region}")
-        private String regionName;
-
-        @Bean
-        public AWSCredentials awsCredentials() {
-            return new BasicAWSCredentials(accessKey, secretKey);
-        }
-
-        @Bean
-        public AWSCredentialsProvider awsCredentialsProvider() {
-            return new AWSStaticCredentialsProvider(awsCredentials());
-        }
-
-        @Bean
-        public Regions regions() {
-            return Regions.fromName(regionName);
-        }
-
-        @Bean
-        public AmazonDynamoDB amazonDynamoDB() {
-            return AmazonDynamoDBClientBuilder.standard()
-                .withRegion(Regions.AP_NORTHEAST_1)
-                .withCredentials(awsCredentialsProvider())
-                .build();
-        }
-    }
-
-    @Configuration
-    public static class RabbitConfiguration {
-
+    @ConnectionUrl
+    @Bean
+    public String connectionUrl(@Value("${cwshopbot.db.connectionUrl}") String connectionUrl) {
+        return connectionUrl;
     }
 }

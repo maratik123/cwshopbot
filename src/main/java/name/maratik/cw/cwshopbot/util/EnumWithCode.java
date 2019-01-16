@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ public interface EnumWithCode {
 
     class Util {
         public static <T extends EnumWithCode> Map<String, T> createCache(T[] values) {
-            return Arrays.stream(values).collect(toImmutableMap(T::getCode, value -> value));
+            return Arrays.stream(values).collect(toImmutableMap(T::getCode, t -> t));
         }
     }
 }

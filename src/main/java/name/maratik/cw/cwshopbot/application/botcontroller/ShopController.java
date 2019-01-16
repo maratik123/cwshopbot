@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,6 @@ package name.maratik.cw.cwshopbot.application.botcontroller;
 
 import name.maratik.cw.cwshopbot.application.config.ForwardUser;
 import name.maratik.cw.cwshopbot.application.service.CWParser;
-import name.maratik.cw.cwshopbot.application.service.ChatWarsAuthService;
 import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.application.service.StatsService;
 import name.maratik.cw.cwshopbot.application.service.YellowPagesService;
@@ -40,8 +39,7 @@ import name.maratik.spring.telegram.util.Localizable;
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -60,7 +58,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,12 +66,14 @@ import java.util.concurrent.ConcurrentMap;
 import static name.maratik.cw.cwshopbot.util.Emoji.LEFTWARDS_ARROW;
 import static name.maratik.cw.cwshopbot.util.Emoji.RIGHTWARDS_ARROW;
 
+import static java.util.Collections.singletonList;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @TelegramBot
+@Log4j2
 public class ShopController extends Localizable {
-    private static final Logger logger = LogManager.getLogger(ShopController.class);
 
     public static final int PAGE_SIZE = 30;
     public static final String VIEW_PREFIX = "/view_";
@@ -96,7 +95,6 @@ public class ShopController extends Localizable {
     private final ItemSearchService itemSearchService;
     private final long devUserId;
     private final String devUserName;
-    private final ChatWarsAuthService chatWarsAuthService;
     private final String cwUserName;
     private final StatsService statsService;
     private final YellowPagesService yellowPagesService;
@@ -107,8 +105,8 @@ public class ShopController extends Localizable {
                           CWParser<ParsedHero> heroParser, ItemSearchService itemSearchService,
                           @Value("${name.maratik.cw.cwshopbot.dev}") long devUserId,
                           @Value("${name.maratik.cw.cwshopbot.dev.username}") String devUserName,
-                          ChatWarsAuthService chatWarsAuthService, @Value("${cwusername}") String cwUserName,
-                          StatsService statsService, YellowPagesService yellowPagesService
+                          @Value("${cwusername}") String cwUserName, StatsService statsService,
+                          YellowPagesService yellowPagesService
     ) {
         this.clock = clock;
         this.forwardStale = forwardStale;
@@ -119,7 +117,6 @@ public class ShopController extends Localizable {
         this.itemSearchService = itemSearchService;
         this.devUserId = devUserId;
         this.devUserName = devUserName;
-        this.chatWarsAuthService = chatWarsAuthService;
         this.cwUserName = cwUserName;
         this.statsService = statsService;
         this.yellowPagesService = yellowPagesService;
@@ -145,7 +142,7 @@ public class ShopController extends Localizable {
                     .setReplyToMessageId(messageId)
                     .setText(t("ShopController.MESSAGE.TO_DEVS"));
             } catch (Exception e) {
-                logger.error("Error on send #bug forward", e);
+                log.error("Error on send #bug forward", e);
                 return new SendMessage()
                     .setChatId(userId)
                     .setReplyToMessageId(messageId)
@@ -252,10 +249,10 @@ public class ShopController extends Localizable {
         Update update, String messageText, User user, long userId, Instant forwardTime, Message message
     ) {
         statsService.updateStats("shop.forward", user);
-        logger.info("Accepted incoming forward data: {}", messageText);
+        log.info("Accepted incoming forward data: {}", messageText);
 
         if (messageIsStale(forwardTime)) {
-            logger.info("Forwarded stale update: {}", update);
+            log.info("Forwarded stale update: {}", update);
             return new SendMessage()
                 .setChatId(userId)
                 .setText(t("ShopController.FORWARD.STALE"));
@@ -302,7 +299,7 @@ public class ShopController extends Localizable {
     @TelegramForward
     public SendMessage defaultForward(long userId, User user) {
         statsService.updateStats("shop.forward.default", user);
-        logger.info("Accepted unsupported forward data from user: ", userId);
+        log.info("Accepted unsupported forward data from user: ", userId);
         return new SendMessage()
             .setChatId(userId)
             .setText(t("ShopController.FORWARD.UNSUPPORTED", user.getFirstName()));
@@ -377,7 +374,7 @@ public class ShopController extends Localizable {
                             .setReplyMarkup(getKeysForYellowPages(yellowPages.getKey()))
                         );
                     } catch (TelegramApiException e) {
-                        logger.error("Can not process execute on request: {}", update, e);
+                        log.error("Can not process execute on request: {}", update, e);
                     }
                 });
         }
@@ -397,7 +394,7 @@ public class ShopController extends Localizable {
         List<InlineKeyboardButton> buttons = keyboardBuilder.build();
         return buttons.isEmpty()
             ? null
-            : new InlineKeyboardMarkup().setKeyboard(Collections.singletonList(buttons));
+            : new InlineKeyboardMarkup().setKeyboard(singletonList(buttons));
     }
 
     private Optional<InlineKeyboardButton> backwardYellowPagesButton(String key) {
@@ -450,7 +447,7 @@ public class ShopController extends Localizable {
         return message.orElseGet(() -> t("ShopController.404"));
     }
 
-    protected static String getCommandSuffix(Message message, int prefixLen) {
+    private static String getCommandSuffix(Message message, int prefixLen) {
         return message.getText().substring(prefixLen);
     }
 }

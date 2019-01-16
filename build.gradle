@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,9 @@ buildscript {
 plugins {
     id 'jacoco'
     id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'com.github.spotbugs' version '1.6.5'
-    id 'net.researchgate.release' version '2.6.0'
+    id 'com.github.spotbugs' version '1.6.9'
+    id 'net.researchgate.release' version '2.8.0'
+    id 'io.franzbecker.gradle-lombok' version '1.14'
 }
 
 group 'name.maratik.cw'
@@ -38,10 +39,10 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        url 'https://s3-us-west-2.amazonaws.com/dynamodb-local/release'
+        url 'https://jitpack.io'
     }
     maven {
-        url 'https://jitpack.io'
+        url 'http://invesdwin.de/artifactory/invesdwin-oss-remote'
     }
 }
 
@@ -53,6 +54,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'net.researchgate.release'
 apply plugin: 'com.google.protobuf'
+apply plugin: 'io.franzbecker.gradle-lombok'
 
 sourceCompatibility = 1.8
 
@@ -65,6 +67,8 @@ configurations {
     compile.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     compile.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     compile.exclude group: 'com.vaadin.external.google', module: 'android-json'
+    compile.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    compile.exclude group: 'ch.qos.logback', module: 'logback-core'
 }
 
 dependencies {
@@ -74,23 +78,27 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile 'org.springframework.boot:spring-boot-starter-amqp'
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+    compile 'org.springframework.data:spring-data-jdbc'
+    compile 'org.springframework:spring-aspects'
+    compile "org.postgresql:postgresql:${postgresqlVersion}"
     compile "org.telegram:telegrambots:${telegrambotsVersion}"
     compile "com.google.guava:guava:${guavaVersion}"
-    compile "com.amazonaws:aws-java-sdk-dynamodb:${awsJavaSdkVersion}"
     compile 'org.apache.logging.log4j:log4j-jcl'
     compile 'org.apache.logging.log4j:log4j-jul'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     compile 'com.fasterxml.jackson.module:jackson-module-afterburner'
-    compile "org.apache.lucene:lucene-core:${luceneVersion}"
-    compile "org.apache.lucene:lucene-analyzers-common:${luceneVersion}"
-    compile "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     compile "com.github.maratik123:spring-telegram:${springTelegramVersion}"
     compile "com.google.protobuf:protobuf-java:${protobufJavaVersion}"
+    compile "org.liquibase:liquibase-core:${liquibaseVersion}"
+    compile "org.apache.commons:commons-dbcp2:${apacheCommonsDbcp2Version}"
+    compile "de.invesdwin:invesdwin-instrument:${invesdwinInstrumentVersion}"
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
-    testCompile "com.amazonaws:DynamoDBLocal:${awsDynamodbLocalVersion}"
     testCompile 'org.springframework.amqp:spring-rabbit-junit'
     testCompile 'org.springframework.amqp:spring-rabbit-test'
+    testCompile "ru.yandex.qatools.embed:postgresql-embedded:${postgresqlEmbeddedVersion}"
 }
 
 bootJar {
@@ -106,12 +114,13 @@ bootRun {
     ]
 }
 
-test {
-    systemProperty 'java.library.path', file('lib').absolutePath
+spotbugs {
+    toolVersion = '3.1.10'
 }
 
-spotbugs {
-    toolVersion = '3.1.8'
+lombok {
+    version = '1.18.4'
+    sha256 = ""
 }
 
 generateGrammarSource {
@@ -121,11 +130,16 @@ generateGrammarSource {
             '-lib', 'src/main/antlr/name/maratik/cw/cwshopbot/parser/generated'
     ]
 }
+
 protobuf {
     generatedFilesBaseDir = project.file("generated").absolutePath
     protoc {
         artifact = "com.google.protobuf:protoc:${protocVersion}"
     }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += [ '-parameters', '-Xlint:unchecked' ]
 }
 
 clean.delete << protobuf.generatedFilesBaseDir

@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,9 @@ import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.model.cwasset.WearableItem;
 import name.maratik.spring.telegram.util.Localizable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
@@ -164,14 +167,19 @@ public class ItemSearchService extends Localizable {
             .map(SearchOutput::getMessage);
     }
 
-    private interface SearchOutput {
-        String getMessage();
+    private abstract static class SearchOutput {
+        @Getter(lazy = true, onMethod_ = {@SuppressFBWarnings("JLM_JSR166_UTILCONCURRENT_MONITORENTER")})
+        private final String message = evalMessage();
+
+        protected abstract String evalMessage();
     }
 
-    private class RecipeOutput implements SearchOutput {
-        private final String message;
+    @RequiredArgsConstructor
+    private class RecipeOutput extends SearchOutput {
+        private final CraftableItem craftableItem;
 
-        private RecipeOutput(CraftableItem craftableItem) {
+        @Override
+        protected String evalMessage() {
             Map<String, Integer> recipe = craftableItem.getRecipe();
             StringBuilder sb = new StringBuilder(t("ItemSearchService.RECIPE.HEADER",
                 craftableItem.getName(), createCommandLink(T_PREFIX, craftableItem), craftableItem.getMana()
@@ -188,34 +196,23 @@ public class ItemSearchService extends Localizable {
                     appendCommandLink(sb, A_PREFIX, item)
                         .append(") x ").append(entry.getValue()).append('\n');
                 });
-            message = sb.toString();
-        }
-
-        @Override
-        public String getMessage() {
-            return message;
+            return sb.toString();
         }
     }
 
-    private class ItemOutput implements SearchOutput {
-        private final String message;
-
-        private ItemOutput(Item item) {
-            message = item.apply(new MessageConstructor(new StringBuilder())).toString();
-        }
+    @RequiredArgsConstructor
+    private class ItemOutput extends SearchOutput {
+        private final Item item;
 
         @Override
-        public String getMessage() {
-            return message;
+        protected String evalMessage() {
+            return item.apply(new MessageConstructor(new StringBuilder())).toString();
         }
 
+        @RequiredArgsConstructor
         private class MessageConstructor implements Item.Visitor<StringBuilder> {
             @SuppressWarnings("StringBufferField")
             private final StringBuilder sb;
-
-            private MessageConstructor(StringBuilder sb) {
-                this.sb = sb;
-            }
 
             @Override
             public StringBuilder visit(Item item) {
@@ -285,28 +282,27 @@ public class ItemSearchService extends Localizable {
         }
     }
 
-    private static class ListOutput implements SearchOutput {
+    @RequiredArgsConstructor
+    private static class ListOutput extends SearchOutput {
+        private final List<? extends Item> items;
 
-        private final String message;
-
-        private ListOutput(List<? extends Item> items) {
+        @Override
+        protected String evalMessage() {
             StringBuilder sb = new StringBuilder();
             items.forEach(item -> appendCommandLink(sb, T_PREFIX, item)
                 .append(' ').append(item.getName()).append('\n')
             );
-            message = sb.toString();
-        }
-
-        @Override
-        public String getMessage() {
-            return message;
+            return sb.toString();
         }
     }
 
-    private class ListRecipes implements SearchOutput {
-        private final String message;
+    @RequiredArgsConstructor
+    private class ListRecipes extends SearchOutput {
+        private final Optional<Item> optionalItem;
+        private final Collection<CraftableItem> items;
 
-        private ListRecipes(Optional<Item> optionalItem, Collection<CraftableItem> items) {
+        @Override
+        protected String evalMessage() {
             StringBuilder sb = new StringBuilder();
             optionalItem.ifPresent(item ->
                 sb.append(t("ItemSearchService.RECIPE_LIST.HEADER",
@@ -320,12 +316,7 @@ public class ItemSearchService extends Localizable {
                         .append(' ').append(craftableItem.getName()).append(" (");
                     appendCommandLink(sb, T_PREFIX, craftableItem).append(")\n");
                 });
-            message = sb.toString();
-        }
-
-        @Override
-        public String getMessage() {
-            return message;
+            return sb.toString();
         }
     }
 }

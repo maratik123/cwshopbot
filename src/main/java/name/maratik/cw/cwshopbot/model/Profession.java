@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -19,6 +19,10 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,31 +33,28 @@ import static name.maratik.cw.cwshopbot.util.Emoji.HAMMERS;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum Profession implements EnumWithCode {
     BLACKSMITH("Blacksmith", HAMMERS),
     ALCHEMIST("Alchemist", ALEMBIC);
 
+    @Getter(onMethod_ = {@JsonValue})
     private final String code;
+    @Getter
     private final String emoji;
     private static final Map<String, Profession> cache = Util.createCache(values());
-
-    Profession(String code, String emoji) {
-        this.code = code;
-        this.emoji = emoji;
-    }
-
-    @JsonValue
-    @Override
-    public String getCode() {
-        return code;
-    }
 
     @JsonCreator
     public static Optional<Profession> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }
 
-    public String getEmoji() {
-        return emoji;
-    }
+    @SuppressWarnings("Convert2Lambda")
+    public static final Converter<String, Profession> CONVERTER = new Converter<String, Profession>() {
+        @Override
+        public Profession convert(@NonNull String source) {
+            return findByCode(source)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown profession: " + source));
+        }
+    };
 }

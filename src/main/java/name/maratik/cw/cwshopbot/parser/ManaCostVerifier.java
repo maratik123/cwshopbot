@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -18,31 +18,27 @@ package name.maratik.cw.cwshopbot.parser;
 import name.maratik.cw.cwshopbot.model.cwasset.CraftableItem;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
+@RequiredArgsConstructor
 public class ManaCostVerifier implements Item.Visitor<Void> {
-    private static final Logger logger = LogManager.getLogger(ManaCostVerifier.class);
-
     private final int manaCost;
-
-    public ManaCostVerifier(int manaCost) {
-        this.manaCost = manaCost;
-    }
 
     @Override
     public Void visit(Item item) {
-        logger.warn("Trying to define mana cost '{}' for non-craftable item: {}", manaCost, item);
+        log.warn("Trying to define mana cost '{}' for non-craftable item: {}", manaCost, item);
         return null;
     }
 
     @Override
     public Void visit(CraftableItem craftableItem) {
         if (craftableItem.getMana() != manaCost) {
-            logger.warn("Mana cost is invalid for item {}: actual={}", craftableItem, manaCost);
+            log.warn("Mana cost is invalid for item {}: actual={}", craftableItem, manaCost);
         }
         return null;
     }

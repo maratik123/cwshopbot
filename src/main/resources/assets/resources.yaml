@@ -1,5 +1,5 @@
 #    cwshopbot
-#    Copyright (C) 2018  Marat Bukharov.
+#    Copyright (C) 2019  Marat Bukharov.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as published by
@@ -15,6 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 stock:
   tradeable: true
+  ingredient: true
   01:
     name: Thread
   02:
@@ -159,8 +160,18 @@ stock:
       20: 4
       05: 4
       12: 1
+  36:
+    name: Resurrection Mix
+    tradeable: false
+    ingredient: false
+    recipe:
+      04: 50
+      03: 20
+      13: 3
+      24: 1
 crafting:
   tradeable: false
+  ingredient: true
   r01:
     name: Champion Sword recipe
   k01:
@@ -1383,6 +1394,7 @@ craftbook:
       - 24
       - 31
       - 33
+      - 36
       - 100
       - 501
       - 505

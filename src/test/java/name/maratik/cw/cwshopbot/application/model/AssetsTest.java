@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,7 @@ import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.model.cwasset.ItemLocation;
 import name.maratik.cw.cwshopbot.model.cwasset.ItemType;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -47,8 +46,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
 public class AssetsTest extends MockedTest {
-    private static final Logger logger = LogManager.getLogger(AssetsTest.class);
     private static final Item.Visitor<Boolean> VISIBILITY_VISITOR = new Item.Visitor<Boolean>() {
         @Override
         public Boolean visit(Item item) {
@@ -82,7 +81,7 @@ public class AssetsTest extends MockedTest {
 
     @Test
     public void shouldAssetsExists() {
-        logger.info("Assets: {}", assets);
+        log.info("Assets: {}", assets);
         assertNotNull(assets);
     }
 
@@ -187,10 +186,19 @@ public class AssetsTest extends MockedTest {
     }
 
     @Test
-    public void shouldAllStockOrCraftingItemsInVisibleRecipes() {
-        Stream.of(ItemLocation.STOCK, ItemLocation.CRAFTING)
-            .map(assets.getItemsByItemLocation()::get)
-            .flatMap(Collection::stream)
+    public void shouldAtLeastOneIngredientAvailable() {
+        assertTrue(assets.getAllItems().values().stream().anyMatch(Item::isIngredient));
+    }
+
+    @Test
+    public void shouldAtLeastOneNonIngredientAvailable() {
+        assertTrue(assets.getAllItems().values().stream().anyMatch(item -> !item.isIngredient()));
+    }
+
+    @Test
+    public void shouldAllIngredientsInVisibleRecipes() {
+        assets.getAllItems().values().stream()
+            .filter(Item::isIngredient)
             .filter(item -> item.apply(VISIBILITY_VISITOR))
             .map(Item::getId)
             .forEach(id ->

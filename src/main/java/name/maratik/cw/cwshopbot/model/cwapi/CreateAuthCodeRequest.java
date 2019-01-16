@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,80 +15,22 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
-import java.util.Objects;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Value
+@Builder
 public class CreateAuthCodeRequest implements ApiRequestWithPayload<CreateAuthCodeRequest.Payload> {
+    @NonNull
     private final Payload payload;
 
-    private CreateAuthCodeRequest(Payload payload) {
-        this.payload = Objects.requireNonNull(payload, "payload");
-    }
-
-    @Override
-    public Payload getPayload() {
-        return payload;
-    }
-
-    @Override
-    public String toString() {
-        return "CreateAuthCodeRequest{" +
-            "payload=" + payload +
-            '}';
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private Payload payload;
-
-        public Builder setPayload(Payload payload) {
-            this.payload = payload;
-            return this;
-        }
-
-        public CreateAuthCodeRequest build() {
-            return new CreateAuthCodeRequest(payload);
-        }
-    }
-
+    @Value
+    @Builder
     public static class Payload implements RequestPayload {
         private final long userId;
-
-        private Payload(long userId) {
-            this.userId = userId;
-        }
-
-        public long getUserId() {
-            return userId;
-        }
-
-        @Override
-        public String toString() {
-            return "Payload{" +
-                "userId=" + userId +
-                '}';
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        public static class Builder {
-            private long userId;
-
-            public Builder setUserId(long userId) {
-                this.userId = userId;
-                return this;
-            }
-
-            public Payload build() {
-                return new Payload(userId);
-            }
-        }
     }
 }

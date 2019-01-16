@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -18,6 +18,7 @@ package name.maratik.cw.cwshopbot.util;
 import name.maratik.cw.cwshopbot.model.cwasset.Item;
 
 import com.google.common.collect.ImmutableList;
+import lombok.ToString;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -39,7 +40,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public class Utils {
     public static final Comparator<MessageEntity> MESSAGE_ENTITY_OFFSET_COMPARATOR =
         Comparator.comparingInt(MessageEntity::getOffset);
-    public static final Object[] EMPTY = new Object[0];
 
     private static final int MAX_PREFIX_LEN = extractMaxPropLenFromMessageType(MessageType::getPrefix);
     private static final int MAX_POSTFIX_LEN = extractMaxPropLenFromMessageType(MessageType::getPostfix);
@@ -202,6 +202,7 @@ public class Utils {
     }
 
     @SuppressWarnings("ReturnOfNull")
+    @ToString
     private static class TextMessageEntity extends MessageEntity {
         private static final String type = MessageType.TEXT.getCode();
         private static final long serialVersionUID = -1361075071106423195L;
@@ -241,14 +242,6 @@ public class Utils {
         @Override
         public User getUser() {
             return null;
-        }
-
-        @Override
-        public String toString() {
-            return "TextMessageEntity{" +
-                "offset=" + offset +
-                ", length=" + length +
-                '}';
         }
     }
 }

@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,31 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.google.common.collect.Maps.toImmutableEnumMap;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum ProfessionByEmoji implements EnumWithCode {
     BLACKSMITH(Profession.BLACKSMITH),
     ALCHEMIST(Profession.ALCHEMIST);
 
+    @Getter
     private final Profession profession;
     private static final Map<String, ProfessionByEmoji> cache = Util.createCache(values());
-
-    ProfessionByEmoji(Profession profession) {
-        this.profession = profession;
-    }
-
-    public Profession getProfession() {
-        return profession;
-    }
+    private static final Map<Profession, ProfessionByEmoji> professionCache = Arrays.stream(values())
+        .collect(toImmutableEnumMap(
+            ProfessionByEmoji::getProfession,
+            t -> t
+        ));
 
     @JsonValue
     @Override
@@ -51,5 +55,9 @@ public enum ProfessionByEmoji implements EnumWithCode {
     @JsonCreator
     public static Optional<ProfessionByEmoji> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
+    }
+
+    public static ProfessionByEmoji findByProfession(Profession profession) {
+        return professionCache.get(profession);
     }
 }

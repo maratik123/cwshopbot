@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Value
 public class Deal {
     private final String sellerId;
     private final String sellerName;
@@ -30,77 +31,4 @@ public class Deal {
     private final String item;
     private final int qty;
     private final int price;
-
-    public Deal(
-        @JsonProperty("sellerId") String sellerId,
-        @JsonProperty("sellerName") String sellerName,
-        @JsonProperty("sellerCastle") CastleByEmoji sellerCastle,
-        @JsonProperty("buyerId") String buyerId,
-        @JsonProperty("buyerName") String buyerName,
-        @JsonProperty("buyerCastle") CastleByEmoji buyerCastle,
-        @JsonProperty("item") String item,
-        @JsonProperty("qty") int qty,
-        @JsonProperty("price") int price
-    ) {
-        this.sellerId = sellerId;
-        this.sellerName = sellerName;
-        this.sellerCastle = sellerCastle;
-        this.buyerId = buyerId;
-        this.buyerName = buyerName;
-        this.buyerCastle = buyerCastle;
-        this.item = item;
-        this.qty = qty;
-        this.price = price;
-    }
-
-    public String getSellerId() {
-        return sellerId;
-    }
-
-    public String getSellerName() {
-        return sellerName;
-    }
-
-    public CastleByEmoji getSellerCastle() {
-        return sellerCastle;
-    }
-
-    public String getBuyerId() {
-        return buyerId;
-    }
-
-    public String getBuyerName() {
-        return buyerName;
-    }
-
-    public CastleByEmoji getBuyerCastle() {
-        return buyerCastle;
-    }
-
-    public String getItem() {
-        return item;
-    }
-
-    public int getQty() {
-        return qty;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    @Override
-    public String toString() {
-        return "Deal{" +
-            "sellerId='" + sellerId + '\'' +
-            ", sellerName='" + sellerName + '\'' +
-            ", sellerCastle=" + sellerCastle +
-            ", buyerId='" + buyerId + '\'' +
-            ", buyerName='" + buyerName + '\'' +
-            ", buyerCastle=" + buyerCastle +
-            ", item='" + item + '\'' +
-            ", qty=" + qty +
-            ", price=" + price +
-            '}';
-    }
 }

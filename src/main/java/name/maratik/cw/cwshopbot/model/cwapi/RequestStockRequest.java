@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,43 +15,16 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
-import java.util.Objects;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Value
+@Builder
 public class RequestStockRequest implements ApiRequest {
+    @NonNull
     private final String token;
-
-    private RequestStockRequest(String token) {
-        this.token = Objects.requireNonNull(token, "token");
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestStockRequest{" +
-            "token='" + token + '\'' +
-            '}';
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String token;
-
-        public Builder setToken(String token) {
-            this.token = token;
-            return this;
-        }
-
-        public RequestStockRequest build() {
-            return new RequestStockRequest(token);
-        }
-    }
 }

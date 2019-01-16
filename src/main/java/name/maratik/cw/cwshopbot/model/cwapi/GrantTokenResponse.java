@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -16,10 +16,13 @@
 package name.maratik.cw.cwshopbot.model.cwapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@ToString(callSuper = true)
 public class GrantTokenResponse extends ApiResponseBase<GrantTokenResponse.Payload> {
 
     public GrantTokenResponse(
@@ -30,11 +33,8 @@ public class GrantTokenResponse extends ApiResponseBase<GrantTokenResponse.Paylo
         super(uuid, result, payload);
     }
 
-    @Override
-    public String toString() {
-        return "GrantTokenResponse{} " + super.toString();
-    }
-
+    @ToString(callSuper = true)
+    @Getter
     public static class Payload extends UserIdResponsePayload {
         private final String id;
         private final String token;
@@ -47,22 +47,6 @@ public class GrantTokenResponse extends ApiResponseBase<GrantTokenResponse.Paylo
             super(userId);
             this.id = id;
             this.token = token;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        @Override
-        public String toString() {
-            return "Payload{" +
-                "id='" + id + '\'' +
-                ", token='" + token + '\'' +
-                "} " + super.toString();
         }
     }
 }

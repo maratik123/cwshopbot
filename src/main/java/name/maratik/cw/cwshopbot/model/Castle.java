@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,9 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 import java.util.Map;
 import java.util.Optional;
@@ -60,9 +63,13 @@ public enum Castle implements EnumWithCode {
     FARM("Ферма", AUBERGINE, Game.RU2),
     URN("Urn", Emoji.URN, Game.EN, Game.RU2);
 
+    @Getter(onMethod_ = {@JsonValue})
     private final String code;
+    @Getter
     private final String castleName;
+    @Getter
     private final String emoji;
+    @Getter
     private final Set<Game> games;
     private static final Map<String, Castle> cache = Util.createCache(values());
 
@@ -73,26 +80,16 @@ public enum Castle implements EnumWithCode {
         this.games = Sets.immutableEnumSet(game, otherGames);
     }
 
-    @JsonValue
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    public String getCastleName() {
-        return castleName;
-    }
-
-    public String getEmoji() {
-        return emoji;
-    }
-
-    public Set<Game> getGames() {
-        return games;
-    }
-
     @JsonCreator
     public static Optional<Castle> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }
+
+    @SuppressWarnings("Convert2Lambda")
+    public static final Converter<String, Castle> CONVERTER = new Converter<String, Castle>() {
+        @Override
+        public Castle convert(@NonNull String source) {
+            return findByCode(source).orElseThrow(() -> new IllegalArgumentException("Unknown castle: " + source));
+        }
+    };
 }

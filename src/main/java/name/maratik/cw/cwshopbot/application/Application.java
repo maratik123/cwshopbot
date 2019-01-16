@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -19,17 +19,21 @@ import name.maratik.cw.cwshopbot.application.config.ExternalConfig;
 import name.maratik.cw.cwshopbot.application.config.InternalConfig;
 import name.maratik.cw.cwshopbot.application.config.TmsConfig;
 
+import de.invesdwin.instrument.DynamicInstrumentationLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 @PropertySource(value = "file:${HOME}/${cwshopbotconfig}/auth.properties", ignoreResourceNotFound = true)
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+    DataSourceAutoConfiguration.class
+})
 @Configuration
 @Import({
     InternalConfig.class,
@@ -38,6 +42,10 @@ import org.springframework.context.annotation.PropertySource;
 })
 @ComponentScan(excludeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application {
+    static {
+        DynamicInstrumentationLoader.waitForInitialized();
+        DynamicInstrumentationLoader.initLoadTimeWeavingContext().registerShutdownHook();
+    }
 
     public static void main(String[] args) {
         Logger logger = LogManager.getLogger(Application.class);

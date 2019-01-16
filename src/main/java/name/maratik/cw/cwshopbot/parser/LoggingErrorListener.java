@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,45 +15,44 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.parser;
 
+import lombok.extern.log4j.Log4j2;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.BitSet;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
 public class LoggingErrorListener extends BaseErrorListener {
-    private static final Logger logger = LogManager.getLogger(LoggingErrorListener.class);
 
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                             int charPositionInLine, String msg, RecognitionException e) {
-        logger.error("line {}:{} {}", line, charPositionInLine, msg);
+        log.error("line {}:{} {}", line, charPositionInLine, msg);
     }
 
     @Override
     public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact,
                                 BitSet ambigAlts, ATNConfigSet configs) {
-        logger.warn("Ambiguity found starting on {} and ending on {}", startIndex, stopIndex);
+        log.warn("Ambiguity found starting on {} and ending on {}", startIndex, stopIndex);
     }
 
     @Override
     public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
                                             BitSet conflictingAlts, ATNConfigSet configs) {
-        logger.warn("Attempting full context starting on {} and ending on {}", startIndex, stopIndex);
+        log.warn("Attempting full context starting on {} and ending on {}", startIndex, stopIndex);
     }
 
     @Override
     public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
                                          int prediction, ATNConfigSet configs) {
-        logger.warn("context sensitivity starting on {} and ending on {} with prediction {}",
+        log.warn("context sensitivity starting on {} and ending on {} with prediction {}",
             startIndex, stopIndex, prediction);
     }
 }

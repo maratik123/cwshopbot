@@ -1,22 +1,27 @@
+//    cwshopbot
+//    Copyright (C) 2019  Marat Bukharov.
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU Affero General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model;
+
+import lombok.Value;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Value
 public class PagedResponse<T> {
     private final T response;
     private final long count;
-
-    public PagedResponse(T response, long count) {
-        this.response = response;
-        this.count = count;
-    }
-
-    public T getResponse() {
-        return response;
-    }
-
-    public long getCount() {
-        return count;
-    }
 }

@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -18,6 +18,8 @@ package name.maratik.cw.cwshopbot.model.cwapi;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@ToString(callSuper = true)
 public class GetInfoResponse extends ApiResponseBase<GetInfoResponse.Payload> {
 
     public GetInfoResponse(
@@ -35,30 +38,15 @@ public class GetInfoResponse extends ApiResponseBase<GetInfoResponse.Payload> {
         super(uuid, result, payload);
     }
 
-    @Override
-    public String toString() {
-        return "GetInfoResponse{} " + super.toString();
-    }
-
+    @ToString
     public static class Payload implements ResponsePayload {
         @JsonIgnore
+        @Getter(onMethod_ = {@JsonIgnore})
         private final Map<String, String> props = new HashMap<>();
 
         @JsonAnySetter
         public void putProp(String key, String value) {
             props.put(key, value);
-        }
-
-        @JsonIgnore
-        public Map<String, String> getProps() {
-            return props;
-        }
-
-        @Override
-        public String toString() {
-            return "Payload{" +
-                "props=" + props +
-                '}';
         }
     }
 }

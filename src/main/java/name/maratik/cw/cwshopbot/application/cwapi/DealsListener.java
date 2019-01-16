@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,21 +17,19 @@ package name.maratik.cw.cwshopbot.application.cwapi;
 
 import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
+@Service
+@Log4j2
 public class DealsListener {
-    private static final Logger logger = LogManager.getLogger(DealsListener.class);
-
     @SuppressWarnings("MethodMayBeStatic")
     @RabbitListener(queues = "${spring.rabbitmq.username}_deals")
     public void processDealsAnnounce(Deal data) {
-        logger.debug("Received message: {}", data);
+        log.debug("Received message: {}", data);
     }
 }

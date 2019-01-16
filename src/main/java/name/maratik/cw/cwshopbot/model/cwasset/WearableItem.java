@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,12 +15,17 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwasset;
 
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.Map;
 import java.util.Objects;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Getter
+@ToString(callSuper = true)
 public class WearableItem extends CraftableItem {
     private final ItemType itemType;
     private final InventorySlot inventorySlot;
@@ -29,35 +34,15 @@ public class WearableItem extends CraftableItem {
     private final int manaboost;
 
     @SuppressWarnings("WeakerAccess")
-    protected WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, Map<String, Integer> recipe,
-                           int mana, Craftbook craftbook, ItemType itemType, InventorySlot inventorySlot, int attack, int defence,
-                           int manaboost) {
-        super(id, name, itemLocation, tradeable, recipe, mana, craftbook);
+    protected WearableItem(String id, String name, ItemLocation itemLocation, boolean tradeable, boolean ingredient,
+                           Map<String, Integer> recipe, int mana, Craftbook craftbook, ItemType itemType,
+                           InventorySlot inventorySlot, int attack, int defence, int manaboost) {
+        super(id, name, itemLocation, tradeable, ingredient, recipe, mana, craftbook);
         this.itemType = Objects.requireNonNull(itemType, "itemType");
         this.inventorySlot = Objects.requireNonNull(inventorySlot, "inventorySlot");
         this.attack = attack;
         this.defence = defence;
         this.manaboost = manaboost;
-    }
-
-    public ItemType getItemType() {
-        return itemType;
-    }
-
-    public InventorySlot getInventorySlot() {
-        return inventorySlot;
-    }
-
-    public int getAttack() {
-        return attack;
-    }
-
-    public int getDefence() {
-        return defence;
-    }
-
-    public int getManaboost() {
-        return manaboost;
     }
 
     @Override
@@ -75,17 +60,6 @@ public class WearableItem extends CraftableItem {
         return super.hashCode();
     }
 
-    @Override
-    public String toString() {
-        return "WearableItem{" +
-            "itemType=" + itemType +
-            ", inventorySlot=" + inventorySlot +
-            ", attack=" + attack +
-            ", defence=" + defence +
-            ", manaboost=" + manaboost +
-            "} " + super.toString();
-    }
-
     public static WearableItemBuilder wearableItemBuilder() {
         return new WearableItemBuilder();
     }
@@ -99,8 +73,8 @@ public class WearableItem extends CraftableItem {
 
         @Override
         public WearableItem build() {
-            return new WearableItem(id, name, itemLocation, tradeable, recipeBuilder.build(), mana, craftbook, itemType,
-                inventorySlot, attack, defence, manaboost);
+            return new WearableItem(id, name, itemLocation, tradeable, ingredient, recipeBuilder.build(), mana,
+                craftbook, itemType, inventorySlot, attack, defence, manaboost);
         }
     }
 

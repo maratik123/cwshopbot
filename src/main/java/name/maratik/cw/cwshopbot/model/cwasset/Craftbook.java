@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -19,6 +19,8 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +28,7 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum Craftbook implements EnumWithCode {
     CRAFTBOOK_1("1", true),
     CRAFTBOOK_2("2", true),
@@ -34,24 +37,11 @@ public enum Craftbook implements EnumWithCode {
     CRAFTBOOK_5("5", true),
     CRAFTBOOK_X("x", false);
 
+    @Getter(onMethod_ = {@JsonValue})
     private final String code;
+    @Getter
     private final boolean visible;
     private static final Map<String, Craftbook> cache = Util.createCache(values());
-
-    Craftbook(String code, boolean visible) {
-        this.code = code;
-        this.visible = visible;
-    }
-
-    @JsonValue
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
 
     @JsonCreator
     public static Optional<Craftbook> findByCode(String code) {

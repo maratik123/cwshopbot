@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -24,14 +24,13 @@ import name.maratik.cw.cwshopbot.parser.generated.ShopEditLexer;
 import name.maratik.cw.cwshopbot.parser.generated.ShopEditParser;
 import name.maratik.cw.cwshopbot.parser.generated.ShopEditParserBaseListener;
 
+import lombok.extern.log4j.Log4j2;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
@@ -43,9 +42,9 @@ import static name.maratik.cw.cwshopbot.util.Utils.reformatMessage;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
+@Service
+@Log4j2
 public class ShopEditParserService implements CWParser<ParsedShopEdit> {
-    private static final Logger logger = LogManager.getLogger(ShopEditParserService.class);
 
     private final ItemSearchService itemSearchService;
 
@@ -64,32 +63,32 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
         ShopEditParser parser = new ShopEditParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
         return catchParseErrors(() -> {
-            ParsedShopEdit.Builder builder = ParsedShopEdit.builder();
+            ParsedShopEdit.ParsedShopEditBuilder builder = ParsedShopEdit.builder();
             ParseTreeWalker.DEFAULT.walk(new ShopEditParserListenerImpl(builder), parser.shopEdit());
             return Optional.of(builder.build());
         }, message);
     }
 
     private class ShopEditParserListenerImpl extends ShopEditParserBaseListener {
-        private final ParsedShopEdit.Builder builder;
-        private ParsedShopEdit.ShopLine.Builder shopLineBuilder;
+        private final ParsedShopEdit.ParsedShopEditBuilder builder;
+        private ParsedShopEdit.ShopLine.ShopLineBuilder shopLineBuilder;
 
-        private ShopEditParserListenerImpl(ParsedShopEdit.Builder builder) {
+        private ShopEditParserListenerImpl(ParsedShopEdit.ParsedShopEditBuilder builder) {
             this.builder = builder;
         }
 
         @Override
         public void exitShopName(ShopEditParser.ShopNameContext ctx) {
-            logger.trace("exitShopName: {}", ctx::getText);
-            builder.setShopName(ctx.getText());
+            log.trace("exitShopName: {}", ctx::getText);
+            builder.shopName(ctx.getText());
         }
 
         @Override
         public void exitShopNumber(ShopEditParser.ShopNumberContext ctx) {
-            logger.trace("exitShopNumber: {}", ctx::getText);
+            log.trace("exitShopNumber: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                builder.setShopNumber(Integer.parseInt(text));
+                builder.shopNumber(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported shop number value: " + text, e);
             }
@@ -97,10 +96,10 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
 
         @Override
         public void exitCurrentOffers(ShopEditParser.CurrentOffersContext ctx) {
-            logger.trace("exitCurrentOffers: {}", ctx::getText);
+            log.trace("exitCurrentOffers: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                builder.setOffersCount(Integer.parseInt(text));
+                builder.offersCount(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported current offers value: " + text, e);
             }
@@ -108,10 +107,10 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
 
         @Override
         public void exitMaxOffers(ShopEditParser.MaxOffersContext ctx) {
-            logger.trace("exitMaxOffers: {}", ctx::getText);
+            log.trace("exitMaxOffers: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                builder.setMaxOffersCount(Integer.parseInt(text));
+                builder.maxOffersCount(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported max offers value: " + text, e);
             }
@@ -119,33 +118,33 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
 
         @Override
         public void enterShopLine(ShopEditParser.ShopLineContext ctx) {
-            logger.trace("enterShopLine: {}", ctx::getText);
+            log.trace("enterShopLine: {}", ctx::getText);
             shopLineBuilder = ParsedShopEdit.ShopLine.builder();
         }
 
         @Override
         public void exitShopLine(ShopEditParser.ShopLineContext ctx) {
-            logger.trace("exitShopLine: {}", ctx::getText);
-            builder.addShopLine(shopLineBuilder.build());
+            log.trace("exitShopLine: {}", ctx::getText);
+            builder.shopLine(shopLineBuilder.build());
         }
 
         @Override
         public void exitItemName(ShopEditParser.ItemNameContext ctx) {
-            logger.trace("exitItemName: {}", ctx::getText);
+            log.trace("exitItemName: {}", ctx::getText);
             String text = ctx.getText();
             List<Item> items = itemSearchService.findItemByNameList(text, false, false);
             if (items.size() != 1) {
                 throw new ParseException("Unknown item name: " + text);
             }
-            shopLineBuilder.setItem(items.get(0));
+            shopLineBuilder.item(items.get(0));
         }
 
         @Override
         public void exitManaCost(ShopEditParser.ManaCostContext ctx) {
-            logger.trace("exitManaCost: {}", ctx::getText);
+            log.trace("exitManaCost: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                shopLineBuilder.setMana(Integer.parseInt(text));
+                shopLineBuilder.mana(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported mana cost value: " + text, e);
             }
@@ -153,10 +152,10 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
 
         @Override
         public void exitPrice(ShopEditParser.PriceContext ctx) {
-            logger.trace("exitPrice: {}", ctx::getText);
+            log.trace("exitPrice: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                shopLineBuilder.setPrice(Integer.parseInt(text));
+                shopLineBuilder.price(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported price value: " + text, e);
             }
@@ -164,15 +163,15 @@ public class ShopEditParserService implements CWParser<ParsedShopEdit> {
 
         @Override
         public void exitShopCommand(ShopEditParser.ShopCommandContext ctx) {
-            logger.trace("exitShopCommand: {}", ctx::getText);
-            builder.setShopCommand(ctx.getText());
+            log.trace("exitShopCommand: {}", ctx::getText);
+            builder.shopCommand(ctx.getText());
         }
 
         @Override
         public void exitBellStatus(ShopEditParser.BellStatusContext ctx) {
-            logger.trace("exitBellStatus: {}", ctx::getText);
+            log.trace("exitBellStatus: {}", ctx::getText);
             String text = ctx.getText();
-            builder.setShopPublishStatus(ShopPublishStatus.findByValue(text)
+            builder.shopPublishStatus(ShopPublishStatus.findByValue(text)
                 .orElseThrow(() -> new ParseException("Unsupported bell status: " + text))
             );
         }

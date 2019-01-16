@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -30,8 +30,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -49,20 +50,19 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Log4j2
 public class AssetsDao {
-    private final Logger logger = LogManager.getLogger(AssetsDao.class);
-
     private final AssetsDto assetsDto;
 
     public AssetsDao(Resource assets, TypeFactory typeFactory) throws IOException {
-        logger.info("Loading assets");
+        log.info("Loading assets");
         try (InputStream is = assets.getInputStream()) {
             assetsDto = new ObjectMapper(new YAMLFactory())
                 .setTypeFactory(typeFactory)
                 .registerModule(new Jdk8Module())
                 .readValue(is, AssetsDto.class);
         }
-        logger.info("Assets successfully loaded, assets parts size: {}, craftbooks: {}",
+        log.info("Assets successfully loaded, assets parts size: {}, craftbooks: {}",
             () -> assetsDto.getAssetsPartMap().size(),
             () -> assetsDto.getCraftbook().size()
         );
@@ -74,7 +74,7 @@ public class AssetsDao {
     }
 
     public Assets createAssets() {
-        logger.info("Decoding assets");
+        log.info("Decoding assets");
         Map<String, String> reverseCraftbookMap = assetsDto.getCraftbook().entrySet().stream()
             .flatMap(entry -> entry.getValue().getItems().stream()
                 .map(id -> new AbstractMap.SimpleImmutableEntry<>(id, entry.getKey()))
@@ -111,7 +111,7 @@ public class AssetsDao {
                 }).collect(toImmutableList())
             ).build();
 
-        logger.info("Assets loaded. Assets size is: {}", () -> result.getAllItems().size());
+        log.info("Assets loaded. Assets size is: {}", () -> result.getAllItems().size());
 
         return result;
     }
@@ -125,6 +125,9 @@ public class AssetsDao {
             .setItemLocation(itemLocation)
             .setTradeable(Optional.ofNullable(resourceItem.getTradeable())
                 .orElseGet(assetsPartDto::isTradeable)
+            )
+            .setIngredient(Optional.ofNullable(resourceItem.getIngredient())
+                .orElseGet(assetsPartDto::isIngredient)
             );
     }
 
@@ -154,111 +157,56 @@ public class AssetsDao {
             .setItemType(itemType);
     }
 
+    @Data
     public static class AssetsDto {
         @JsonProperty(required = true)
         private Map<String, CraftbookDto> craftbook;
         private final Map<String, AssetsPartDto> assetsPartMap = new HashMap<>();
 
-        public Map<String, CraftbookDto> getCraftbook() {
-            return craftbook;
-        }
-
-        public void setCraftbook(Map<String, CraftbookDto> craftbook) {
-            this.craftbook = craftbook;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public Map<String, AssetsPartDto> getAssetsPartMap() {
-            return assetsPartMap;
-        }
-
         @JsonAnySetter
         public void putAssetsPart(String key, AssetsPartDto assetsPartDto) {
             assetsPartMap.put(key, assetsPartDto);
         }
-
-        @Override
-        public String toString() {
-            return "AssetsDto{" +
-                "craftbook=" + craftbook +
-                ", assetsPartMap=" + assetsPartMap +
-                '}';
-        }
     }
 
+    @Data
     public static class AssetsPartDto {
         @JsonProperty(required = true)
         private boolean tradeable;
+        @JsonProperty(defaultValue = "false")
+        private boolean ingredient;
         private final Map<String, ResourceItem> items = new HashMap<>();
-
-        @SuppressWarnings("WeakerAccess")
-        public boolean isTradeable() {
-            return tradeable;
-        }
-
-        public void setTradeable(boolean tradeable) {
-            this.tradeable = tradeable;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public Map<String, ResourceItem> getItems() {
-            return items;
-        }
 
         @JsonAnySetter
         public void putItem(String key, ResourceItem resourceItem) {
             items.put(key, resourceItem);
         }
-
-        @Override
-        public String toString() {
-            return "AssetsPartDto{" +
-                "tradeable=" + tradeable +
-                ", items=" + items +
-                '}';
-        }
     }
 
+    @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
+    @Data
     public static class CraftbookDto {
         @JsonProperty(required = true)
         private int mana;
         @JsonProperty(required = true)
         private Set<String> items;
 
-        public int getMana() {
-            return mana;
-        }
-
-        public void setMana(int mana) {
-            this.mana = mana;
-        }
-
-        @SuppressWarnings("WeakerAccess")
         public Set<String> getItems() {
             if (items == null) {
                 items = new HashSet<>();
             }
             return items;
         }
-
-        public void setItems(Set<String> items) {
-            this.items = items;
-        }
-
-        @Override
-        public String toString() {
-            return "CraftbookDto{" +
-                "mana=" + mana +
-                ", items=" + items +
-                '}';
-        }
     }
 
-    public static class ResourceItem {
+    @Data
+    private static class ResourceItem {
         @JsonProperty(required = true)
         private String name;
         @JsonProperty
         private Boolean tradeable;
+        @JsonProperty
+        private Boolean ingredient;
         @JsonProperty
         private Map<String, Integer> recipe;
         @JsonProperty
@@ -273,98 +221,5 @@ public class AssetsDao {
         private int def;
         @JsonProperty(defaultValue = "0")
         private int manaboost;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public Boolean getTradeable() {
-            return tradeable;
-        }
-
-        public void setTradeable(Boolean tradeable) {
-            this.tradeable = tradeable;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public Map<String, Integer> getRecipe() {
-            return recipe;
-        }
-
-        public void setRecipe(Map<String, Integer> recipe) {
-            this.recipe = recipe;
-        }
-
-        public Integer getMana() {
-            return mana;
-        }
-
-        public void setMana(Integer mana) {
-            this.mana = mana;
-        }
-
-        public ItemType getType() {
-            return type;
-        }
-
-        public void setType(ItemType type) {
-            this.type = type;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public InventorySlot getWear() {
-            return wear;
-        }
-
-        public void setWear(InventorySlot wear) {
-            this.wear = wear;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public int getAtt() {
-            return att;
-        }
-
-        public void setAtt(int att) {
-            this.att = att;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public int getDef() {
-            return def;
-        }
-
-        public void setDef(int def) {
-            this.def = def;
-        }
-
-        @SuppressWarnings("WeakerAccess")
-        public int getManaboost() {
-            return manaboost;
-        }
-
-        public void setManaboost(int manaboost) {
-            this.manaboost = manaboost;
-        }
-
-        @Override
-        public String toString() {
-            return "ResourceItem{" +
-                "name='" + name + '\'' +
-                ", tradeable=" + tradeable +
-                ", recipe=" + recipe +
-                ", mana=" + mana +
-                ", type=" + type +
-                ", wear=" + wear +
-                ", att=" + att +
-                ", def=" + def +
-                ", manaboost=" + manaboost +
-                '}';
-        }
     }
 }

@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,8 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.objects.Message;
+
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertThat;
@@ -74,9 +76,9 @@ public class HeroParserServiceTest extends MockedTest {
             .orElseThrow(AssertionError::new);
 
         ParsedHero expected = ParsedHero.builder()
-            .setCharName("Forester SM")
-            .setCastle(Castle.MOONLIGHT)
-            .setGuildAbbrev("ETC")
+            .charName("Forester SM")
+            .castle(Castle.MOONLIGHT)
+            .guildAbbrev(Optional.of("ETC"))
             .build();
 
         assertThat(parsedHero, samePropertyValuesAs(expected));

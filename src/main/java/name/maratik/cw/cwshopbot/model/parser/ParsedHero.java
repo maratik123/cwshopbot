@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -17,70 +17,21 @@ package name.maratik.cw.cwshopbot.model.parser;
 
 import name.maratik.cw.cwshopbot.model.Castle;
 
-import java.util.Objects;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
+
 import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Value
+@Builder
 public class ParsedHero {
+    @NonNull
     private final Castle castle;
+    @NonNull
     private final String charName;
     private final Optional<String> guildAbbrev;
-
-    private ParsedHero(Castle castle, String charName, String guildAbbrev) {
-        this.castle = Objects.requireNonNull(castle, "castle");
-        this.charName = Objects.requireNonNull(charName, "charName");
-        this.guildAbbrev = Optional.ofNullable(guildAbbrev);
-    }
-
-    public Castle getCastle() {
-        return castle;
-    }
-
-    public String getCharName() {
-        return charName;
-    }
-
-    public Optional<String> getGuildAbbrev() {
-        return guildAbbrev;
-    }
-
-    @Override
-    public String toString() {
-        return "ParsedHero{" +
-            "castle=" + castle +
-            ", charName='" + charName + '\'' +
-            ", guildAbbrev=" + guildAbbrev +
-            '}';
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private Castle castle;
-        private String charName;
-        private String guildAbbrev;
-
-        public Builder setCastle(Castle castle) {
-            this.castle = castle;
-            return this;
-        }
-
-        public Builder setCharName(String charName) {
-            this.charName = charName;
-            return this;
-        }
-
-        public Builder setGuildAbbrev(String guildAbbrev) {
-            this.guildAbbrev = guildAbbrev;
-            return this;
-        }
-
-        public ParsedHero build() {
-            return new ParsedHero(castle, charName, guildAbbrev);
-        }
-    }
 }

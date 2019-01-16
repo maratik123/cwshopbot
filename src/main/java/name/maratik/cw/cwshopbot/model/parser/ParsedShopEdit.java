@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,9 @@ import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import name.maratik.cw.cwshopbot.parser.ParseException;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Singular;
+import lombok.Value;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +34,7 @@ import static name.maratik.cw.cwshopbot.parser.ParserUtils.verifyItem;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Value
 public class ParsedShopEdit {
     private final String shopName;
     private final int offersCount;
@@ -41,8 +45,10 @@ public class ParsedShopEdit {
     private final ShopPublishStatus shopPublishStatus;
     private final List<ShopLine> shopLines;
 
-    private ParsedShopEdit(String shopName, int offersCount, int maxOffersCount, int shopNumber, String shopCode,
-                           String shopCommand, ShopPublishStatus shopPublishStatus, List<ShopLine> shopLines) {
+    @Builder
+    private ParsedShopEdit(String shopName, int offersCount, int maxOffersCount, int shopNumber,
+                           String shopCommand, ShopPublishStatus shopPublishStatus,
+                           @Singular ImmutableList<ShopLine> shopLines) {
         this.shopName = Objects.requireNonNull(shopName, "shopName");
         this.offersCount = offersCount;
         this.maxOffersCount = maxOffersCount;
@@ -51,7 +57,7 @@ public class ParsedShopEdit {
         if (!shopCommand.startsWith(SHOP_COMMAND_PREFIX)) {
             throw new ParseException("Shop command has unexpected format: " + shopCommand);
         }
-        this.shopCode = Objects.requireNonNull(shopCode, "shopCode");
+        this.shopCode = extractShopCodeFromShopCommand(shopCommand);
         if (!shopCommand.endsWith(shopCode)) {
             throw new ParseException("Shop command '" + shopCommand + "' does not contain shop code: " + shopCode);
         }
@@ -59,108 +65,8 @@ public class ParsedShopEdit {
         this.shopLines = Objects.requireNonNull(shopLines, "shopLines");
     }
 
-    public String getShopName() {
-        return shopName;
-    }
-
-    public int getOffersCount() {
-        return offersCount;
-    }
-
-    public int getMaxOffersCount() {
-        return maxOffersCount;
-    }
-
-    public int getShopNumber() {
-        return shopNumber;
-    }
-
-    public String getShopCode() {
-        return shopCode;
-    }
-
-    public List<ShopLine> getShopLines() {
-        return shopLines;
-    }
-
-    public String getShopCommand() {
-        return shopCommand;
-    }
-
-    public ShopPublishStatus getShopPublishStatus() {
-        return shopPublishStatus;
-    }
-
-    @Override
-    public String toString() {
-        return "ParsedShopEdit{" +
-            "shopName='" + shopName + '\'' +
-            ", offersCount=" + offersCount +
-            ", maxOffersCount=" + maxOffersCount +
-            ", shopNumber=" + shopNumber +
-            ", shopCode='" + shopCode + '\'' +
-            ", shopCommand='" + shopCommand + '\'' +
-            ", shopPublishStatus=" + shopPublishStatus +
-            ", shopLines=" + shopLines +
-            '}';
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String shopName;
-        private int offersCount;
-        private int maxOffersCount;
-        private int shopNumber;
-        private String shopCommand;
-        private ShopPublishStatus shopPublishStatus;
-        private final ImmutableList.Builder<ShopLine> shopLines = ImmutableList.builder();
-
-        public Builder setShopName(String shopName) {
-            this.shopName = shopName;
-            return this;
-        }
-
-        public Builder setOffersCount(int offersCount) {
-            this.offersCount = offersCount;
-            return this;
-        }
-
-        public Builder setMaxOffersCount(int maxOffersCount) {
-            this.maxOffersCount = maxOffersCount;
-            return this;
-        }
-
-        public Builder setShopNumber(int shopNumber) {
-            this.shopNumber = shopNumber;
-            return this;
-        }
-
-        public Builder setShopCommand(String shopCommand) {
-            this.shopCommand = shopCommand;
-            return this;
-        }
-
-        public Builder setShopPublishStatus(ShopPublishStatus shopPublishStatus) {
-            this.shopPublishStatus = shopPublishStatus;
-            return this;
-        }
-
-        public Builder addShopLine(ShopLine shopLine) {
-            shopLines.add(Objects.requireNonNull(shopLine, "shopLine"));
-            return this;
-        }
-
-        public ParsedShopEdit build() {
-            String shopCode = extractShopCodeFromShopCommand(shopCommand);
-            return new ParsedShopEdit(shopName, offersCount, maxOffersCount, shopNumber, shopCode, shopCommand,
-                shopPublishStatus, shopLines.build()
-            );
-        }
-    }
-
+    @Builder
+    @Value
     public static class ShopLine {
         private final Item item;
         private final int mana;
@@ -171,56 +77,6 @@ public class ParsedShopEdit {
             this.mana = mana;
             verifyItem(item, mana);
             this.price = price;
-        }
-
-        public Item getItem() {
-            return item;
-        }
-
-        public int getMana() {
-            return mana;
-        }
-
-        public int getPrice() {
-            return price;
-        }
-
-        @Override
-        public String toString() {
-            return "ShopLine{" +
-                "item=" + item +
-                ", mana=" + mana +
-                ", price=" + price +
-                '}';
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        public static class Builder {
-            private Item item;
-            private int mana;
-            private int price;
-
-            public Builder setItem(Item item) {
-                this.item = item;
-                return this;
-            }
-
-            public Builder setMana(int mana) {
-                this.mana = mana;
-                return this;
-            }
-
-            public Builder setPrice(int price) {
-                this.price = price;
-                return this;
-            }
-
-            public ShopLine build() {
-                return new ShopLine(item, mana, price);
-            }
         }
     }
 }

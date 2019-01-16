@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -16,10 +16,12 @@
 package name.maratik.cw.cwshopbot.model.cwapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@ToString(callSuper = true)
 public class CreateAuthCodeResponse extends ApiResponseBase<UserIdResponsePayload> {
 
     public CreateAuthCodeResponse(
@@ -28,10 +30,5 @@ public class CreateAuthCodeResponse extends ApiResponseBase<UserIdResponsePayloa
         @JsonProperty("payload") UserIdResponsePayload payload
     ) {
         super(uuid, result, payload);
-    }
-
-    @Override
-    public String toString() {
-        return "CreateAuthCodeResponse{} " + super.toString();
     }
 }

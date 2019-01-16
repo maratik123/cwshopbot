@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -26,14 +26,13 @@ import name.maratik.cw.cwshopbot.parser.generated.ShopInfoLexer;
 import name.maratik.cw.cwshopbot.parser.generated.ShopInfoParser;
 import name.maratik.cw.cwshopbot.parser.generated.ShopInfoParserBaseListener;
 
+import lombok.extern.log4j.Log4j2;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
@@ -45,10 +44,9 @@ import static name.maratik.cw.cwshopbot.util.Utils.reformatMessage;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Component
+@Service
+@Log4j2
 public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
-    private static final Logger logger = LogManager.getLogger(ShopInfoParserService.class);
-
     private final ItemSearchService itemSearchService;
 
     public ShopInfoParserService(ItemSearchService itemSearchService) {
@@ -66,32 +64,32 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
         ShopInfoParser parser = new ShopInfoParser(tokens);
         parser.setErrorHandler(new BailErrorStrategy());
         return catchParseErrors(() -> {
-            ParsedShopInfo.Builder builder = ParsedShopInfo.builder();
+            ParsedShopInfo.ParsedShopInfoBuilder builder = ParsedShopInfo.builder();
             ParseTreeWalker.DEFAULT.walk(new ShopInfoParserListener(builder), parser.shopInfo());
             return Optional.of(builder.build());
         }, message);
     }
 
     private class ShopInfoParserListener extends ShopInfoParserBaseListener {
-        private final ParsedShopInfo.Builder builder;
-        private ParsedShopInfo.ShopLine.Builder shopLineBuilder;
+        private final ParsedShopInfo.ParsedShopInfoBuilder builder;
+        private ParsedShopInfo.ShopLine.ShopLineBuilder shopLineBuilder;
 
-        private ShopInfoParserListener(ParsedShopInfo.Builder builder) {
+        private ShopInfoParserListener(ParsedShopInfo.ParsedShopInfoBuilder builder) {
             this.builder = builder;
         }
 
         @Override
         public void exitShopName(ShopInfoParser.ShopNameContext ctx) {
-            logger.trace("exitShopName: {}", ctx::getText);
-            builder.setShopName(ctx.getText());
+            log.trace("exitShopName: {}", ctx::getText);
+            builder.shopName(ctx.getText());
         }
 
         @Override
         public void exitShopNumber(ShopInfoParser.ShopNumberContext ctx) {
-            logger.trace("exitShopNumber: {}", ctx::getText);
+            log.trace("exitShopNumber: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                builder.setShopNumber(Integer.parseInt(text));
+                builder.shopNumber(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported shop number value: " + text, e);
             }
@@ -99,16 +97,16 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
         @Override
         public void exitCharName(ShopInfoParser.CharNameContext ctx) {
-            logger.trace("exitCharName: {}", ctx::getText);
-            builder.setCharName(ctx.getText());
+            log.trace("exitCharName: {}", ctx::getText);
+            builder.charName(ctx.getText());
         }
 
         @Override
         public void exitCurrentMana(ShopInfoParser.CurrentManaContext ctx) {
-            logger.trace("exitCurrentMana: {}", ctx::getText);
+            log.trace("exitCurrentMana: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                builder.setCurrentMana(Integer.parseInt(text));
+                builder.currentMana(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported current mana value: " + text, e);
             }
@@ -116,10 +114,10 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
         @Override
         public void exitMaxMana(ShopInfoParser.MaxManaContext ctx) {
-            logger.trace("exitMaxMana: {}", ctx::getText);
+            log.trace("exitMaxMana: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                builder.setMaxMana(Integer.parseInt(text));
+                builder.maxMana(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported max mana value: " + text, e);
             }
@@ -127,65 +125,65 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
         @Override
         public void exitProfessionFromCastle(ShopInfoParser.ProfessionFromCastleContext ctx) {
-            logger.trace("exitProfessionFromCastle: {}", ctx::getText);
+            log.trace("exitProfessionFromCastle: {}", ctx::getText);
             String text = ctx.getText();
             String[] textParts = text.split(" ");
             if (textParts.length != 3 || !textParts[1].equals("from")) {
                 throw new ParseException("Unknown profession from castle: " + text);
             }
             String profession = textParts[0];
-            builder.setProfession(Profession.findByCode(profession)
+            builder.profession(Profession.findByCode(profession)
                 .orElseThrow(() -> new ParseException("Unsupported profession: " + profession))
             );
             String castle = textParts[2];
-            builder.setCastle(Castle.findByCode(castle)
+            builder.castle(Castle.findByCode(castle)
                 .orElseThrow(() -> new ParseException("Unsupported castle: " + castle))
             );
         }
 
         @Override
         public void exitShopTypeIs(ShopInfoParser.ShopTypeIsContext ctx) {
-            logger.trace("exitShopTypeIs: {}", ctx::getText);
+            log.trace("exitShopTypeIs: {}", ctx::getText);
             String text = ctx.getText();
             String[] textParts = text.split(" ");
             if (textParts.length != 2 || !textParts[1].equals("is")) {
                 throw new ParseException("Unsupported shop type is: " + text);
             }
-            builder.setShopType(textParts[0]);
+            builder.shopType(textParts[0]);
         }
 
         @Override
         public void exitShopState(ShopInfoParser.ShopStateContext ctx) {
-            logger.trace("exitShopState: {}", ctx::getText);
+            log.trace("exitShopState: {}", ctx::getText);
             String text = ctx.getText();
-            builder.setShopState(ShopState.findByCode(text)
+            builder.shopState(ShopState.findByCode(text)
                 .orElseThrow(() -> new ParseException("Unsupported shop state: " + text))
             );
         }
 
         @Override
         public void enterShopLine(ShopInfoParser.ShopLineContext ctx) {
-            logger.trace("enterShopLine: {}", ctx::getText);
+            log.trace("enterShopLine: {}", ctx::getText);
             shopLineBuilder = ParsedShopInfo.ShopLine.builder();
         }
 
         @Override
         public void exitItemName(ShopInfoParser.ItemNameContext ctx) {
-            logger.trace("exitItemName: {}", ctx::getText);
+            log.trace("exitItemName: {}", ctx::getText);
             String text = ctx.getText();
             List<Item> items = itemSearchService.findItemByNameList(text, false, false);
             if (items.size() != 1) {
                 throw new ParseException("Unknown item name: " + text);
             }
-            shopLineBuilder.setItem(items.get(0));
+            shopLineBuilder.item(items.get(0));
         }
 
         @Override
         public void exitManaCost(ShopInfoParser.ManaCostContext ctx) {
-            logger.trace("exitManaCost: {}", ctx::getText);
+            log.trace("exitManaCost: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                shopLineBuilder.setMana(Integer.parseInt(text));
+                shopLineBuilder.mana(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported mana cost value: " + text, e);
             }
@@ -193,10 +191,10 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
         @Override
         public void exitPrice(ShopInfoParser.PriceContext ctx) {
-            logger.trace("exitPrice: {}", ctx::getText);
+            log.trace("exitPrice: {}", ctx::getText);
             String text = ctx.getText();
             try {
-                shopLineBuilder.setPrice(Integer.parseInt(text));
+                shopLineBuilder.price(Integer.parseInt(text));
             } catch (NumberFormatException e) {
                 throw new ParseException("Unsupported price value: " + text, e);
             }
@@ -204,20 +202,20 @@ public class ShopInfoParserService implements CWParser<ParsedShopInfo> {
 
         @Override
         public void exitCraftCommand(ShopInfoParser.CraftCommandContext ctx) {
-            logger.trace("exitCraftCommand: {}", ctx::getText);
-            shopLineBuilder.setCraftCommand(ctx.getText());
+            log.trace("exitCraftCommand: {}", ctx::getText);
+            shopLineBuilder.craftCommand(ctx.getText());
         }
 
         @Override
         public void exitShopLine(ShopInfoParser.ShopLineContext ctx) {
-            logger.trace("exitShopLine: {}", ctx::getText);
-            builder.addShopLine(shopLineBuilder.build());
+            log.trace("exitShopLine: {}", ctx::getText);
+            builder.shopLine(shopLineBuilder.build());
         }
 
         @Override
         public void exitShopCommand(ShopInfoParser.ShopCommandContext ctx) {
-            logger.trace("exitShopCommand: {}", ctx::getText);
-            builder.setShopCommand(ctx.getText());
+            log.trace("exitShopCommand: {}", ctx::getText);
+            builder.shopCommand(ctx.getText());
         }
     }
 }

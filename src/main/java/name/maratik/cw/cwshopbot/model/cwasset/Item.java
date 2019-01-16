@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -15,77 +15,38 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwasset;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.Objects;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Item {
+    @EqualsAndHashCode.Include
     private final String id;
     private final String name;
     private final ItemLocation itemLocation;
     private final boolean tradeable;
+    private final boolean ingredient;
     private final String lowerName;
 
-    protected Item(String id, String name, ItemLocation itemLocation, boolean tradeable) {
+    protected Item(String id, String name, ItemLocation itemLocation, boolean tradeable, boolean ingredient) {
         this.id = Objects.requireNonNull(id, "id");
         this.name = Objects.requireNonNull(name, "name");
         this.itemLocation = Objects.requireNonNull(itemLocation, "itemLocation");
         this.tradeable = tradeable;
+        this.ingredient = ingredient;
         this.lowerName = name.toLowerCase();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ItemLocation getItemLocation() {
-        return itemLocation;
-    }
-
-    public boolean isTradeable() {
-        return tradeable;
-    }
-
-    public String getLowerName() {
-        return lowerName;
     }
 
     public <T> T apply(Visitor<? extends T> visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Item)) {
-            return false;
-        }
-
-        Item item = (Item) o;
-
-        return getId().equals(item.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "Item{" +
-            "id='" + id + '\'' +
-            ", name='" + name + '\'' +
-            ", itemLocation=" + itemLocation +
-            ", tradeable=" + tradeable +
-            '}';
     }
 
     public static ItemBuilder itemBuilder() {
@@ -100,18 +61,19 @@ public class Item {
 
         @Override
         public Item build() {
-            return new Item(id, name, itemLocation, tradeable);
+            return new Item(id, name, itemLocation, tradeable, ingredient);
         }
     }
 
     public abstract static class AbstractItemBuilder<T extends AbstractItemBuilder<T, R>, R extends Item> {
-        @SuppressWarnings("WeakerAccess")
         protected String id;
         protected String name;
         @SuppressWarnings("WeakerAccess")
         protected ItemLocation itemLocation;
         @SuppressWarnings("WeakerAccess")
         protected boolean tradeable;
+        @SuppressWarnings("WeakerAccess")
+        protected boolean ingredient;
 
         public abstract T getThis();
         public abstract R build();
@@ -133,6 +95,11 @@ public class Item {
 
         public T setTradeable(boolean tradeable) {
             this.tradeable = tradeable;
+            return getThis();
+        }
+
+        public T setIngredient(boolean ingredient) {
+            this.ingredient = ingredient;
             return getThis();
         }
     }

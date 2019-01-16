@@ -1,5 +1,5 @@
 //    cwshopbot
-//    Copyright (C) 2018  Marat Bukharov.
+//    Copyright (C) 2019  Marat Bukharov.
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,19 @@ import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.google.common.collect.Maps.toImmutableEnumMap;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
+@RequiredArgsConstructor
 public enum CastleByEmoji implements EnumWithCode {
     MOONLIGHT(Castle.MOONLIGHT),
     WOLFPACK(Castle.WOLFPACK),
@@ -44,12 +50,14 @@ public enum CastleByEmoji implements EnumWithCode {
     FARM(Castle.FARM),
     URN(Castle.URN);
 
+    @Getter
     private final Castle castle;
     private static final Map<String, CastleByEmoji> cache = Util.createCache(values());
-
-    CastleByEmoji(Castle castle) {
-        this.castle = castle;
-    }
+    private static final Map<Castle, CastleByEmoji> castleCache = Arrays.stream(values())
+        .collect(toImmutableEnumMap(
+            CastleByEmoji::getCastle,
+            t -> t
+        ));
 
     @JsonValue
     @Override
@@ -57,12 +65,12 @@ public enum CastleByEmoji implements EnumWithCode {
         return castle.getEmoji();
     }
 
-    public Castle getCastle() {
-        return castle;
-    }
-
     @JsonCreator
     public static Optional<CastleByEmoji> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
+    }
+
+    public static CastleByEmoji findByCastle(Castle castle) {
+        return castleCache.get(castle);
     }
 }
