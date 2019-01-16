@@ -19,8 +19,7 @@ import name.maratik.cw.cwshopbot.model.cwapi.CastleByEmoji;
 import name.maratik.cw.cwshopbot.model.cwapi.ProfessionByEmoji;
 import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 
-import com.google.common.collect.ImmutableList;
-
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
 /**
@@ -35,11 +34,13 @@ public class YellowPageUtils {
             .ownerCastle(CastleByEmoji.MOONLIGHT)
             .kind(ProfessionByEmoji.BLACKSMITH)
             .mana(100)
-            .offers(ImmutableList.of(
+            .active(true)
+            .offers(singletonList(
                 YellowPage.Offer.builder()
                     .price(200)
                     .mana(300)
                     .item("testItem")
+                    .active(true)
                     .build()
             ))
             .specialization(singletonMap("testSpecialization", 400));

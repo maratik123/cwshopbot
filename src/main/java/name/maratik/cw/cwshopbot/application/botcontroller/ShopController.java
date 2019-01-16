@@ -21,6 +21,7 @@ import name.maratik.cw.cwshopbot.application.service.ItemSearchService;
 import name.maratik.cw.cwshopbot.application.service.StatsService;
 import name.maratik.cw.cwshopbot.application.service.YellowPagesService;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
+import name.maratik.cw.cwshopbot.model.NavigableYellowPage;
 import name.maratik.cw.cwshopbot.model.parser.ParsedHero;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopEdit;
 import name.maratik.cw.cwshopbot.model.parser.ParsedShopInfo;
@@ -346,12 +347,16 @@ public class ShopController extends Localizable {
     }
 
     private SendMessage yellowPagesHelper(long userId, String key) {
-        Optional<Map.Entry<String, String>> response = yellowPagesService.formattedYellowPages(key);
-        return new SendMessage()
+        Optional<Map.Entry<NavigableYellowPage, String>> response = yellowPagesService.formattedYellowPages(key);
+        SendMessage sendMessage = new SendMessage()
             .enableMarkdown(true)
             .setChatId(userId)
-            .setText(getMessage(response.map(Map.Entry::getValue)))
-            .setReplyMarkup(getKeysForYellowPages(response.map(Map.Entry::getKey).orElse(null)));
+            .setText(getMessage(response.map(Map.Entry::getValue)));
+        return response
+            .map(Map.Entry::getKey)
+            .map(ShopController::getKeysForYellowPages)
+            .map(sendMessage::setReplyMarkup)
+            .orElse(sendMessage);
     }
 
     @TelegramCallbackQuery
@@ -384,43 +389,45 @@ public class ShopController extends Localizable {
     }
 
     @SuppressWarnings("ReturnOfNull")
-    private InlineKeyboardMarkup getKeysForYellowPages(String key) {
-        if (key == null) {
+    private static InlineKeyboardMarkup getKeysForYellowPages(NavigableYellowPage navigableYellowPage) {
+        if (navigableYellowPage == null) {
             return null;
         }
         ImmutableList.Builder<InlineKeyboardButton> keyboardBuilder = ImmutableList.builder();
-        backwardYellowPagesButton(key).ifPresent(keyboardBuilder::add);
-        forwardYellowPagesButton(key).ifPresent(keyboardBuilder::add);
+        navigableYellowPage.getPreviousLink()
+            .flatMap(ShopController::backwardYellowPagesButton)
+            .ifPresent(keyboardBuilder::add);
+        navigableYellowPage.getNextLink()
+            .flatMap(ShopController::forwardYellowPagesButton)
+            .ifPresent(keyboardBuilder::add);
         List<InlineKeyboardButton> buttons = keyboardBuilder.build();
         return buttons.isEmpty()
             ? null
             : new InlineKeyboardMarkup().setKeyboard(singletonList(buttons));
     }
 
-    private Optional<InlineKeyboardButton> backwardYellowPagesButton(String key) {
-        return yellowPagesService.previousKey(key).
-            flatMap(previousKey -> Packer.packData(
-                ReplyData.PagedRequest.newBuilder()
-                    .setRequestType(ReplyData.RequestType.YELLOW_PAGES)
-                    .setQuery(previousKey)
-                    .build(),
-                64
-            ))
+    private static Optional<InlineKeyboardButton> backwardYellowPagesButton(String key) {
+        return Packer.packData(
+            ReplyData.PagedRequest.newBuilder()
+                .setRequestType(ReplyData.RequestType.YELLOW_PAGES)
+                .setQuery(key)
+                .build(),
+            64
+        )
             .map(data -> new InlineKeyboardButton()
                 .setCallbackData(data)
                 .setText(LEFTWARDS_ARROW)
             );
     }
 
-    private Optional<InlineKeyboardButton> forwardYellowPagesButton(String key) {
-        return yellowPagesService.nextKey(key)
-            .flatMap(nextKey -> Packer.packData(
-                ReplyData.PagedRequest.newBuilder()
-                    .setRequestType(ReplyData.RequestType.YELLOW_PAGES)
-                    .setQuery(nextKey)
-                    .build(),
-                64
-            ))
+    private static Optional<InlineKeyboardButton> forwardYellowPagesButton(String key) {
+        return Packer.packData(
+            ReplyData.PagedRequest.newBuilder()
+                .setRequestType(ReplyData.RequestType.YELLOW_PAGES)
+                .setQuery(key)
+                .build(),
+            64
+        )
             .map(data -> new InlineKeyboardButton()
                 .setCallbackData(data)
                 .setText(RIGHTWARDS_ARROW)

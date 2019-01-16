@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Value;
 
 import java.util.List;
@@ -41,6 +40,7 @@ public class YellowPage {
     private final int mana;
     private final List<Offer> offers;
     private final Map<String, Integer> specialization;
+    private final boolean active;
 
     public YellowPage(
         @JsonProperty("link") String link,
@@ -50,7 +50,8 @@ public class YellowPage {
         @JsonProperty("kind") ProfessionByEmoji kind,
         @JsonProperty("mana") int mana,
         @JsonProperty("offers") List<Offer> offers,
-        @JsonProperty("specialization") Map<String, Integer> specialization
+        @JsonProperty("specialization") Map<String, Integer> specialization,
+        @JsonProperty(value = "active", defaultValue = "true") boolean active
     ) {
         this.link = Objects.requireNonNull(link, "link");
         this.name = Objects.requireNonNull(name, "name");
@@ -64,14 +65,27 @@ public class YellowPage {
         this.specialization = Optional.ofNullable(specialization)
             .map(ImmutableMap::copyOf)
             .orElseGet(ImmutableMap::of);
+        this.active = active;
     }
 
     @Value
     @Builder
     public static class Offer {
-        @NonNull
         private final String item;
         private final int price;
         private final int mana;
+        private final boolean active;
+
+        public Offer(
+            @JsonProperty("item") String item,
+            @JsonProperty("price") int price,
+            @JsonProperty("mana") int mana,
+            @JsonProperty(value = "active", defaultValue = "true") boolean active
+        ) {
+            this.item = Objects.requireNonNull(item, "item");
+            this.price = price;
+            this.mana = mana;
+            this.active = active;
+        }
     }
 }

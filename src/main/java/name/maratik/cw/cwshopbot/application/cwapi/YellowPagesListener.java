@@ -15,7 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.cwapi;
 
-import name.maratik.cw.cwshopbot.application.service.YellowPagesService;
+import name.maratik.cw.cwshopbot.application.storage.YellowPagesStorage;
 import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 
 import lombok.extern.log4j.Log4j2;
@@ -30,15 +30,15 @@ import java.util.List;
 @Service
 @Log4j2
 public class YellowPagesListener {
-    private final YellowPagesService yellowPagesService;
+    private final YellowPagesStorage yellowPagesStorage;
 
-    public YellowPagesListener(YellowPagesService yellowPagesService) {
-        this.yellowPagesService = yellowPagesService;
+    public YellowPagesListener(YellowPagesStorage yellowPagesStorage) {
+        this.yellowPagesStorage = yellowPagesStorage;
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.username}_yellow_pages")
     public void processYellowPagesAnnounce(List<YellowPage> data) {
         log.debug("Received next: {}", data);
-        yellowPagesService.storeYellowPages(data);
+        yellowPagesStorage.saveYellowPages(data);
     }
 }

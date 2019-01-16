@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -38,7 +40,7 @@ public class YellowPagesStorageTest extends MockedTest {
         YellowPage yellowPage = YellowPageUtils.createYellowPage()
             .link("testLink")
             .build();
-        yellowPagesStorage.saveYellowPages(ImmutableList.of(yellowPage));
+        yellowPagesStorage.saveYellowPages(singletonList(yellowPage));
 
         NavigableYellowPage navigableYellowPage = yellowPagesStorage.findYellowPage("testL");
 
@@ -86,6 +88,20 @@ public class YellowPagesStorageTest extends MockedTest {
 
         assertEquals("testLink1", navigableYellowPage.getNextLink()
             .orElseThrow(() -> new AssertionError("Could not find next link"))
+        );
+    }
+
+    @Test
+    public void shouldInactiveOnAbsentYellowPage() {
+        YellowPage yellowPage = YellowPageUtils.createYellowPage()
+            .active(true)
+            .link("testLink")
+            .build();
+        yellowPagesStorage.saveYellowPages(singletonList(yellowPage));
+        yellowPagesStorage.saveYellowPages(emptyList());
+        assertFalse(yellowPagesStorage.findYellowPage("testLink").getYellowPage()
+            .orElseThrow(() -> new AssertionError("Could not find yellow page"))
+            .isActive()
         );
     }
 }

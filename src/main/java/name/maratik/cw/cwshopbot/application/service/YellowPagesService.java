@@ -15,22 +15,17 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.service;
 
+import name.maratik.cw.cwshopbot.application.storage.YellowPagesStorage;
+import name.maratik.cw.cwshopbot.model.NavigableYellowPage;
 import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 import name.maratik.spring.telegram.util.Localizable;
 
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
-import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Pattern;
-
-import static java.util.Collections.newSetFromMap;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -40,19 +35,16 @@ public class YellowPagesService extends Localizable {
     private static final Pattern UNDERSCORE = Pattern.compile("_", Pattern.LITERAL);
     private static final String UNDERSCORE_REPLACEMENT = "\\\\_";
 
-    private final NavigableMap<String, YellowPage> yellowPagesStorage = new ConcurrentSkipListMap<>();
-    private final Set<String> activeStores = newSetFromMap(new ConcurrentHashMap<>());
+    private final YellowPagesStorage yellowPagesStorage;
 
-    public void storeYellowPages(List<YellowPage> yellowPages) {
-        activeStores.clear();
-        yellowPages.forEach(yellowPage -> {
-            yellowPagesStorage.put(yellowPage.getLink(), yellowPage);
-            activeStores.add(yellowPage.getLink());
-        });
+    public YellowPagesService(YellowPagesStorage yellowPagesStorage) {
+        this.yellowPagesStorage = yellowPagesStorage;
     }
 
-    public Optional<Map.Entry<String, String>> formattedYellowPages(String key) {
-        return fetchYellowPages(key).map(yellowPage -> {
+    public Optional<Map.Entry<NavigableYellowPage, String>> formattedYellowPages(String key) {
+        NavigableYellowPage navigableYellowPage = fetchYellowPages(key);
+
+        return navigableYellowPage.getYellowPage().map(yellowPage -> {
             StringBuilder sb = new StringBuilder(t("YellowPages.INFO",
                 yellowPage.getLink(),
                 UNDERSCORE.matcher(yellowPage.getName()).replaceAll(UNDERSCORE_REPLACEMENT),
@@ -60,10 +52,9 @@ public class YellowPagesService extends Localizable {
                 yellowPage.getOwnerCastle().getCode(),
                 yellowPage.getKind().getCode(),
                 yellowPage.getMana(),
-                t(activeStores.contains(yellowPage.getLink())
+                yellowPage.isActive()
                     ? "YellowPages.INFO.ACTIVE"
                     : "YellowPages.INFO.INACTIVE"
-                )
             ));
 
             if (!yellowPage.getOffers().isEmpty()) {
@@ -78,7 +69,7 @@ public class YellowPagesService extends Localizable {
                 );
             }
 
-            return new AbstractMap.SimpleImmutableEntry<>(yellowPage.getLink(), sb.toString());
+            return new AbstractMap.SimpleImmutableEntry<>(navigableYellowPage, sb.toString());
         });
     }
 
@@ -90,26 +81,9 @@ public class YellowPagesService extends Localizable {
         sb.append(t("YellowPages.OFFER", offer.getItem(), offer.getMana(), offer.getPrice()));
     }
 
-    private Optional<YellowPage> fetchYellowPages() {
-        return Optional.ofNullable(yellowPagesStorage.firstEntry())
-            .map(Map.Entry::getValue);
-    }
-
-    private Optional<YellowPage> fetchYellowPages(String key) {
+    private NavigableYellowPage fetchYellowPages(String key) {
         return Optional.ofNullable(key)
-            .map(yellowPagesStorage::ceilingEntry)
-            .map(Map.Entry::getValue)
-            .map(Optional::of)
-            .orElseGet(this::fetchYellowPages);
-    }
-
-    public Optional<String> previousKey(String key) {
-        return Optional.ofNullable(key)
-            .map(yellowPagesStorage::lowerKey);
-    }
-
-    public Optional<String> nextKey(String key) {
-        return Optional.ofNullable(key)
-            .map(yellowPagesStorage::higherKey);
+            .map(yellowPagesStorage::findYellowPage)
+            .orElseGet(() -> yellowPagesStorage.findYellowPage(""));
     }
 }
