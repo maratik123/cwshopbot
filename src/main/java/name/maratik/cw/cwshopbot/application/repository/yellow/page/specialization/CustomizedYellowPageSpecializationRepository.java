@@ -18,6 +18,7 @@ package name.maratik.cw.cwshopbot.application.repository.yellow.page.specializat
 import name.maratik.cw.cwshopbot.entity.YellowPageSpecializationEntity;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,8 +27,10 @@ import java.util.List;
  */
 public interface CustomizedYellowPageSpecializationRepository {
     @Modifying
+    @Transactional
     void save(YellowPageSpecializationEntity yellowPageSpecializationEntity);
 
     @Modifying
+    @Transactional
     void saveAll(List<YellowPageSpecializationEntity> yellowPageSpecializationEntities);
 }

@@ -20,6 +20,7 @@ import name.maratik.cw.cwshopbot.entity.YellowPageOfferEntity;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
 
@@ -27,12 +28,14 @@ import java.util.stream.Stream;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public interface YellowPageOfferRepository extends Repository<YellowPageOfferEntity, Void>, CustomizedYellowPageOfferRepository {
+    @Transactional(readOnly = true)
     @Query("" +
         "SELECT item, price, mana, active" +
         "  FROM yellow_page_offer" +
         " WHERE yellow_page = :yellowPage")
     Stream<YellowPageOfferEntity.Content> findByYellowPage(String yellowPage);
 
+    @Transactional
     @Query("" +
         "UPDATE yellow_page_offer" +
         "   SET active = FALSE")

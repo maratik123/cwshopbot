@@ -20,6 +20,7 @@ import name.maratik.cw.cwshopbot.entity.YellowPageSpecializationEntity;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
 
@@ -27,12 +28,14 @@ import java.util.stream.Stream;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public interface YellowPageSpecializationRepository extends Repository<YellowPageSpecializationEntity, Void>, CustomizedYellowPageSpecializationRepository {
+    @Transactional(readOnly = true)
     @Query("" +
         "SELECT specialization, value" +
         "  FROM yellow_page_specialization" +
         " WHERE yellow_page = :yellowPage")
     Stream<YellowPageSpecializationEntity.Content> findByYellowPage(String yellowPage);
 
+    @Transactional
     @Query("" +
         "UPDATE yellow_page_specialization" +
         "   SET value = 0")

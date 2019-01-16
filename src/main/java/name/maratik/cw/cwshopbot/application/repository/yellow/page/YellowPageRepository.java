@@ -20,6 +20,7 @@ import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -27,18 +28,21 @@ import java.util.Optional;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public interface YellowPageRepository extends Repository<YellowPageEntity, String>, CustomizedYellowPageRepository {
+    @Transactional(readOnly = true)
     @Query("" +
         "SELECT link, name, owner_name, owner_castle, profession, mana, active" +
         "  FROM yellow_page" +
         " WHERE link = :link")
     Optional<YellowPageEntity> findByLink(String link);
 
+    @Transactional
     @Query("" +
         "UPDATE yellow_page" +
         "   SET active = FALSE")
     @Modifying
     void setAllInactive();
 
+    @Transactional(readOnly = true)
     @Query("" +
         "SELECT link, name, owner_name, owner_castle, profession, mana, active" +
         "  FROM yellow_page" +
@@ -47,6 +51,7 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
         " LIMIT 1")
     Optional<YellowPageEntity> findFirstByLinkGreaterThanOrderByLink(String link);
 
+    @Transactional(readOnly = true)
     @Query("" +
         "SELECT link" +
         "  FROM yellow_page" +
@@ -55,6 +60,7 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
         " LIMIT 1")
     Optional<YellowPageEntity.Link> findTopByLinkBeforeOrderByLink(String link);
 
+    @Transactional(readOnly = true)
     @Query("" +
         "SELECT link" +
         "  FROM yellow_page" +
