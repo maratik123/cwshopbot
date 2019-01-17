@@ -30,7 +30,9 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.google.common.base.Ticker;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -91,7 +93,8 @@ public class InternalConfig {
                                                  @Value("${name.maratik.cw.cwshopbot.token}") String token) {
         return new TelegramBotBuilder()
             .username(username)
-            .token(token);
+            .token(token)
+            .maxThreads(5);
     }
 
     @Bean
@@ -149,7 +152,9 @@ public class InternalConfig {
                     .setTypeFactory(typeFactory)
                     .registerModules(
                         new AfterburnerModule(),
-                        new Jdk8Module()
+                        new Jdk8Module(),
+                        new JavaTimeModule(),
+                        new ParameterNamesModule()
                     )
             );
         }
@@ -191,15 +196,15 @@ public class InternalConfig {
             dataSource.setUsername(username);
             dataSource.setPassword(password);
             dataSource.setValidationQuery("SELECT 1");
-            dataSource.setMaxWaitMillis(10_000);
+            dataSource.setMaxWaitMillis(TimeUnit.SECONDS.toMillis(10));
             dataSource.setMaxTotal(5);
             dataSource.setTestWhileIdle(true);
             dataSource.setInitialSize(2);
             dataSource.setMinIdle(1);
-            dataSource.setTimeBetweenEvictionRunsMillis(10_000);
+            dataSource.setTimeBetweenEvictionRunsMillis(TimeUnit.SECONDS.toMillis(10));
             dataSource.setMaxIdle(2);
             dataSource.setSoftMinEvictableIdleTimeMillis(TimeUnit.MINUTES.toMillis(10));
-            dataSource.setMaxConnLifetimeMillis(TimeUnit.HOURS.toMillis(10));
+            dataSource.setMaxConnLifetimeMillis(TimeUnit.MINUTES.toMillis(20));
             dataSource.setDefaultAutoCommit(false);
             return dataSource;
         }

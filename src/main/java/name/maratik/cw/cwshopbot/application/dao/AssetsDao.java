@@ -30,6 +30,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
@@ -59,7 +62,12 @@ public class AssetsDao {
         try (InputStream is = assets.getInputStream()) {
             assetsDto = new ObjectMapper(new YAMLFactory())
                 .setTypeFactory(typeFactory)
-                .registerModule(new Jdk8Module())
+                .registerModules(
+                    new AfterburnerModule(),
+                    new Jdk8Module(),
+                    new JavaTimeModule(),
+                    new ParameterNamesModule()
+                )
                 .readValue(is, AssetsDto.class);
         }
         log.info("Assets successfully loaded, assets parts size: {}, craftbooks: {}",

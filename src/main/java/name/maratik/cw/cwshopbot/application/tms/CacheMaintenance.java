@@ -47,7 +47,7 @@ public class CacheMaintenance {
         }
     }
 
-    @Scheduled(fixedRateString = "P1D", initialDelayString = "PT30M")
+    @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT30M")
     public void cleanupUnifiedObjectMapperCache() {
         try {
             unifiedObjectMapperCache.cleanUp();
