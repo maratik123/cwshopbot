@@ -24,7 +24,7 @@ import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -42,7 +42,7 @@ public class DealStorage {
 
     @Transactional
     public long saveDeal(Deal deal) {
-        return dealRepository.save(DealEntity.of(deal, Timestamp.from(clockHolder.instant()))).getId();
+        return dealRepository.save(DealEntity.of(deal, LocalDateTime.now(clockHolder))).getId();
     }
 
     public Optional<Deal> findDeal(long id) {

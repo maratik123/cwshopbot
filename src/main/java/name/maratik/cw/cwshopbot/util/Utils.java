@@ -27,6 +27,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -196,6 +197,10 @@ public class Utils {
     }
 
     public static SqlParameterValue timestamp(Timestamp value) {
+        return new SqlParameterValue(Types.TIMESTAMP, value);
+    }
+
+    public static SqlParameterValue timestamp(LocalDateTime value) {
         return new SqlParameterValue(Types.TIMESTAMP, value);
     }
 

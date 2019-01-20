@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -57,9 +57,9 @@ public class DealEntity {
     private final int qty;
     private final int price;
     @NonNull
-    private final Timestamp creationTime;
+    private final LocalDateTime creationTime;
 
-    public static DealEntity of(@NonNull Deal deal, @NonNull Timestamp creationTime) {
+    public static DealEntity of(@NonNull Deal deal, @NonNull LocalDateTime creationTime) {
         return new DealEntity(
             null,
             deal.getSellerId(),

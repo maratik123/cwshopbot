@@ -19,7 +19,7 @@ import name.maratik.cw.cwshopbot.application.config.ClockHolder;
 import name.maratik.cw.cwshopbot.entity.DealEntity;
 import name.maratik.cw.cwshopbot.model.Castle;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -36,7 +36,7 @@ public class DealEntityUtils {
             .item("testItem")
             .qty(100)
             .price(200)
-            .creationTime(Timestamp.from(clockHolder.instant()))
+            .creationTime(LocalDateTime.now(clockHolder))
             .build();
     }
 }
