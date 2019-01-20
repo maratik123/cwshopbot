@@ -114,7 +114,7 @@ public class YellowPagesStorage {
                 .kind(ProfessionByEmoji.findByProfession(yellowPageEntity.getProfession()))
                 .mana(yellowPageEntity.getMana())
                 .active(yellowPageEntity.isActive())
-                .offers(yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+                .offers(yellowPageOfferRepository.findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                     .map(yellowPageOfferEntity -> YellowPage.Offer.builder()
                         .item(yellowPageOfferEntity.getItem())
                         .mana(yellowPageOfferEntity.getMana())
@@ -124,7 +124,8 @@ public class YellowPagesStorage {
                     )
                     .collect(toImmutableList())
                 )
-                .specialization(yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+                .specialization(yellowPageSpecializationRepository
+                    .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                     .collect(toImmutableMap(
                         YellowPageSpecializationEntity.Content::getSpecialization,
                         YellowPageSpecializationEntity.Content::getValue

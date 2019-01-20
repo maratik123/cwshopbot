@@ -40,6 +40,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -64,7 +65,8 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
             YellowPageSpecializationEntity yellowPageSpecializationEntity = createYellowPageSpecializationEntity().build();
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
 
-            List<YellowPageSpecializationEntity.Content> fetchedYellowPageSpecializationContents = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+            List<YellowPageSpecializationEntity.Content> fetchedYellowPageSpecializationContents = yellowPageSpecializationRepository
+                .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                 .collect(toImmutableList());
 
             assertThat(fetchedYellowPageSpecializationContents, contains(specializationMatches(yellowPageSpecializationEntity)));
@@ -86,7 +88,8 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
                 .build();
             yellowPageSpecializationRepository.saveAll(ImmutableList.of(yellowPageSpecializationEntity, anotherYellowPageSpecializationEntity));
 
-            List<YellowPageSpecializationEntity.Content> fetchedYellowPageSpecializationContents = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+            List<YellowPageSpecializationEntity.Content> fetchedYellowPageSpecializationContents = yellowPageSpecializationRepository
+                .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                 .collect(toImmutableList());
 
             assertThat(fetchedYellowPageSpecializationContents, containsInAnyOrder(
@@ -108,7 +111,8 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
                 .value(50)
                 .build();
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
-            YellowPageSpecializationEntity.Content yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+            YellowPageSpecializationEntity.Content yellowPageSpecializationContent = yellowPageSpecializationRepository
+                .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(50, yellowPageSpecializationContent.getValue());
@@ -117,7 +121,8 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
                 .value(100)
                 .build();
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
-            yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+            yellowPageSpecializationContent = yellowPageSpecializationRepository
+                .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(100, yellowPageSpecializationContent.getValue());
@@ -136,16 +141,18 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
                 .value(100)
                 .build();
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
-            YellowPageSpecializationEntity.Content yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+            YellowPageSpecializationEntity.Content yellowPageSpecializationContent = yellowPageSpecializationRepository
+                .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(100, yellowPageSpecializationContent.getValue());
 
             yellowPageSpecializationRepository.zeroValueForYellowPages(singleton(yellowPageEntity.getLink()));
-            yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
+            assertFalse(yellowPageSpecializationRepository
+                .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(fetchAssertion("yellow_page_specialization"));
-            assertEquals(0, yellowPageSpecializationContent.getValue());
+                .isPresent()
+            );
 
             return null;
         });

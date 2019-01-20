@@ -39,6 +39,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -65,7 +66,8 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
             YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity().build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
 
-            List<YellowPageOfferEntity.Content> fetchedYellowPageOfferEntities = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+            List<YellowPageOfferEntity.Content> fetchedYellowPageOfferEntities = yellowPageOfferRepository
+                .findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                 .collect(toImmutableList());
 
             assertThat(fetchedYellowPageOfferEntities, contains(offerMatches(yellowPageOfferEntity)));
@@ -88,7 +90,7 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
             yellowPageOfferRepository.saveAll(ImmutableList.of(yellowPageOfferEntity, anotherYellowPageOfferEntity));
 
             List<YellowPageOfferEntity.Content> fetchedYellowPageOfferContents = yellowPageOfferRepository
-                .findByYellowPage(yellowPageEntity.getLink())
+                .findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                 .collect(toImmutableList());
 
             assertThat(fetchedYellowPageOfferContents, containsInAnyOrder(
@@ -107,23 +109,25 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
             yellowPageRepository.save(yellowPageEntity);
 
             YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity()
-                .active(true)
+                .mana(100)
                 .build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
             YellowPageOfferEntity.Content yellowPageOfferContent = yellowPageOfferRepository
-                .findByYellowPage(yellowPageEntity.getLink())
+                .findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
-            assertTrue(yellowPageOfferContent.isActive());
+            assertEquals(100, yellowPageOfferContent.getMana());
 
             yellowPageOfferEntity = yellowPageOfferEntity.toBuilder()
-                .active(false)
+                .mana(200)
                 .build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
-            yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+
+            yellowPageOfferContent = yellowPageOfferRepository
+                .findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
-            assertFalse(yellowPageOfferContent.isActive());
+            assertEquals(200, yellowPageOfferContent.getMana());
 
             return null;
         });
@@ -139,16 +143,19 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
                 .active(true)
                 .build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
-            YellowPageOfferEntity.Content yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+            YellowPageOfferEntity.Content yellowPageOfferContent = yellowPageOfferRepository
+                .findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                 .findAny()
                 .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
             assertTrue(yellowPageOfferContent.isActive());
 
             yellowPageOfferRepository.setInactiveForYellowPages(singleton(yellowPageEntity.getLink()));
-            yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+
+            assertFalse(yellowPageOfferRepository
+                .findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
-            assertFalse(yellowPageOfferContent.isActive());
+                .isPresent()
+            );
 
             return null;
         });

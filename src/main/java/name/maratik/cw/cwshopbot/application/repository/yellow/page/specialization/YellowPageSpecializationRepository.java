@@ -33,8 +33,9 @@ public interface YellowPageSpecializationRepository extends Repository<YellowPag
     @Query("" +
         "SELECT specialization, value" +
         "  FROM yellow_page_specialization" +
-        " WHERE yellow_page = :yellowPage")
-    Stream<YellowPageSpecializationEntity.Content> findByYellowPage(String yellowPage);
+        " WHERE yellow_page = :yellowPage" +
+        "   AND value > 0")
+    Stream<YellowPageSpecializationEntity.Content> findByYellowPageAndValueGreaterThan0(String yellowPage);
 
     @Transactional
     @Query("" +

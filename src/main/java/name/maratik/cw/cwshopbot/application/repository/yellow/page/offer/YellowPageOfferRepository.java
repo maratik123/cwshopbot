@@ -33,8 +33,9 @@ public interface YellowPageOfferRepository extends Repository<YellowPageOfferEnt
     @Query("" +
         "SELECT item, price, mana, active" +
         "  FROM yellow_page_offer" +
-        " WHERE yellow_page = :yellowPage")
-    Stream<YellowPageOfferEntity.Content> findByYellowPage(String yellowPage);
+        " WHERE yellow_page = :yellowPage" +
+        "   AND active")
+    Stream<YellowPageOfferEntity.Content> findByYellowPageAndActiveIsTrue(String yellowPage);
 
     @Transactional
     @Query("" +
