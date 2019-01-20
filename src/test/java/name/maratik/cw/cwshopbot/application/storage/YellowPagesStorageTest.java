@@ -37,7 +37,7 @@ public class YellowPagesStorageTest extends MockedTest {
 
     @Test
     public void shouldSaveAndFetchYellowPages() {
-        YellowPage yellowPage = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage = StorageUtils.createYellowPage()
             .link("testLink")
             .build();
         yellowPagesStorage.saveYellowPages(singletonList(yellowPage));
@@ -53,13 +53,13 @@ public class YellowPagesStorageTest extends MockedTest {
 
     @Test
     public void shouldPreviousLinkNotEmpty() {
-        YellowPage yellowPage = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage = StorageUtils.createYellowPage()
             .link("testLink")
             .build();
-        YellowPage yellowPage1 = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage1 = StorageUtils.createYellowPage()
             .link("testLink1")
             .build();
-        YellowPage yellowPage2 = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage2 = StorageUtils.createYellowPage()
             .link("testLink2")
             .build();
         yellowPagesStorage.saveYellowPages(ImmutableList.of(yellowPage, yellowPage1, yellowPage2));
@@ -73,13 +73,13 @@ public class YellowPagesStorageTest extends MockedTest {
 
     @Test
     public void shouldNextLinkNotEmpty() {
-        YellowPage yellowPage = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage = StorageUtils.createYellowPage()
             .link("testLink")
             .build();
-        YellowPage yellowPage1 = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage1 = StorageUtils.createYellowPage()
             .link("testLink1")
             .build();
-        YellowPage yellowPage2 = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage2 = StorageUtils.createYellowPage()
             .link("testLink2")
             .build();
         yellowPagesStorage.saveYellowPages(ImmutableList.of(yellowPage, yellowPage1, yellowPage2));
@@ -93,7 +93,7 @@ public class YellowPagesStorageTest extends MockedTest {
 
     @Test
     public void shouldInactiveOnAbsentYellowPage() {
-        YellowPage yellowPage = YellowPageUtils.createYellowPage()
+        YellowPage yellowPage = StorageUtils.createYellowPage()
             .active(true)
             .link("testLink")
             .build();

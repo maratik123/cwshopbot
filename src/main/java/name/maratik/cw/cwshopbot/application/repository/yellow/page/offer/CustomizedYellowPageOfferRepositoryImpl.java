@@ -20,7 +20,11 @@ import name.maratik.cw.cwshopbot.entity.YellowPageOfferEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Collection;
+
+import static name.maratik.cw.cwshopbot.util.Utils.bool;
+import static name.maratik.cw.cwshopbot.util.Utils.number;
+import static name.maratik.cw.cwshopbot.util.Utils.text;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -44,22 +48,27 @@ public class CustomizedYellowPageOfferRepositoryImpl implements CustomizedYellow
 
     @Override
     public void save(YellowPageOfferEntity yellowPageOfferEntity) {
-        jdbcTemplate.update(SAVE_YELLOW_PAGE_OFFER,
-            yellowPageOfferEntity.getYellowPage(), yellowPageOfferEntity.getItem(), yellowPageOfferEntity.getPrice(),
-            yellowPageOfferEntity.getMana(), yellowPageOfferEntity.isActive());
+        jdbcTemplate.update(SAVE_YELLOW_PAGE_OFFER, saveYellowPageOfferParams(yellowPageOfferEntity));
     }
 
     @Override
-    public void saveAll(List<YellowPageOfferEntity> yellowPageOfferEntities) {
+    public void saveAll(Collection<YellowPageOfferEntity> yellowPageOfferEntities) {
         if (yellowPageOfferEntities.isEmpty()) {
             return;
         }
         jdbcTemplate.batchUpdate(SAVE_YELLOW_PAGE_OFFER, yellowPageOfferEntities.stream()
-            .map(yellowPageOfferEntity -> new Object[]{
-                yellowPageOfferEntity.getYellowPage(), yellowPageOfferEntity.getItem(),
-                yellowPageOfferEntity.getPrice(), yellowPageOfferEntity.getMana(), yellowPageOfferEntity.isActive()
-            })
+            .map(CustomizedYellowPageOfferRepositoryImpl::saveYellowPageOfferParams)
             .collect(toImmutableList())
         );
+    }
+
+    private static Object[] saveYellowPageOfferParams(YellowPageOfferEntity yellowPageOfferEntity) {
+        return new Object[]{
+            text(yellowPageOfferEntity.getYellowPage()),
+            text(yellowPageOfferEntity.getItem()),
+            number(yellowPageOfferEntity.getPrice()),
+            number(yellowPageOfferEntity.getMana()),
+            bool(yellowPageOfferEntity.isActive())
+        };
     }
 }

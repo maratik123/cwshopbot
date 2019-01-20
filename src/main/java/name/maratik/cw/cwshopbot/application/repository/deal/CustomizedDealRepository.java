@@ -13,28 +13,16 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.config;
+package name.maratik.cw.cwshopbot.application.repository.deal;
 
-import name.maratik.spring.telegram.annotation.EnableTelegramBot;
+import name.maratik.cw.cwshopbot.entity.DealEntity;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Configuration
-@EnableTelegramBot
-public class ExternalConfig {
-    @ConnectionUrl
-    @Bean
-    public String connectionUrl(@Value("${cwshopbot.db.connectionUrl}") String connectionUrl) {
-        return connectionUrl;
-    }
-
-    @Bean
-    public ClockHolder clock() {
-        return new SystemClockHolder();
-    }
+public interface CustomizedDealRepository {
+    @Transactional
+    DealEntity.Key save(DealEntity dealEntity);
 }

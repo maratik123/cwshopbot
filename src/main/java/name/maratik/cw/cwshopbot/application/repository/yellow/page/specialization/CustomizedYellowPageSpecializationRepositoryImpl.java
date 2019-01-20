@@ -20,7 +20,10 @@ import name.maratik.cw.cwshopbot.entity.YellowPageSpecializationEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Collection;
+
+import static name.maratik.cw.cwshopbot.util.Utils.number;
+import static name.maratik.cw.cwshopbot.util.Utils.text;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -42,23 +45,25 @@ public class CustomizedYellowPageSpecializationRepositoryImpl implements Customi
 
     @Override
     public void save(YellowPageSpecializationEntity yellowPageSpecializationEntity) {
-        jdbcTemplate.update(SAVE_YELLOW_PAGE_SPECIALIZATION,
-            yellowPageSpecializationEntity.getYellowPage(), yellowPageSpecializationEntity.getSpecialization(),
-            yellowPageSpecializationEntity.getValue()
-        );
+        jdbcTemplate.update(SAVE_YELLOW_PAGE_SPECIALIZATION, saveYellowPageSpecializationParams(yellowPageSpecializationEntity));
     }
 
     @Override
-    public void saveAll(List<YellowPageSpecializationEntity> yellowPageSpecializationEntities) {
+    public void saveAll(Collection<YellowPageSpecializationEntity> yellowPageSpecializationEntities) {
         if (yellowPageSpecializationEntities.isEmpty()) {
             return;
         }
         jdbcTemplate.batchUpdate(SAVE_YELLOW_PAGE_SPECIALIZATION, yellowPageSpecializationEntities.stream()
-            .map(yellowPageSpecializationEntity -> new Object[]{
-                yellowPageSpecializationEntity.getYellowPage(), yellowPageSpecializationEntity.getSpecialization(),
-                yellowPageSpecializationEntity.getValue()
-            })
+            .map(CustomizedYellowPageSpecializationRepositoryImpl::saveYellowPageSpecializationParams)
             .collect(toImmutableList())
         );
+    }
+
+    private static Object[] saveYellowPageSpecializationParams(YellowPageSpecializationEntity yellowPageSpecializationEntity) {
+        return new Object[]{
+            text(yellowPageSpecializationEntity.getYellowPage()),
+            text(yellowPageSpecializationEntity.getSpecialization()),
+            number(yellowPageSpecializationEntity.getValue())
+        };
     }
 }

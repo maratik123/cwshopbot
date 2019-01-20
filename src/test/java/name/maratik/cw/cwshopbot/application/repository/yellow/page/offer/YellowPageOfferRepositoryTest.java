@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.repository.yellow.page.offer;
 
+import name.maratik.cw.cwshopbot.application.repository.RepositoryUtils;
 import name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageRepository;
 import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import name.maratik.cw.cwshopbot.entity.YellowPageOfferEntity;
@@ -86,7 +87,8 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
                 .build();
             yellowPageOfferRepository.saveAll(ImmutableList.of(yellowPageOfferEntity, anotherYellowPageOfferEntity));
 
-            List<YellowPageOfferEntity.Content> fetchedYellowPageOfferContents = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+            List<YellowPageOfferEntity.Content> fetchedYellowPageOfferContents = yellowPageOfferRepository
+                .findByYellowPage(yellowPageEntity.getLink())
                 .collect(toImmutableList());
 
             assertThat(fetchedYellowPageOfferContents, containsInAnyOrder(
@@ -108,9 +110,10 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
                 .active(true)
                 .build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
-            YellowPageOfferEntity.Content yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
+            YellowPageOfferEntity.Content yellowPageOfferContent = yellowPageOfferRepository
+                .findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_offer"));
+                .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
             assertTrue(yellowPageOfferContent.isActive());
 
             yellowPageOfferEntity = yellowPageOfferEntity.toBuilder()
@@ -119,7 +122,7 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
             yellowPageOfferRepository.save(yellowPageOfferEntity);
             yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_offer"));
+                .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
             assertFalse(yellowPageOfferContent.isActive());
 
             return null;
@@ -138,13 +141,13 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
             yellowPageOfferRepository.save(yellowPageOfferEntity);
             YellowPageOfferEntity.Content yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_offer"));
+                .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
             assertTrue(yellowPageOfferContent.isActive());
 
             yellowPageOfferRepository.setInactiveForYellowPages(singleton(yellowPageEntity.getLink()));
             yellowPageOfferContent = yellowPageOfferRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_offer"));
+                .orElseThrow(RepositoryUtils.fetchAssertion("yellow_page_offer"));
             assertFalse(yellowPageOfferContent.isActive());
 
             return null;

@@ -15,26 +15,16 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.config;
 
-import name.maratik.spring.telegram.annotation.EnableTelegramBot;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.time.Clock;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Configuration
-@EnableTelegramBot
-public class ExternalConfig {
-    @ConnectionUrl
-    @Bean
-    public String connectionUrl(@Value("${cwshopbot.db.connectionUrl}") String connectionUrl) {
-        return connectionUrl;
-    }
+public class SystemClockHolder extends ClockHolder {
+    private final Clock systemClock = Clock.systemUTC();
 
-    @Bean
-    public ClockHolder clock() {
-        return new SystemClockHolder();
+    @Override
+    public Clock get() {
+        return systemClock;
     }
 }

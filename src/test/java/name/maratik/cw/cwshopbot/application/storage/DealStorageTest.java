@@ -13,28 +13,35 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.config;
+package name.maratik.cw.cwshopbot.application.storage;
 
-import name.maratik.spring.telegram.annotation.EnableTelegramBot;
+import name.maratik.cw.cwshopbot.mock.MockedTest;
+import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import static name.maratik.cw.cwshopbot.application.repository.RepositoryUtils.fetchAssertion;
+
+import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Configuration
-@EnableTelegramBot
-public class ExternalConfig {
-    @ConnectionUrl
-    @Bean
-    public String connectionUrl(@Value("${cwshopbot.db.connectionUrl}") String connectionUrl) {
-        return connectionUrl;
+public class DealStorageTest extends MockedTest {
+    @Autowired
+    private DealStorage dealStorage;
+
+    @Test
+    public void shouldSaveAndGetDeal() {
+        Deal deal = StorageUtils.createDeal().build();
+
+        long id = dealStorage.saveDeal(deal);
+
+        Deal storedDeal = dealStorage.findDeal(id).orElseThrow(fetchAssertion("deal"));
+
+        assertThat(storedDeal, samePropertyValuesAs(deal));
     }
 
-    @Bean
-    public ClockHolder clock() {
-        return new SystemClockHolder();
-    }
 }

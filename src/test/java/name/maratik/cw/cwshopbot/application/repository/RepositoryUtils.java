@@ -13,28 +13,15 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.config;
+package name.maratik.cw.cwshopbot.application.repository;
 
-import name.maratik.spring.telegram.annotation.EnableTelegramBot;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Configuration
-@EnableTelegramBot
-public class ExternalConfig {
-    @ConnectionUrl
-    @Bean
-    public String connectionUrl(@Value("${cwshopbot.db.connectionUrl}") String connectionUrl) {
-        return connectionUrl;
-    }
-
-    @Bean
-    public ClockHolder clock() {
-        return new SystemClockHolder();
+public class RepositoryUtils {
+    public static Supplier<AssertionError> fetchAssertion(String entityName) {
+        return () -> new AssertionError("Could not fetch " + entityName);
     }
 }

@@ -50,4 +50,11 @@
             ALTER TABLE yellow_page SET (fillfactor = 90)
         </sql>
     </changeSet>
+    <changeSet id="yellow_page_collation" author="maratik">
+        <modifyDataType tableName="yellow_page" columnName="link" newDataType="text collate &quot;C&quot;"/>
+        <modifyDataType tableName="yellow_page" columnName="name" newDataType="text collate &quot;C&quot;"/>
+        <modifyDataType tableName="yellow_page" columnName="owner_name" newDataType="text collate &quot;C&quot;"/>
+        <modifyDataType tableName="yellow_page" columnName="owner_castle" newDataType="text collate &quot;C&quot;"/>
+        <modifyDataType tableName="yellow_page" columnName="profession" newDataType="text collate &quot;C&quot;"/>
+    </changeSet>
 </databaseChangeLog>

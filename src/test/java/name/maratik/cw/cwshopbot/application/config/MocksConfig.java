@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.config;
 
+import name.maratik.cw.cwshopbot.mock.OffsetClockHolder;
 import name.maratik.spring.telegram.TelegramBotService;
 
 import com.rabbitmq.client.Channel;
@@ -89,6 +90,11 @@ public class MocksConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory());
         return factory;
+    }
+
+    @Bean
+    public OffsetClockHolder clock() {
+        return new OffsetClockHolder();
     }
 
     private static void resetChannel(Channel channel) {

@@ -20,7 +20,7 @@ import name.maratik.cw.cwshopbot.entity.YellowPageOfferEntity;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -32,5 +32,5 @@ public interface CustomizedYellowPageOfferRepository {
 
     @Transactional
     @Modifying
-    void saveAll(List<YellowPageOfferEntity> yellowPageOfferEntities);
+    void saveAll(Collection<YellowPageOfferEntity> yellowPageOfferEntities);
 }

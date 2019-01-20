@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.cwapi;
 
+import name.maratik.cw.cwshopbot.application.storage.DealStorage;
 import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 
 import lombok.extern.log4j.Log4j2;
@@ -27,9 +28,15 @@ import org.springframework.stereotype.Service;
 @Service
 @Log4j2
 public class DealsListener {
-    @SuppressWarnings("MethodMayBeStatic")
+    private final DealStorage dealStorage;
+
+    public DealsListener(DealStorage dealStorage) {
+        this.dealStorage = dealStorage;
+    }
+
     @RabbitListener(queues = "${spring.rabbitmq.username}_deals")
     public void processDealsAnnounce(Deal data) {
         log.debug("Received message: {}", data);
+        dealStorage.saveDeal(data);
     }
 }

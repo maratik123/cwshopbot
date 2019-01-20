@@ -19,10 +19,14 @@ import name.maratik.cw.cwshopbot.model.cwasset.Item;
 
 import com.google.common.collect.ImmutableList;
 import lombok.ToString;
+import org.springframework.jdbc.core.SqlParameterValue;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -169,6 +173,30 @@ public class Utils {
 
     public static <T> Stream<T> stream(Optional<T> optional) {
         return optional.map(Stream::of).orElseGet(Stream::empty);
+    }
+
+    public static SqlParameterValue text(String value) {
+        return new SqlParameterValue(Types.VARCHAR, value);
+    }
+
+    public static SqlParameterValue number(Integer value) {
+        return new SqlParameterValue(Types.INTEGER, value);
+    }
+
+    public static SqlParameterValue number(Long value) {
+        return new SqlParameterValue(Types.BIGINT, value);
+    }
+
+    public static SqlParameterValue bool(Boolean value) {
+        return new SqlParameterValue(Types.BOOLEAN, value);
+    }
+
+    public static SqlParameterValue timestamp(Instant value) {
+        return timestamp(Timestamp.from(value));
+    }
+
+    public static SqlParameterValue timestamp(Timestamp value) {
+        return new SqlParameterValue(Types.TIMESTAMP, value);
     }
 
     private static List<MessageEntity> generateTextMessageEntities(Message message) {

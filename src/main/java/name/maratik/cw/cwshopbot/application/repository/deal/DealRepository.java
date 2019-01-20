@@ -13,28 +13,25 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.config;
+package name.maratik.cw.cwshopbot.application.repository.deal;
 
-import name.maratik.spring.telegram.annotation.EnableTelegramBot;
+import name.maratik.cw.cwshopbot.entity.DealEntity;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Configuration
-@EnableTelegramBot
-public class ExternalConfig {
-    @ConnectionUrl
-    @Bean
-    public String connectionUrl(@Value("${cwshopbot.db.connectionUrl}") String connectionUrl) {
-        return connectionUrl;
-    }
-
-    @Bean
-    public ClockHolder clock() {
-        return new SystemClockHolder();
-    }
+@Transactional
+public interface DealRepository extends Repository<DealEntity, Long>, CustomizedDealRepository {
+    @Transactional(readOnly = true)
+    @Query("" +
+        "SELECT id, seller_id, seller_name, seller_castle, buyer_id, buyer_name, buyer_castle, item, qty, price, creation_time" +
+        "  FROM deal" +
+        " WHERE id = :id")
+    Optional<DealEntity> findById(long id);
 }

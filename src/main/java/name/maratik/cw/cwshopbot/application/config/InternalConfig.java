@@ -64,7 +64,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
@@ -95,11 +94,6 @@ public class InternalConfig {
             .username(username)
             .token(token)
             .maxThreads(5);
-    }
-
-    @Bean
-    public Clock clock() {
-        return Clock.systemUTC();
     }
 
     @Bean

@@ -20,34 +20,42 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
-    <changeSet id="yellow_page_offer" author="maratik">
-        <createTable tableName="yellow_page_offer">
-            <column name="yellow_page" type="text">
-                <constraints nullable="false" referencedTableName="yellow_page" referencedColumnNames="link"
-                             foreignKeyName="fk_yellow_page"/>
+    <changeSet id="deal" author="maratik">
+        <createSequence sequenceName="deal_seq_id" cacheSize="10"/>
+        <createTable tableName="deal">
+            <column name="id" type="bigint" defaultValueComputed="nextval('deal_seq_id')">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="item" type="text">
+            <column name="seller_id" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seller_name" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seller_castle" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="buyer_id" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="buyer_name" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="buyer_castle" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item" type="text collate &quot;C&quot;">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qty" type="integer">
                 <constraints nullable="false"/>
             </column>
             <column name="price" type="integer">
                 <constraints nullable="false"/>
             </column>
-            <column name="mana" type="integer">
-                <constraints nullable="false"/>
-            </column>
-            <column name="active" type="boolean">
+            <column name="creation_time" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addPrimaryKey tableName="yellow_page_offer" columnNames="yellow_page, item"/>
-    </changeSet>
-    <changeSet id="yellow_page_offer_fillfactor" author="maratik">
-        <sql>
-            ALTER TABLE yellow_page_offer SET (fillfactor = 90)
-        </sql>
-    </changeSet>
-    <changeSet id="yellow_page_offer_collation" author="maratik">
-        <modifyDataType tableName="yellow_page_offer" columnName="yellow_page" newDataType="text collate &quot;C&quot;"/>
-        <modifyDataType tableName="yellow_page_offer" columnName="item" newDataType="text collate &quot;C&quot;"/>
     </changeSet>
 </databaseChangeLog>

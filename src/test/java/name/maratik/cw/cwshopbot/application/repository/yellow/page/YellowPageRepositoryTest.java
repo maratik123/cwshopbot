@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageEntity;
+import static name.maratik.cw.cwshopbot.application.repository.RepositoryUtils.fetchAssertion;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +48,7 @@ public class YellowPageRepositoryTest extends MockedTest {
             yellowPageRepository.save(yellowPageEntity);
 
             YellowPageEntity fetchedYellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertThat(fetchedYellowPageEntity, samePropertyValuesAs(yellowPageEntity));
 
@@ -64,7 +65,7 @@ public class YellowPageRepositoryTest extends MockedTest {
             yellowPageRepository.save(yellowPageEntity);
 
             yellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertTrue(yellowPageEntity.isActive());
 
@@ -75,7 +76,7 @@ public class YellowPageRepositoryTest extends MockedTest {
             yellowPageRepository.save(yellowPageEntity);
 
             yellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertFalse(yellowPageEntity.isActive());
 
@@ -93,12 +94,12 @@ public class YellowPageRepositoryTest extends MockedTest {
             yellowPageRepository.saveAll(ImmutableList.of(yellowPageEntity, anotherYellowPageEntity));
 
             YellowPageEntity fetchedYellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertThat(fetchedYellowPageEntity, samePropertyValuesAs(yellowPageEntity));
 
             fetchedYellowPageEntity = yellowPageRepository.findByLink(anotherYellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertThat(fetchedYellowPageEntity, samePropertyValuesAs(anotherYellowPageEntity));
 
@@ -115,14 +116,14 @@ public class YellowPageRepositoryTest extends MockedTest {
             yellowPageRepository.save(yellowPageEntity);
 
             yellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertTrue(yellowPageEntity.isActive());
 
             yellowPageRepository.setAllInactive();
 
             yellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page"));
+                .orElseThrow(fetchAssertion("yellow_page"));
 
             assertFalse(yellowPageEntity.isActive());
 

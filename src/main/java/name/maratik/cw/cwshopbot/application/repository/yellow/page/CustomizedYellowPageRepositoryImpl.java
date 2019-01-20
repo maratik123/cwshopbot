@@ -20,7 +20,11 @@ import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Collection;
+
+import static name.maratik.cw.cwshopbot.util.Utils.bool;
+import static name.maratik.cw.cwshopbot.util.Utils.number;
+import static name.maratik.cw.cwshopbot.util.Utils.text;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -47,25 +51,29 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
 
     @Override
     public void save(YellowPageEntity yellowPageEntity) {
-        jdbcTemplate.update(SAVE_YELLOW_PAGE,
-            yellowPageEntity.getLink(), yellowPageEntity.getName(), yellowPageEntity.getOwnerName(),
-            yellowPageEntity.getOwnerCastle().getCode(), yellowPageEntity.getProfession().getCode(),
-            yellowPageEntity.getMana(), yellowPageEntity.isActive()
-        );
+        jdbcTemplate.update(SAVE_YELLOW_PAGE, saveYellowPageParams(yellowPageEntity));
     }
 
     @Override
-    public void saveAll(List<YellowPageEntity> yellowPageEntities) {
+    public void saveAll(Collection<YellowPageEntity> yellowPageEntities) {
         if (yellowPageEntities.isEmpty()) {
             return;
         }
         jdbcTemplate.batchUpdate(SAVE_YELLOW_PAGE, yellowPageEntities.stream()
-            .map(yellowPageEntity -> new Object[]{
-                yellowPageEntity.getLink(), yellowPageEntity.getName(), yellowPageEntity.getOwnerName(),
-                yellowPageEntity.getOwnerCastle().getCode(), yellowPageEntity.getProfession().getCode(),
-                yellowPageEntity.getMana(), yellowPageEntity.isActive()
-            })
+            .map(CustomizedYellowPageRepositoryImpl::saveYellowPageParams)
             .collect(toImmutableList())
         );
+    }
+
+    private static Object[] saveYellowPageParams(YellowPageEntity yellowPageEntity) {
+        return new Object[]{
+            text(yellowPageEntity.getLink()),
+            text(yellowPageEntity.getName()),
+            text(yellowPageEntity.getOwnerName()),
+            text(yellowPageEntity.getOwnerCastle().getCode()),
+            text(yellowPageEntity.getProfession().getCode()),
+            number(yellowPageEntity.getMana()),
+            bool(yellowPageEntity.isActive())
+        };
     }
 }

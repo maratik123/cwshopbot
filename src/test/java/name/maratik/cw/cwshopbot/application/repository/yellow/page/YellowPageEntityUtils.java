@@ -15,9 +15,9 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.repository.yellow.page;
 
+import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import name.maratik.cw.cwshopbot.entity.YellowPageOfferEntity;
 import name.maratik.cw.cwshopbot.entity.YellowPageSpecializationEntity;
-import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.Profession;
 
@@ -26,11 +26,9 @@ import name.maratik.cw.cwshopbot.model.Profession;
  */
 public class YellowPageEntityUtils {
 
-    public static final String TEST_LINK = "testLink";
-
     public static YellowPageEntity.YellowPageEntityBuilder createYellowPageEntity() {
         return YellowPageEntity.builder()
-            .link(TEST_LINK)
+            .link("testLink")
             .name("testShopName")
             .ownerName("testOwnerName")
             .ownerCastle(Castle.MOONLIGHT)
@@ -41,7 +39,7 @@ public class YellowPageEntityUtils {
 
     public static YellowPageOfferEntity.YellowPageOfferEntityBuilder createYellowPageOfferEntity() {
         return YellowPageOfferEntity.builder()
-            .yellowPage(TEST_LINK)
+            .yellowPage("testLink")
             .item("testItem")
             .price(100)
             .mana(200)
@@ -50,7 +48,7 @@ public class YellowPageEntityUtils {
 
     public static YellowPageSpecializationEntity.YellowPageSpecializationEntityBuilder createYellowPageSpecializationEntity() {
         return YellowPageSpecializationEntity.builder()
-            .yellowPage(TEST_LINK)
+            .yellowPage("testLink")
             .specialization("testSpecialization")
             .value(100);
     }

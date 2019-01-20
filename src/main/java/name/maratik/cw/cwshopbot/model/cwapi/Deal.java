@@ -16,31 +16,41 @@
 package name.maratik.cw.cwshopbot.model.cwapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 @Value
+@Builder
 public class Deal {
+    @NonNull
     private final String sellerId;
+    @NonNull
     private final String sellerName;
+    @NonNull
     private final CastleByEmoji sellerCastle;
+    @NonNull
     private final String buyerId;
+    @NonNull
     private final String buyerName;
+    @NonNull
     private final CastleByEmoji buyerCastle;
+    @NonNull
     private final String item;
     private final int qty;
     private final int price;
 
     public Deal(
-        @JsonProperty("sellerId") String sellerId,
-        @JsonProperty("sellerName") String sellerName,
-        @JsonProperty("sellerCastle") CastleByEmoji sellerCastle,
-        @JsonProperty("buyerId") String buyerId,
-        @JsonProperty("buyerName") String buyerName,
-        @JsonProperty("buyerCastle") CastleByEmoji buyerCastle,
-        @JsonProperty("item") String item,
+        @NonNull @JsonProperty("sellerId") String sellerId,
+        @NonNull @JsonProperty("sellerName") String sellerName,
+        @NonNull @JsonProperty("sellerCastle") CastleByEmoji sellerCastle,
+        @NonNull @JsonProperty("buyerId") String buyerId,
+        @NonNull @JsonProperty("buyerName") String buyerName,
+        @NonNull @JsonProperty("buyerCastle") CastleByEmoji buyerCastle,
+        @NonNull @JsonProperty("item") String item,
         @JsonProperty("qty") int qty,
         @JsonProperty("price") int price
     ) {

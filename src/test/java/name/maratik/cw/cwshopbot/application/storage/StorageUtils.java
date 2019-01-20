@@ -16,6 +16,7 @@
 package name.maratik.cw.cwshopbot.application.storage;
 
 import name.maratik.cw.cwshopbot.model.cwapi.CastleByEmoji;
+import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 import name.maratik.cw.cwshopbot.model.cwapi.ProfessionByEmoji;
 import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 
@@ -25,7 +26,7 @@ import static java.util.Collections.singletonMap;
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public class YellowPageUtils {
+public class StorageUtils {
     public static YellowPage.YellowPageBuilder createYellowPage() {
         return YellowPage.builder()
             .link("testLink")
@@ -44,5 +45,18 @@ public class YellowPageUtils {
                     .build()
             ))
             .specialization(singletonMap("testSpecialization", 400));
+    }
+
+    public static Deal.DealBuilder createDeal() {
+        return Deal.builder()
+            .sellerId("testSellerId")
+            .sellerName("testSellerName")
+            .sellerCastle(CastleByEmoji.MOONLIGHT)
+            .buyerId("testBuyerId")
+            .buyerName("testBuyerName")
+            .buyerCastle(CastleByEmoji.AMBER)
+            .item("testItem")
+            .price(100)
+            .qty(200);
     }
 }

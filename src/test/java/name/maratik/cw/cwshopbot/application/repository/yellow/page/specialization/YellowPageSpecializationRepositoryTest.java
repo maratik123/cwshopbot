@@ -30,6 +30,7 @@ import java.util.List;
 
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageEntity;
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageSpecializationEntity;
+import static name.maratik.cw.cwshopbot.application.repository.RepositoryUtils.fetchAssertion;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Collections.singleton;
@@ -109,7 +110,7 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
             YellowPageSpecializationEntity.Content yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_specialization"));
+                .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(50, yellowPageSpecializationContent.getValue());
 
             yellowPageSpecializationEntity = yellowPageSpecializationEntity.toBuilder()
@@ -118,7 +119,7 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
             yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_specialization"));
+                .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(100, yellowPageSpecializationContent.getValue());
 
             return null;
@@ -137,13 +138,13 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
             yellowPageSpecializationRepository.save(yellowPageSpecializationEntity);
             YellowPageSpecializationEntity.Content yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_specialization"));
+                .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(100, yellowPageSpecializationContent.getValue());
 
             yellowPageSpecializationRepository.zeroValueForYellowPages(singleton(yellowPageEntity.getLink()));
             yellowPageSpecializationContent = yellowPageSpecializationRepository.findByYellowPage(yellowPageEntity.getLink())
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not fetch yellow_page_specialization"));
+                .orElseThrow(fetchAssertion("yellow_page_specialization"));
             assertEquals(0, yellowPageSpecializationContent.getValue());
 
             return null;

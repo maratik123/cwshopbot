@@ -65,9 +65,13 @@ public abstract class MockedTest {
     @Autowired
     private DbCleaner dbCleaner;
 
+    @Autowired
+    private OffsetClockHolder offsetClockHolder;
+
     @Before
     public void init() {
         setupLocale();
+        offsetClockHolder.reset();
         dbCleaner.clearDb();
         resetMocks();
     }

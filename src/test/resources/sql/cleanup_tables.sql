@@ -17,4 +17,5 @@
 delete from yellow_page_offer;
 delete from yellow_page_specialization;
 delete from yellow_page;
+delete from deal;
 commit;
