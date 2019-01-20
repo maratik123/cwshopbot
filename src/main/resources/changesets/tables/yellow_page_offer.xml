@@ -50,4 +50,10 @@
         <modifyDataType tableName="yellow_page_offer" columnName="yellow_page" newDataType="text collate &quot;C&quot;"/>
         <modifyDataType tableName="yellow_page_offer" columnName="item" newDataType="text collate &quot;C&quot;"/>
     </changeSet>
+    <changeSet id="yellow_page_offer_collation_2" author="maratik">
+        <sql>
+            ALTER TABLE yellow_page_offer ALTER COLUMN yellow_page TYPE TEXT COLLATE "C" USING (yellow_page::TEXT);
+            ALTER TABLE yellow_page_offer ALTER COLUMN item TYPE TEXT COLLATE "C" USING (item::TEXT);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

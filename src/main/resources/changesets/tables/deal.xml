@@ -58,4 +58,15 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="deal_collation" author="maratik">
+        <sql>
+            ALTER TABLE deal ALTER COLUMN seller_id TYPE TEXT COLLATE "C" USING (seller_id::TEXT);
+            ALTER TABLE deal ALTER COLUMN seller_name TYPE TEXT COLLATE "C" USING (seller_name::TEXT);
+            ALTER TABLE deal ALTER COLUMN seller_castle TYPE TEXT COLLATE "C" USING (seller_castle::TEXT);
+            ALTER TABLE deal ALTER COLUMN buyer_id TYPE TEXT COLLATE "C" USING (buyer_id::TEXT);
+            ALTER TABLE deal ALTER COLUMN buyer_name TYPE TEXT COLLATE "C" USING (buyer_name::TEXT);
+            ALTER TABLE deal ALTER COLUMN buyer_castle TYPE TEXT COLLATE "C" USING (buyer_castle::TEXT);
+            ALTER TABLE deal ALTER COLUMN item TYPE TEXT COLLATE "C" USING (item::TEXT);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

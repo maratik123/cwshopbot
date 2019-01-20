@@ -57,4 +57,13 @@
         <modifyDataType tableName="yellow_page" columnName="owner_castle" newDataType="text collate &quot;C&quot;"/>
         <modifyDataType tableName="yellow_page" columnName="profession" newDataType="text collate &quot;C&quot;"/>
     </changeSet>
+    <changeSet id="yellow_page_collation_2" author="maratik">
+        <sql>
+            ALTER TABLE yellow_page ALTER COLUMN link TYPE TEXT COLLATE "C" USING (link::TEXT);
+            ALTER TABLE yellow_page ALTER COLUMN name TYPE TEXT COLLATE "C" USING (name::TEXT);
+            ALTER TABLE yellow_page ALTER COLUMN owner_name TYPE TEXT COLLATE "C" USING (owner_name::TEXT);
+            ALTER TABLE yellow_page ALTER COLUMN owner_castle TYPE TEXT COLLATE "C" USING (owner_castle::TEXT);
+            ALTER TABLE yellow_page ALTER COLUMN profession TYPE TEXT COLLATE "C" USING (profession::TEXT);
+        </sql>
+    </changeSet>
 </databaseChangeLog>
