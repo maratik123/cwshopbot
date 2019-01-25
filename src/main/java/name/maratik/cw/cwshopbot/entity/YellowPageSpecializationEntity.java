@@ -15,6 +15,8 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.entity;
 
+import name.maratik.cw.cwshopbot.model.cwapi.Specialization;
+
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -30,14 +32,14 @@ public class YellowPageSpecializationEntity {
     @NonNull
     private final String yellowPage;
     @NonNull
-    private final String specialization;
+    private final Specialization specialization;
     private final int value;
 
     @Value
     @Table("yellow_page_specialization")
     public static class Content {
         @NonNull
-        private final String specialization;
+        private final Specialization specialization;
         private final int value;
     }
 }

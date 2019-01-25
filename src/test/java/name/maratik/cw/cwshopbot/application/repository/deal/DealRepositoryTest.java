@@ -16,6 +16,8 @@
 package name.maratik.cw.cwshopbot.application.repository.deal;
 
 import name.maratik.cw.cwshopbot.application.config.ClockHolder;
+import name.maratik.cw.cwshopbot.application.repository.account.AccountRepository;
+import name.maratik.cw.cwshopbot.entity.AccountEntity;
 import name.maratik.cw.cwshopbot.entity.DealEntity;
 import name.maratik.cw.cwshopbot.mock.MockedTest;
 
@@ -36,6 +38,9 @@ public class DealRepositoryTest extends MockedTest {
     private DealRepository dealRepository;
 
     @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @Autowired
@@ -44,15 +49,21 @@ public class DealRepositoryTest extends MockedTest {
     @Test
     public void shouldSaveAndFind() {
         transactionTemplate.execute(status -> {
-            DealEntity dealEntity = DealEntityUtils.createDealEntity(clockHolder);
-            DealEntity.Key dealEntityKey = dealRepository.save(dealEntity);
-            DealEntity expectedDealEntity = dealEntity.withId(dealEntityKey.getId());
+            AccountEntity sellerAccount = accountRepository.save(DealEntityUtils.createSellerAccount(clockHolder));
+            AccountEntity buyerAccount = accountRepository.save(DealEntityUtils.createBuyerAccount(clockHolder));
+            DealEntity beforeDealEntity = DealEntityUtils.createDealEntity(
+                sellerAccount.getId(),
+                buyerAccount.getId(),
+                clockHolder
+            );
+            DealEntity afterDealEntity = dealRepository.save(beforeDealEntity);
+            DealEntity expectedDealEntity = beforeDealEntity.withId(afterDealEntity.getId());
+            assertThat(afterDealEntity, samePropertyValuesAs(expectedDealEntity));
             assertThat(
-                dealRepository.findById(dealEntityKey.getId())
+                dealRepository.findById(afterDealEntity.getId())
                     .orElseThrow(fetchAssertion("deal")),
                 samePropertyValuesAs(expectedDealEntity)
             );
-
             return null;
         });
     }

@@ -17,12 +17,15 @@ package name.maratik.cw.cwshopbot.entity;
 
 import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.Profession;
+import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -43,7 +46,24 @@ public class YellowPageEntity {
     @NonNull
     private final Profession profession;
     private final int mana;
+    private final int maxMana;
     private final boolean active;
+    @NonNull
+    private final LocalDateTime lastActiveTime;
+
+    public static YellowPageEntity of(YellowPage yellowPage, LocalDateTime lastActiveTime) {
+        return new YellowPageEntity(
+            yellowPage.getLink(),
+            yellowPage.getName(),
+            yellowPage.getOwnerName(),
+            yellowPage.getOwnerCastle().getCastle(),
+            yellowPage.getKind().getProfession(),
+            yellowPage.getMana(),
+            yellowPage.getMana(),
+            true,
+            lastActiveTime
+        );
+    }
 
     @Value
     @Table("yellow_page")

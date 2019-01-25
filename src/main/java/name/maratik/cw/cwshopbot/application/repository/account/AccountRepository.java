@@ -13,36 +13,24 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.repository.yellow.page.offer;
+package name.maratik.cw.cwshopbot.application.repository.account;
 
-import name.maratik.cw.cwshopbot.entity.YellowPageOfferEntity;
+import name.maratik.cw.cwshopbot.entity.AccountEntity;
 
-import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-public interface YellowPageOfferRepository extends Repository<YellowPageOfferEntity, Void>, CustomizedYellowPageOfferRepository {
+public interface AccountRepository extends Repository<AccountEntity, Long>, CustomizedAccountRepository {
     @Transactional(readOnly = true)
     @Query("" +
-        "SELECT item, price, mana, active, last_active_time" +
-        "  FROM yellow_page_offer" +
-        " WHERE yellow_page = :yellowPage" +
-        "   AND active")
-    Stream<YellowPageOfferEntity.Content> findByYellowPageAndActiveIsTrue(String yellowPage);
-
-    @Transactional
-    @Query("" +
-        "UPDATE yellow_page_offer" +
-        "   SET active = FALSE" +
-        " WHERE yellow_page IN (:yellowPages)" +
-        "   AND active")
-    @Modifying
-    void setInactiveForYellowPages(Collection<String> yellowPages);
+        "SELECT id, external_id, name, castle, creation_time" +
+        "  FROM account" +
+        " WHERE id = :id")
+    Optional<AccountEntity> findById(long id);
 }

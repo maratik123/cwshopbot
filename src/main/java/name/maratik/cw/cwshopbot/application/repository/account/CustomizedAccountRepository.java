@@ -13,25 +13,16 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.repository.deal;
+package name.maratik.cw.cwshopbot.application.repository.account;
 
-import name.maratik.cw.cwshopbot.entity.DealEntity;
+import name.maratik.cw.cwshopbot.entity.AccountEntity;
 
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Transactional
-public interface DealRepository extends Repository<DealEntity, Long>, CustomizedDealRepository {
-    @Transactional(readOnly = true)
-    @Query("" +
-        "SELECT id, seller_account_id, buyer_account_id, item, qty, price, creation_time" +
-        "  FROM deal" +
-        " WHERE id = :id")
-    Optional<DealEntity> findById(long id);
+public interface CustomizedAccountRepository {
+    @Transactional
+    AccountEntity save(AccountEntity accountEntity);
 }

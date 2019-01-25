@@ -56,4 +56,15 @@
             ALTER TABLE yellow_page_offer ALTER COLUMN item TYPE TEXT COLLATE "C" USING (item::TEXT);
         </sql>
     </changeSet>
+    <changeSet id="yellow_page_offer_modification_time" author="maratik">
+        <addColumn tableName="yellow_page_offer">
+            <column name="last_active_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+            UPDATE yellow_page_offer SET last_active_time = TIMESTAMP 'now' WHERE last_active_time IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="yellow_page_offer" columnName="last_active_time"/>
+    </changeSet>
 </databaseChangeLog>

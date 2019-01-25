@@ -23,5 +23,6 @@
     <include file="tables/yellow_page.xml" relativeToChangelogFile="true"/>
     <include file="tables/yellow_page_offer.xml" relativeToChangelogFile="true"/>
     <include file="tables/yellow_page_specialization.xml" relativeToChangelogFile="true"/>
+    <include file="tables/account.xml" relativeToChangelogFile="true"/>
     <include file="tables/deal.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -30,7 +30,7 @@ import java.util.Optional;
 public interface YellowPageRepository extends Repository<YellowPageEntity, String>, CustomizedYellowPageRepository {
     @Transactional(readOnly = true)
     @Query("" +
-        "SELECT link, name, owner_name, owner_castle, profession, mana, active" +
+        "SELECT link, name, owner_name, owner_castle, profession, mana, max_mana, active, last_active_time" +
         "  FROM yellow_page" +
         " WHERE link = :link")
     Optional<YellowPageEntity> findByLink(String link);
@@ -45,13 +45,14 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
 
     @Transactional(readOnly = true)
     @Query("" +
-        "SELECT link, name, owner_name, owner_castle, profession, mana, active" +
+        "SELECT link, name, owner_name, owner_castle, profession, mana, max_mana, active, last_active_time" +
         "  FROM yellow_page" +
         " WHERE link >= :link" +
         " ORDER BY link" +
         " LIMIT 1")
     Optional<YellowPageEntity> findFirstByLinkGreaterThanOrderByLink(String link);
 
+    @SuppressWarnings("SpringDataRepositoryMethodReturnTypeInspection")
     @Transactional(readOnly = true)
     @Query("" +
         "SELECT link" +
@@ -59,8 +60,9 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
         " WHERE link < :link" +
         " ORDER BY link DESC" +
         " LIMIT 1")
-    Optional<YellowPageEntity.Link> findTopByLinkBeforeOrderByLink(String link);
+    Optional<String> findTopByLinkBeforeOrderByLink(String link);
 
+    @SuppressWarnings("SpringDataRepositoryMethodReturnTypeInspection")
     @Transactional(readOnly = true)
     @Query("" +
         "SELECT link" +
@@ -68,5 +70,5 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
         " WHERE link > :link" +
         " ORDER BY link" +
         " LIMIT 1")
-    Optional<YellowPageEntity.Link> findFirstByLinkAfterOrderByLink(String link);
+    Optional<String> findFirstByLinkAfterOrderByLink(String link);
 }

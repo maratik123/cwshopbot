@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.repository.yellow.page.offer;
 
+import name.maratik.cw.cwshopbot.application.config.ClockHolder;
 import name.maratik.cw.cwshopbot.application.repository.RepositoryUtils;
 import name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageRepository;
 import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
@@ -57,13 +58,16 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private ClockHolder clockHolder;
+
     @Test
     public void shouldSaveAndGetYellowPageOffer() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
-            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity().build();
+            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity(clockHolder).build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
 
             List<YellowPageOfferEntity.Content> fetchedYellowPageOfferEntities = yellowPageOfferRepository
@@ -80,10 +84,10 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
     @Test
     public void shouldBatchedSaveAndGetYellowPageOffer() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
-            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity().build();
+            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity(clockHolder).build();
             YellowPageOfferEntity anotherYellowPageOfferEntity = yellowPageOfferEntity.toBuilder()
                 .item(yellowPageOfferEntity.getItem() + '1')
                 .build();
@@ -105,10 +109,10 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
     @Test
     public void shouldUpdateYellowPageOffer() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
-            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity()
+            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity(clockHolder)
                 .mana(100)
                 .build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);
@@ -136,10 +140,10 @@ public class YellowPageOfferRepositoryTest extends MockedTest {
     @Test
     public void shouldInactiveYellowPageOffer() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
-            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity()
+            YellowPageOfferEntity yellowPageOfferEntity = createYellowPageOfferEntity(clockHolder)
                 .active(true)
                 .build();
             yellowPageOfferRepository.save(yellowPageOfferEntity);

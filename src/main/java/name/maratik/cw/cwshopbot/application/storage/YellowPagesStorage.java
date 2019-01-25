@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.storage;
 
+import name.maratik.cw.cwshopbot.application.config.ClockHolder;
 import name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageRepository;
 import name.maratik.cw.cwshopbot.application.repository.yellow.page.offer.YellowPageOfferRepository;
 import name.maratik.cw.cwshopbot.application.repository.yellow.page.specialization.YellowPageSpecializationRepository;
@@ -26,16 +27,19 @@ import name.maratik.cw.cwshopbot.model.cwapi.CastleByEmoji;
 import name.maratik.cw.cwshopbot.model.cwapi.ProfessionByEmoji;
 import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 
+import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Maps.toImmutableEnumMap;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -45,18 +49,26 @@ public class YellowPagesStorage {
     private final YellowPageRepository yellowPageRepository;
     private final YellowPageOfferRepository yellowPageOfferRepository;
     private final YellowPageSpecializationRepository yellowPageSpecializationRepository;
+    private final ClockHolder clockHolder;
 
     public YellowPagesStorage(YellowPageRepository yellowPageRepository,
                               YellowPageOfferRepository yellowPageOfferRepository,
-                              YellowPageSpecializationRepository yellowPageSpecializationRepository) {
+                              YellowPageSpecializationRepository yellowPageSpecializationRepository,
+                              ClockHolder clockHolder, @SuppressWarnings("unused") SpringLiquibase springLiquibase) {
         this.yellowPageRepository = yellowPageRepository;
         this.yellowPageOfferRepository = yellowPageOfferRepository;
         this.yellowPageSpecializationRepository = yellowPageSpecializationRepository;
+        this.clockHolder = clockHolder;
+    }
+
+    @PostConstruct
+    public void ensureBeansInitialized() {
     }
 
     @Transactional
     public void saveYellowPages(List<YellowPage> yellowPages) {
         yellowPageRepository.setAllInactive();
+        LocalDateTime now = LocalDateTime.now(clockHolder);
         Set<String> links = yellowPages.stream()
             .map(YellowPage::getLink)
             .collect(toImmutableSet());
@@ -66,28 +78,12 @@ public class YellowPagesStorage {
         }
 
         yellowPageRepository.saveAll(yellowPages.stream()
-            .map(yellowPage -> YellowPageEntity.builder()
-                .link(yellowPage.getLink())
-                .name(yellowPage.getName())
-                .ownerName(yellowPage.getOwnerName())
-                .ownerCastle(yellowPage.getOwnerCastle().getCastle())
-                .profession(yellowPage.getKind().getProfession())
-                .mana(yellowPage.getMana())
-                .active(true)
-                .build()
-            )
+            .map(yellowPage -> YellowPageEntity.of(yellowPage, now))
             .collect(toImmutableList())
         );
         yellowPageOfferRepository.saveAll(yellowPages.stream()
             .flatMap(yellowPage -> yellowPage.getOffers().stream()
-                .map(offer -> YellowPageOfferEntity.builder()
-                    .yellowPage(yellowPage.getLink())
-                    .item(offer.getItem())
-                    .price(offer.getPrice())
-                    .mana(offer.getMana())
-                    .active(true)
-                    .build()
-                )
+                .map(offer -> YellowPageOfferEntity.of(yellowPage.getLink(), offer, now))
             )
             .collect(toImmutableList())
         );
@@ -126,7 +122,7 @@ public class YellowPagesStorage {
                 )
                 .specialization(yellowPageSpecializationRepository
                     .findByYellowPageAndValueGreaterThan0(yellowPageEntity.getLink())
-                    .collect(toImmutableMap(
+                    .collect(toImmutableEnumMap(
                         YellowPageSpecializationEntity.Content::getSpecialization,
                         YellowPageSpecializationEntity.Content::getValue
                     ))
@@ -138,12 +134,10 @@ public class YellowPagesStorage {
             .previousLink(yellowPage
                 .map(YellowPage::getLink)
                 .flatMap(yellowPageRepository::findTopByLinkBeforeOrderByLink)
-                .map(YellowPageEntity.Link::getLink)
             )
             .nextLink(yellowPage
                 .map(YellowPage::getLink)
                 .flatMap(yellowPageRepository::findFirstByLinkAfterOrderByLink)
-                .map(YellowPageEntity.Link::getLink)
             )
             .build();
     }

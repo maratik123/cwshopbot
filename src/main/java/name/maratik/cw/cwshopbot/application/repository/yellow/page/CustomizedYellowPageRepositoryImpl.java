@@ -18,6 +18,7 @@ package name.maratik.cw.cwshopbot.application.repository.yellow.page;
 import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import static name.maratik.cw.cwshopbot.util.Utils.bool;
 import static name.maratik.cw.cwshopbot.util.Utils.number;
 import static name.maratik.cw.cwshopbot.util.Utils.text;
+import static name.maratik.cw.cwshopbot.util.Utils.timestamp;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -34,15 +36,26 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Repository
 public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageRepository {
     private static final String SAVE_YELLOW_PAGE = "" +
-        "INSERT INTO YELLOW_PAGE(LINK, NAME, OWNER_NAME, OWNER_CASTLE, PROFESSION, MANA, ACTIVE)" +
-        "  VALUES(?, ?, ?, ?, ?, ?, ?)" +
+        "INSERT INTO YELLOW_PAGE as YP(LINK," +
+        "                        NAME," +
+        "                        OWNER_NAME," +
+        "                        OWNER_CASTLE," +
+        "                        PROFESSION," +
+        "                        MANA," +
+        "                        MAX_MANA," +
+        "                        ACTIVE," +
+        "                        LAST_ACTIVE_TIME)" +
+        "  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)" +
         "  ON CONFLICT (LINK) DO UPDATE SET" +
         "    NAME = EXCLUDED.NAME," +
         "    OWNER_NAME = EXCLUDED.OWNER_NAME," +
         "    OWNER_CASTLE = EXCLUDED.OWNER_CASTLE," +
         "    PROFESSION = EXCLUDED.PROFESSION," +
         "    MANA = EXCLUDED.MANA," +
-        "    ACTIVE = EXCLUDED.ACTIVE";
+        "    MAX_MANA = GREATEST(YP.MAX_MANA, EXCLUDED.MANA)," +
+        "    ACTIVE = EXCLUDED.ACTIVE," +
+        "    LAST_ACTIVE_TIME = EXCLUDED.LAST_ACTIVE_TIME";
+
     private final JdbcTemplate jdbcTemplate;
 
     public CustomizedYellowPageRepositoryImpl(JdbcTemplate jdbcTemplate) {
@@ -66,14 +79,17 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
     }
 
     private static Object[] saveYellowPageParams(YellowPageEntity yellowPageEntity) {
+        SqlParameterValue mana = number(yellowPageEntity.getMana());
         return new Object[]{
             text(yellowPageEntity.getLink()),
             text(yellowPageEntity.getName()),
             text(yellowPageEntity.getOwnerName()),
             text(yellowPageEntity.getOwnerCastle().getCode()),
             text(yellowPageEntity.getProfession().getCode()),
-            number(yellowPageEntity.getMana()),
-            bool(yellowPageEntity.isActive())
+            mana,
+            mana,
+            bool(yellowPageEntity.isActive()),
+            timestamp(yellowPageEntity.getLastActiveTime())
         };
     }
 }

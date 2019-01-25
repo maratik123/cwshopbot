@@ -30,18 +30,14 @@ import static name.maratik.cw.cwshopbot.util.Utils.timestamp;
 @Repository
 public class CustomizedDealRepositoryImpl implements CustomizedDealRepository {
     private static final String SAVE_DEAL = "" +
-        "INSERT INTO deal(seller_id, " +
-        "                 seller_name, " +
-        "                 seller_castle, " +
-        "                 buyer_id, " +
-        "                 buyer_name, " +
-        "                 buyer_castle, " +
-        "                 item, " +
-        "                 qty, " +
-        "                 price, " +
-        "                 creation_time)" +
-        " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" +
-        " RETURNING id";
+        "INSERT INTO DEAL(SELLER_ACCOUNT_ID, " +
+        "                 BUYER_ACCOUNT_ID, " +
+        "                 ITEM, " +
+        "                 QTY, " +
+        "                 PRICE, " +
+        "                 CREATION_TIME)" +
+        " VALUES(?, ?, ?, ?, ?, ?)" +
+        " RETURNING ID";
     private final JdbcTemplate jdbcTemplate;
 
     public CustomizedDealRepositoryImpl(JdbcTemplate jdbcTemplate) {
@@ -49,18 +45,14 @@ public class CustomizedDealRepositoryImpl implements CustomizedDealRepository {
     }
 
     @Override
-    public DealEntity.Key save(DealEntity dealEntity) {
-        return jdbcTemplate.queryForObject(SAVE_DEAL, DealEntity.Key::rowMapper,
-            text(dealEntity.getSellerId()),
-            text(dealEntity.getSellerName()),
-            text(dealEntity.getSellerCastle().getCode()),
-            text(dealEntity.getBuyerId()),
-            text(dealEntity.getBuyerName()),
-            text(dealEntity.getBuyerCastle().getCode()),
+    public DealEntity save(DealEntity dealEntity) {
+        return dealEntity.withId(jdbcTemplate.queryForObject(SAVE_DEAL, Long.class,
+            number(dealEntity.getSellerAccountId()),
+            number(dealEntity.getBuyerAccountId()),
             text(dealEntity.getItem()),
             number(dealEntity.getQty()),
             number(dealEntity.getPrice()),
             timestamp(dealEntity.getCreationTime())
-        );
+        ));
     }
 }

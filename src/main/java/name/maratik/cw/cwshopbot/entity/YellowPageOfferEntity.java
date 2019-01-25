@@ -15,10 +15,14 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.entity;
 
+import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
+
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -34,6 +38,20 @@ public class YellowPageOfferEntity {
     private final int price;
     private final int mana;
     private final boolean active;
+    @NonNull
+    private final LocalDateTime lastActiveTime;
+
+    public static YellowPageOfferEntity of(String yellowPage, YellowPage.Offer yellowPageOffer,
+                                           LocalDateTime lastActiveTime) {
+        return new YellowPageOfferEntity(
+            yellowPage,
+            yellowPageOffer.getItem(),
+            yellowPageOffer.getPrice(),
+            yellowPageOffer.getMana(),
+            true,
+            lastActiveTime
+        );
+    }
 
     @Value
     @Table("yellow_page_offer")
@@ -43,5 +61,7 @@ public class YellowPageOfferEntity {
         private final int price;
         private final int mana;
         private final boolean active;
+        @NonNull
+        private final LocalDateTime lastActiveTime;
     }
 }

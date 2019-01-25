@@ -69,4 +69,110 @@
             ALTER TABLE deal ALTER COLUMN item TYPE TEXT COLLATE "C" USING (item::TEXT);
         </sql>
     </changeSet>
+    <changeSet id="deal_migrate_to_account_id" author="maratik">
+        <dropNotNullConstraint tableName="deal" columnName="seller_id"/>
+        <dropNotNullConstraint tableName="deal" columnName="seller_name"/>
+        <dropNotNullConstraint tableName="deal" columnName="seller_castle"/>
+        <dropNotNullConstraint tableName="deal" columnName="buyer_id"/>
+        <dropNotNullConstraint tableName="deal" columnName="buyer_name"/>
+        <dropNotNullConstraint tableName="deal" columnName="buyer_castle"/>
+        <createIndex tableName="deal" indexName="deal_seller_id_ix">
+            <column name="seller_id" type="text"/>
+        </createIndex>
+        <createIndex tableName="deal" indexName="deal_buyer_id_ix">
+            <column name="buyer_id" type="text"/>
+        </createIndex>
+        <addColumn tableName="deal">
+            <column name="seller_account_id" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="deal_seller_account_fk"
+                             referencedTableName="account"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="buyer_account_id" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="deal_buyer_account_fk"
+                             referencedTableName="account"
+                             referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+        <createIndex tableName="deal" indexName="deal_seller_account_ix">
+            <column name="seller_account_id" type="bigint"/>
+        </createIndex>
+        <createIndex tableName="deal" indexName="deal_buyer_account_ix">
+            <column name="buyer_account_id" type="bigint"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="deal_migrate_to_account_id_2" author="maratik">
+        <sql splitStatements="false">
+            DO $$
+                DECLARE
+                    R RECORD;
+                BEGIN
+                    FOR R IN INSERT INTO account as a(external_id, name, castle, creation_time)
+                        SELECT external_id, name, castle, min(creation_time) as creation_time
+                          FROM ((SELECT d.seller_id          as external_id,
+                                        d.seller_name        as name,
+                                        d.seller_castle      as castle,
+                                        min(d.creation_time) as creation_time
+                                   FROM deal d
+                                  WHERE d.seller_id IS NOT NULL
+                                  GROUP BY d.seller_id, d.seller_name, d.seller_castle)
+                           UNION ALL
+                          (SELECT d.buyer_id           as external_id,
+                                  d.buyer_name         as name,
+                                  d.buyer_castle       as castle,
+                                  min(d.creation_time) as creation_time
+                             FROM deal d
+                            WHERE d.buyer_id IS NOT NULL
+                            GROUP BY d.buyer_id, d.buyer_name, d.buyer_castle)) t
+                         GROUP BY external_id, name, castle
+                        ON CONFLICT (external_id, name, castle) do update
+                            set external_id = a.external_id,
+                                name = a.name,
+                                castle = a.castle,
+                                CREATION_TIME = least(a.CREATION_TIME, EXCLUDED.CREATION_TIME)
+                        RETURNING id, external_id, name, castle
+                    LOOP
+                        UPDATE deal
+                           SET seller_id = null,
+                               seller_name = null,
+                               seller_castle = null,
+                               seller_account_id = r.id
+                         WHERE seller_account_id is null
+                           AND seller_id = r.external_id
+                           AND seller_name = r.name
+                           AND seller_castle = r.castle;
+                        UPDATE deal
+                           SET buyer_id = null,
+                               buyer_name = null,
+                               buyer_castle = null,
+                               buyer_account_id = r.id
+                         WHERE buyer_account_id is null
+                           AND buyer_id = r.external_id
+                           AND buyer_name = r.name
+                           AND buyer_castle = r.castle;
+                    END LOOP;
+                END
+                $$ LANGUAGE PLPGSQL;
+        </sql>
+    </changeSet>
+    <changeSet id="deal_migrate_to_account_id_3" author="maratik">
+        <preConditions onError="CONTINUE">
+            <sqlCheck expectedResult="0">
+                select count(*)
+                  from deal
+                 where seller_id is not null
+                    or buyer_id is not null
+            </sqlCheck>
+        </preConditions>
+        <dropColumn tableName="deal" columnName="seller_id"/>
+        <dropColumn tableName="deal" columnName="seller_name"/>
+        <dropColumn tableName="deal" columnName="seller_castle"/>
+        <dropColumn tableName="deal" columnName="buyer_id"/>
+        <dropColumn tableName="deal" columnName="buyer_name"/>
+        <dropColumn tableName="deal" columnName="buyer_castle"/>
+        <addNotNullConstraint tableName="deal" columnName="seller_account_id"/>
+        <addNotNullConstraint tableName="deal" columnName="buyer_account_id"/>
+    </changeSet>
 </databaseChangeLog>

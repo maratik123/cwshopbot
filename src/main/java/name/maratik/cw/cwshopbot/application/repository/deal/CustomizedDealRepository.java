@@ -24,5 +24,5 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface CustomizedDealRepository {
     @Transactional
-    DealEntity.Key save(DealEntity dealEntity);
+    DealEntity save(DealEntity dealEntity);
 }

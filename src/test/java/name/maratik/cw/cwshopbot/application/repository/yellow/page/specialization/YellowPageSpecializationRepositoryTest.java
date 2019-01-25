@@ -15,10 +15,12 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.repository.yellow.page.specialization;
 
+import name.maratik.cw.cwshopbot.application.config.ClockHolder;
 import name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageRepository;
 import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import name.maratik.cw.cwshopbot.entity.YellowPageSpecializationEntity;
 import name.maratik.cw.cwshopbot.mock.MockedTest;
+import name.maratik.cw.cwshopbot.model.cwapi.Specialization;
 
 import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matcher;
@@ -28,9 +30,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
+import static name.maratik.cw.cwshopbot.application.repository.RepositoryUtils.fetchAssertion;
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageEntity;
 import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageSpecializationEntity;
-import static name.maratik.cw.cwshopbot.application.repository.RepositoryUtils.fetchAssertion;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Collections.singleton;
@@ -56,10 +58,13 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private ClockHolder clockHolder;
+
     @Test
     public void shouldSaveAndGetYellowPageSpecialization() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
             YellowPageSpecializationEntity yellowPageSpecializationEntity = createYellowPageSpecializationEntity().build();
@@ -79,12 +84,14 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
     @Test
     public void shouldBatchedSaveAndGetYellowPageSpecialization() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
-            YellowPageSpecializationEntity yellowPageSpecializationEntity = createYellowPageSpecializationEntity().build();
+            YellowPageSpecializationEntity yellowPageSpecializationEntity = createYellowPageSpecializationEntity()
+                .specialization(Specialization.BOOTS)
+                .build();
             YellowPageSpecializationEntity anotherYellowPageSpecializationEntity = yellowPageSpecializationEntity.toBuilder()
-                .specialization(yellowPageSpecializationEntity.getSpecialization() + '1')
+                .specialization(Specialization.ARMOR)
                 .build();
             yellowPageSpecializationRepository.saveAll(ImmutableList.of(yellowPageSpecializationEntity, anotherYellowPageSpecializationEntity));
 
@@ -104,7 +111,7 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
     @Test
     public void shouldUpdateYellowPageSpecialization() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
             YellowPageSpecializationEntity yellowPageSpecializationEntity = createYellowPageSpecializationEntity()
@@ -134,7 +141,7 @@ public class YellowPageSpecializationRepositoryTest extends MockedTest {
     @Test
     public void shouldZeroYellowPageSpecialization() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
             YellowPageSpecializationEntity yellowPageSpecializationEntity = createYellowPageSpecializationEntity()

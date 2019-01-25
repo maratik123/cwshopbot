@@ -18,6 +18,7 @@ package name.maratik.cw.cwshopbot.model.cwapi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import lombok.Builder;
 import lombok.Value;
 
@@ -39,7 +40,7 @@ public class YellowPage {
     private final ProfessionByEmoji kind;
     private final int mana;
     private final List<Offer> offers;
-    private final Map<String, Integer> specialization;
+    private final Map<Specialization, Integer> specialization;
     private final boolean active;
 
     public YellowPage(
@@ -50,7 +51,7 @@ public class YellowPage {
         @JsonProperty("kind") ProfessionByEmoji kind,
         @JsonProperty("mana") int mana,
         @JsonProperty("offers") List<Offer> offers,
-        @JsonProperty("specialization") Map<String, Integer> specialization,
+        @JsonProperty("specialization") Map<Specialization, Integer> specialization,
         @JsonProperty("active") boolean active
     ) {
         this.link = Objects.requireNonNull(link, "link");
@@ -63,7 +64,7 @@ public class YellowPage {
             .map(ImmutableList::copyOf)
             .orElseGet(ImmutableList::of);
         this.specialization = Optional.ofNullable(specialization)
-            .map(ImmutableMap::copyOf)
+            .map(Maps::immutableEnumMap)
             .orElseGet(ImmutableMap::of);
         this.active = active;
     }

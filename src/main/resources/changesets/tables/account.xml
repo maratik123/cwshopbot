@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+    cwshopbot
+    Copyright (C) 2019  Marat Bukharov.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet id="account" author="maratik">
+        <createSequence sequenceName="account_seq_id" cacheSize="10"/>
+        <createTable tableName="account">
+            <column name="id" type="bigint" defaultValueComputed="nextval('account_seq_id')">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="external_id" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="castle" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creation_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            alter table account alter column external_id type text collate "C" using (external_id::text);
+            alter table account alter column name type text collate "C" using (name::text);
+            alter table account alter column castle type text collate "C" using (castle::text);
+        </sql>
+        <addUniqueConstraint tableName="account" columnNames="external_id, name, castle"/>
+    </changeSet>
+</databaseChangeLog>

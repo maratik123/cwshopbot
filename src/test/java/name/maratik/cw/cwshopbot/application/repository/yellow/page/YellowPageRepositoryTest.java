@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.application.repository.yellow.page;
 
+import name.maratik.cw.cwshopbot.application.config.ClockHolder;
 import name.maratik.cw.cwshopbot.entity.YellowPageEntity;
 import name.maratik.cw.cwshopbot.mock.MockedTest;
 
@@ -23,8 +24,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageEntity;
 import static name.maratik.cw.cwshopbot.application.repository.RepositoryUtils.fetchAssertion;
+import static name.maratik.cw.cwshopbot.application.repository.yellow.page.YellowPageEntityUtils.createYellowPageEntity;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertFalse;
@@ -41,10 +42,13 @@ public class YellowPageRepositoryTest extends MockedTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private ClockHolder clockHolder;
+
     @Test
     public void shouldSaveAndGetYellowPage() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             yellowPageRepository.save(yellowPageEntity);
 
             YellowPageEntity fetchedYellowPageEntity = yellowPageRepository.findByLink(yellowPageEntity.getLink())
@@ -59,7 +63,7 @@ public class YellowPageRepositoryTest extends MockedTest {
     @Test
     public void shouldUpdateYellowPage() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity()
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder)
                 .active(true)
                 .build();
             yellowPageRepository.save(yellowPageEntity);
@@ -87,7 +91,7 @@ public class YellowPageRepositoryTest extends MockedTest {
     @Test
     public void shouldBatchedSaveAndGetYellowPage() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity().build();
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder).build();
             YellowPageEntity anotherYellowPageEntity = yellowPageEntity.toBuilder()
                 .link(yellowPageEntity.getLink() + '1')
                 .build();
@@ -110,7 +114,7 @@ public class YellowPageRepositoryTest extends MockedTest {
     @Test
     public void shouldInactiveYellowPage() {
         transactionTemplate.execute(status -> {
-            YellowPageEntity yellowPageEntity = createYellowPageEntity()
+            YellowPageEntity yellowPageEntity = createYellowPageEntity(clockHolder)
                 .active(true)
                 .build();
             yellowPageRepository.save(yellowPageEntity);

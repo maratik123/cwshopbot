@@ -25,6 +25,7 @@ import java.util.Collection;
 import static name.maratik.cw.cwshopbot.util.Utils.bool;
 import static name.maratik.cw.cwshopbot.util.Utils.number;
 import static name.maratik.cw.cwshopbot.util.Utils.text;
+import static name.maratik.cw.cwshopbot.util.Utils.timestamp;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -34,12 +35,13 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Repository
 public class CustomizedYellowPageOfferRepositoryImpl implements CustomizedYellowPageOfferRepository {
     private static final String SAVE_YELLOW_PAGE_OFFER = "" +
-        "INSERT INTO YELLOW_PAGE_OFFER(YELLOW_PAGE, ITEM, PRICE, MANA, ACTIVE)" +
-        "  VALUES(?, ?, ?, ?, ?)" +
+        "INSERT INTO YELLOW_PAGE_OFFER(YELLOW_PAGE, ITEM, PRICE, MANA, ACTIVE, LAST_ACTIVE_TIME)" +
+        "  VALUES(?, ?, ?, ?, ?, ?)" +
         "  ON CONFLICT(YELLOW_PAGE, ITEM) DO UPDATE SET " +
         "    PRICE = EXCLUDED.PRICE," +
         "    MANA = EXCLUDED.MANA," +
-        "    ACTIVE = EXCLUDED.ACTIVE";
+        "    ACTIVE = EXCLUDED.ACTIVE," +
+        "    LAST_ACTIVE_TIME = EXCLUDED.LAST_ACTIVE_TIME";
     private final JdbcTemplate jdbcTemplate;
 
     public CustomizedYellowPageOfferRepositoryImpl(JdbcTemplate jdbcTemplate) {
@@ -68,7 +70,8 @@ public class CustomizedYellowPageOfferRepositoryImpl implements CustomizedYellow
             text(yellowPageOfferEntity.getItem()),
             number(yellowPageOfferEntity.getPrice()),
             number(yellowPageOfferEntity.getMana()),
-            bool(yellowPageOfferEntity.isActive())
+            bool(yellowPageOfferEntity.isActive()),
+            timestamp(yellowPageOfferEntity.getLastActiveTime())
         };
     }
 }

@@ -20,6 +20,8 @@ import name.maratik.cw.cwshopbot.model.cwasset.Item;
 import com.google.common.collect.ImmutableList;
 import lombok.ToString;
 import org.springframework.jdbc.core.SqlParameterValue;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -180,6 +182,10 @@ public class Utils {
         return new SqlParameterValue(Types.VARCHAR, value);
     }
 
+    public static SqlParameterValue text(EnumWithCode value) {
+        return text(value.getCode());
+    }
+
     public static SqlParameterValue number(Integer value) {
         return new SqlParameterValue(Types.INTEGER, value);
     }
@@ -202,6 +208,14 @@ public class Utils {
 
     public static SqlParameterValue timestamp(LocalDateTime value) {
         return new SqlParameterValue(Types.TIMESTAMP, value);
+    }
+
+    @NonNull
+    public static <T> T requireNonNull(@Nullable T obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException();
+        }
+        return obj;
     }
 
     private static List<MessageEntity> generateTextMessageEntities(Message message) {

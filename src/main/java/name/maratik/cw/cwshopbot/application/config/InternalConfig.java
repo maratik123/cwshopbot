@@ -20,6 +20,7 @@ import name.maratik.cw.cwshopbot.application.repository.Base;
 import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.ForwardKey;
 import name.maratik.cw.cwshopbot.model.Profession;
+import name.maratik.cw.cwshopbot.model.cwapi.Specialization;
 import name.maratik.cw.cwshopbot.model.cwasset.Assets;
 import name.maratik.cw.cwshopbot.util.LRUCachingMap;
 import name.maratik.spring.telegram.config.TelegramBotBuilder;
@@ -51,9 +52,14 @@ import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.jdbc.core.DataAccessStrategy;
+import org.springframework.data.jdbc.core.DefaultDataAccessStrategy;
+import org.springframework.data.jdbc.core.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.jdbc.repository.config.JdbcConfiguration;
+import org.springframework.data.relational.core.conversion.RelationalConverter;
+import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -181,6 +187,17 @@ public class InternalConfig {
         }
 
         @Bean
+        public DataAccessStrategy dataAccessStrategy(
+            RelationalMappingContext mappingContext,
+            RelationalConverter converter,
+            NamedParameterJdbcTemplate operations
+        ) {
+            return new DefaultDataAccessStrategy(new SqlGeneratorSource(mappingContext), mappingContext, converter,
+                operations
+            );
+        }
+
+        @Bean
         public DataSource dataSource(@ConnectionUrl String connectionUrl,
                                      @Value("${cwshopbot.db.username}") String username,
                                      @Value("${cwshopbot.db.password}") String password) {
@@ -193,7 +210,7 @@ public class InternalConfig {
             dataSource.setMaxWaitMillis(TimeUnit.SECONDS.toMillis(10));
             dataSource.setMaxTotal(5);
             dataSource.setTestWhileIdle(true);
-            dataSource.setInitialSize(2);
+            dataSource.setInitialSize(1);
             dataSource.setMinIdle(1);
             dataSource.setTimeBetweenEvictionRunsMillis(TimeUnit.SECONDS.toMillis(10));
             dataSource.setMaxIdle(2);
@@ -214,7 +231,11 @@ public class InternalConfig {
         @Override
         @NonNull
         protected JdbcCustomConversions jdbcCustomConversions() {
-            return new JdbcCustomConversions(ImmutableList.of(Castle.CONVERTER, Profession.CONVERTER));
+            return new JdbcCustomConversions(ImmutableList.of(
+                Castle.CONVERTER,
+                Profession.CONVERTER,
+                Specialization.CONVERTER
+            ));
         }
     }
 }

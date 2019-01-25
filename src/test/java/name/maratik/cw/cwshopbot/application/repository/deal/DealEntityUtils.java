@@ -16,6 +16,7 @@
 package name.maratik.cw.cwshopbot.application.repository.deal;
 
 import name.maratik.cw.cwshopbot.application.config.ClockHolder;
+import name.maratik.cw.cwshopbot.entity.AccountEntity;
 import name.maratik.cw.cwshopbot.entity.DealEntity;
 import name.maratik.cw.cwshopbot.model.Castle;
 
@@ -25,17 +26,31 @@ import java.time.LocalDateTime;
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
 public class DealEntityUtils {
-    public static DealEntity createDealEntity(ClockHolder clockHolder) {
+    public static DealEntity createDealEntity(long sellerAccountId, long buyerAccountId, ClockHolder clockHolder) {
         return DealEntity.builder()
-            .sellerId("testSellerId")
-            .sellerName("testSellerName")
-            .sellerCastle(Castle.MOONLIGHT)
-            .buyerId("testBuyerId")
-            .buyerName("testBuyerName")
-            .buyerCastle(Castle.AMBER)
+            .sellerAccountId(sellerAccountId)
+            .buyerAccountId(buyerAccountId)
             .item("testItem")
             .qty(100)
             .price(200)
+            .creationTime(LocalDateTime.now(clockHolder))
+            .build();
+    }
+
+    public static AccountEntity createSellerAccount(ClockHolder clockHolder) {
+        return AccountEntity.builder()
+            .externalId("testSellerExternalId")
+            .name("testSellerName")
+            .castle(Castle.DAWN_CASTLE)
+            .creationTime(LocalDateTime.now(clockHolder))
+            .build();
+    }
+
+    public static AccountEntity createBuyerAccount(ClockHolder clockHolder) {
+        return AccountEntity.builder()
+            .externalId("testBuyerExternalId")
+            .name("testBuyerName")
+            .castle(Castle.DAWN_CASTLE)
             .creationTime(LocalDateTime.now(clockHolder))
             .build();
     }

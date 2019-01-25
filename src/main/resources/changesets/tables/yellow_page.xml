@@ -66,4 +66,20 @@
             ALTER TABLE yellow_page ALTER COLUMN profession TYPE TEXT COLLATE "C" USING (profession::TEXT);
         </sql>
     </changeSet>
+    <changeSet id="yellow_page_max_mana_modification_time" author="maratik">
+        <addColumn tableName="yellow_page">
+            <column name="max_mana" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_active_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+            UPDATE yellow_page SET max_mana = mana WHERE max_mana IS NULL;
+            UPDATE yellow_page SET last_active_time = TIMESTAMP 'now' WHERE last_active_time IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="yellow_page" columnName="max_mana"/>
+        <addNotNullConstraint tableName="yellow_page" columnName="last_active_time"/>
+    </changeSet>
 </databaseChangeLog>

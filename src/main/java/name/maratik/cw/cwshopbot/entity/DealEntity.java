@@ -15,7 +15,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.entity;
 
-import name.maratik.cw.cwshopbot.model.Castle;
 import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 
 import lombok.Builder;
@@ -23,10 +22,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.Nullable;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -38,20 +34,9 @@ import java.util.Objects;
 @Table("deal")
 public class DealEntity {
     @Id
-    @Nullable
     private final Long id;
-    @NonNull
-    private final String sellerId;
-    @NonNull
-    private final String sellerName;
-    @NonNull
-    private final Castle sellerCastle;
-    @NonNull
-    private final String buyerId;
-    @NonNull
-    private final String buyerName;
-    @NonNull
-    private final Castle buyerCastle;
+    private final long sellerAccountId;
+    private final long buyerAccountId;
     @NonNull
     private final String item;
     private final int qty;
@@ -59,15 +44,16 @@ public class DealEntity {
     @NonNull
     private final LocalDateTime creationTime;
 
-    public static DealEntity of(@NonNull Deal deal, @NonNull LocalDateTime creationTime) {
+    public static DealEntity of(
+        @NonNull Deal deal,
+        long sellerAccountId,
+        long buyerAccountId,
+        @NonNull LocalDateTime creationTime
+    ) {
         return new DealEntity(
             null,
-            deal.getSellerId(),
-            deal.getSellerName(),
-            deal.getSellerCastle().getCastle(),
-            deal.getBuyerId(),
-            deal.getBuyerName(),
-            deal.getBuyerCastle().getCastle(),
+            sellerAccountId,
+            buyerAccountId,
             deal.getItem(),
             deal.getQty(),
             deal.getPrice(),
@@ -79,16 +65,6 @@ public class DealEntity {
         if (Objects.equals(id, this.id)) {
             return this;
         }
-        return new DealEntity(id, sellerId, sellerName, sellerCastle, buyerId, buyerName, buyerCastle, item, qty, price, creationTime);
-    }
-
-    @Value
-    @Table("deal")
-    public static class Key {
-        private final long id;
-
-        public static Key rowMapper(ResultSet rs, @SuppressWarnings("unused") int i) throws SQLException {
-            return new Key(rs.getLong("id"));
-        }
+        return new DealEntity(id, sellerAccountId, buyerAccountId, item, qty, price, creationTime);
     }
 }

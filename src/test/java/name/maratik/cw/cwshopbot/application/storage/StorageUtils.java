@@ -18,6 +18,7 @@ package name.maratik.cw.cwshopbot.application.storage;
 import name.maratik.cw.cwshopbot.model.cwapi.CastleByEmoji;
 import name.maratik.cw.cwshopbot.model.cwapi.Deal;
 import name.maratik.cw.cwshopbot.model.cwapi.ProfessionByEmoji;
+import name.maratik.cw.cwshopbot.model.cwapi.Specialization;
 import name.maratik.cw.cwshopbot.model.cwapi.YellowPage;
 
 import static java.util.Collections.singletonList;
@@ -44,7 +45,7 @@ public class StorageUtils {
                     .active(true)
                     .build()
             ))
-            .specialization(singletonMap("testSpecialization", 400));
+            .specialization(singletonMap(Specialization.BOOTS, 400));
     }
 
     public static Deal.DealBuilder createDeal() {

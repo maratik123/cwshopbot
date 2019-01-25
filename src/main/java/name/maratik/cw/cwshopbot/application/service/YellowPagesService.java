@@ -66,7 +66,7 @@ public class YellowPagesService extends Localizable {
             if (!yellowPage.getSpecialization().isEmpty()) {
                 sb.append(t("YellowPages.SPECIALIZATION.HEADER"));
                 yellowPage.getSpecialization().forEach((kind, value) ->
-                    sb.append(t("YellowPages.SPECIALIZATION", kind, value))
+                    sb.append(t(kind)).append(": ").append(value).append('\n')
                 );
             }
 
