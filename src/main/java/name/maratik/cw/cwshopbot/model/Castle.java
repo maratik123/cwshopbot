@@ -18,7 +18,6 @@ package name.maratik.cw.cwshopbot.model;
 import name.maratik.cw.cwshopbot.util.Emoji;
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Sets;
 import lombok.Getter;
@@ -80,7 +79,6 @@ public enum Castle implements EnumWithCode {
         this.games = Sets.immutableEnumSet(game, otherGames);
     }
 
-    @JsonCreator
     public static Optional<Castle> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }

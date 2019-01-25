@@ -17,7 +17,6 @@ package name.maratik.cw.cwshopbot.model.cwapi;
 
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +52,6 @@ public enum ChatWarsApiResult implements EnumWithCode {
     private final String code;
     private static final Map<String, ChatWarsApiResult> cache = Util.createCache(values());
 
-    @JsonCreator
     public static ChatWarsApiResult findByCode(String code) {
         return cache.getOrDefault(code, UNKNOWN);
     }

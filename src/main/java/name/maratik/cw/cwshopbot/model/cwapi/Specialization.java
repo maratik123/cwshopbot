@@ -19,6 +19,7 @@ import name.maratik.cw.cwshopbot.model.cwasset.InventorySlot;
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 import name.maratik.spring.telegram.util.LocalizableValue;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
@@ -43,7 +44,7 @@ public enum Specialization implements EnumWithCode, LocalizableValue {
     COAT("coat", InventorySlot.CLOAK),
     GLOVES("gloves", InventorySlot.HANDS);
 
-    @Getter
+    @Getter(onMethod_ = @JsonValue)
     private final String code;
 
     @Getter

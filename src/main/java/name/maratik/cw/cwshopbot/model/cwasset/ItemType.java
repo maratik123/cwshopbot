@@ -18,7 +18,6 @@ package name.maratik.cw.cwshopbot.model.cwasset;
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 import name.maratik.spring.telegram.util.LocalizableValue;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +51,6 @@ public enum ItemType implements EnumWithCode, LocalizableValue {
     private final String translationTag;
     private static final Map<String, ItemType> cache = Util.createCache(values());
 
-    @JsonCreator
     public static Optional<ItemType> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }

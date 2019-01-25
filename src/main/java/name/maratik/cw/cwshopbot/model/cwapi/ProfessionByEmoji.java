@@ -18,7 +18,6 @@ package name.maratik.cw.cwshopbot.model.cwapi;
 import name.maratik.cw.cwshopbot.model.Profession;
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +51,6 @@ public enum ProfessionByEmoji implements EnumWithCode {
         return profession.getEmoji();
     }
 
-    @JsonCreator
     public static Optional<ProfessionByEmoji> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }

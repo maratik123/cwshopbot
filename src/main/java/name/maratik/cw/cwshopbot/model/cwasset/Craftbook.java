@@ -17,7 +17,6 @@ package name.maratik.cw.cwshopbot.model.cwasset;
 
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,6 @@ public enum Craftbook implements EnumWithCode {
     private final boolean visible;
     private static final Map<String, Craftbook> cache = Util.createCache(values());
 
-    @JsonCreator
     public static Optional<Craftbook> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }

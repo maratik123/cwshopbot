@@ -17,7 +17,6 @@ package name.maratik.cw.cwshopbot.model.cwapi;
 
 import name.maratik.cw.cwshopbot.util.EnumWithCode;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public enum Operation implements EnumWithCode {
     @Getter(onMethod_ = {@JsonValue})
     private final String code;
 
-    @JsonCreator
     public static Optional<Operation> findByCode(String code) {
         return Optional.ofNullable(cache.get(code));
     }
