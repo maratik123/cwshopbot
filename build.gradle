@@ -108,6 +108,7 @@ dependencies {
     testCompile 'org.springframework.amqp:spring-rabbit-junit'
     testCompile 'org.springframework.amqp:spring-rabbit-test'
     testCompile 'ru.yandex.qatools.embed:postgresql-embedded:2.10'
+    testCompile 'de.flapdoodle.embed:de.flapdoodle.embed.process:2.1.2'
 }
 
 bootJar {
