@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+    cwshopbot
+    Copyright (C) 2019  Marat Bukharov.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet id="user_action" author="maratik">
+        <createSequence sequenceName="user_action_seq_id" cacheSize="10"/>
+        <createTable tableName="user_action">
+            <column name="id" type="bigint" defaultValueComputed="nextval('user_action_seq_id')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tg_user" type="bigint">
+                <constraints nullable="false" foreignKeyName="user_action_tg_user_fk" referencedTableName="tg_user"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="command" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE user_action ALTER COLUMN command TYPE TEXT COLLATE "C" USING (command::TEXT);
+        </sql>
+        <createIndex tableName="user_action" indexName="user_action_tg_user_ix">
+            <column name="tg_user" type="bigint"/>
+        </createIndex>
+        <createIndex tableName="user_action" indexName="user_action_command_ix">
+            <column name="command" type="bigint"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

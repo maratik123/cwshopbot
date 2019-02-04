@@ -19,17 +19,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-        classpath "com.google.protobuf:protobuf-gradle-plugin:${protobufGradlePluginVersion}"
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.2.RELEASE'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.7'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
     }
 }
 
 plugins {
     id 'jacoco'
-    id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.researchgate.release' version '2.8.0'
-    id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'io.franzbecker.gradle-lombok' version '2.0'
 }
 
 group 'name.maratik.cw'
@@ -49,6 +49,8 @@ repositories {
 apply plugin: 'antlr'
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.github.spotbugs'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
@@ -56,10 +58,11 @@ apply plugin: 'net.researchgate.release'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'io.franzbecker.gradle-lombok'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 wrapper {
-    gradleVersion = '4.10.2'
+    gradleVersion = '5.1.1'
     distributionType = 'ALL'
 }
 
@@ -74,8 +77,8 @@ configurations {
 }
 
 dependencies {
-    antlr "org.antlr:antlr4:${antlr4Version}"
-    compile "org.antlr:antlr4-runtime:${antlr4Version}"
+    antlr 'org.antlr:antlr4:4.7.2'
+    compile 'org.antlr:antlr4-runtime:4.7.2'
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.springframework.boot:spring-boot-starter-jetty'
@@ -84,27 +87,27 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-aop'
     compile 'org.springframework.data:spring-data-jdbc'
     compile 'org.springframework:spring-aspects'
-    compile "org.postgresql:postgresql:${postgresqlVersion}"
-    compile "org.telegram:telegrambots:${telegrambotsVersion}"
-    compile "com.google.guava:guava:${guavaVersion}"
+    compile 'org.postgresql:postgresql:42.2.5'
+    compile 'org.telegram:telegrambots:4.1.2'
+    compile 'com.google.guava:guava:27.0.1-jre'
     compile 'org.apache.logging.log4j:log4j-jcl'
     compile 'org.apache.logging.log4j:log4j-jul'
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
-    compile "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
-    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
-    compile "com.github.maratik123:spring-telegram:${springTelegramVersion}"
-    compile "com.google.protobuf:protobuf-java:${protobufJavaVersion}"
-    compile "org.liquibase:liquibase-core:${liquibaseVersion}"
-    compile "org.apache.commons:commons-dbcp2:${apacheCommonsDbcp2Version}"
-    compile "de.invesdwin:invesdwin-instrument:${invesdwinInstrumentVersion}"
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8'
+    compile 'com.fasterxml.jackson.module:jackson-module-afterburner:2.9.8'
+    compile 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.9.8'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.8'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.8'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.8'
+    compile 'com.github.maratik123:spring-telegram:3.0'
+    compile 'com.google.protobuf:protobuf-java:3.6.1'
+    compile 'org.liquibase:liquibase-core:3.6.2'
+    compile 'org.apache.commons:commons-dbcp2:2.5.0'
+    compile 'de.invesdwin:invesdwin-instrument:1.0.2'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.amqp:spring-rabbit-junit'
     testCompile 'org.springframework.amqp:spring-rabbit-test'
-    testCompile "ru.yandex.qatools.embed:postgresql-embedded:${postgresqlEmbeddedVersion}"
+    testCompile 'ru.yandex.qatools.embed:postgresql-embedded:2.10'
 }
 
 bootJar {
@@ -121,12 +124,12 @@ bootRun {
 }
 
 spotbugs {
-    toolVersion = '3.1.10'
+    toolVersion = '3.1.11'
 }
 
 lombok {
     version = '1.18.4'
-    sha256 = ""
+    sha256 = ''
 }
 
 generateGrammarSource {
@@ -138,9 +141,9 @@ generateGrammarSource {
 }
 
 protobuf {
-    generatedFilesBaseDir = project.file("generated").absolutePath
+    generatedFilesBaseDir = project.file('generated').absolutePath
     protoc {
-        artifact = "com.google.protobuf:protoc:${protocVersion}"
+        artifact = 'com.google.protobuf:protoc:3.6.1'
     }
 }
 

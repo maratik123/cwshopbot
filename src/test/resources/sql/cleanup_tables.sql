@@ -1,3 +1,5 @@
+-- noinspection SqlWithoutWhereForFile
+
 -- cwshopbot
 -- Copyright (C) 2019  Marat Bukharov.
 --
@@ -18,4 +20,5 @@ delete from yellow_page_offer;
 delete from yellow_page_specialization;
 delete from yellow_page;
 delete from deal;
+delete from account;
 commit;

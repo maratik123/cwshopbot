@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+    cwshopbot
+    Copyright (C) 2019  Marat Bukharov.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet id="tg_user" author="maratik">
+        <createTable tableName="tg_user">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_bot" type="boolean">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_name" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_name" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="language_code" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE tg_user ALTER COLUMN first_name TYPE TEXT COLLATE "C" USING (first_name::TEXT);
+            ALTER TABLE tg_user ALTER COLUMN last_name TYPE TEXT COLLATE "C" USING (last_name::TEXT);
+            ALTER TABLE tg_user ALTER COLUMN user_name TYPE TEXT COLLATE "C" USING (user_name::TEXT);
+            ALTER TABLE tg_user ALTER COLUMN language_code TYPE TEXT COLLATE "C" USING (language_code::TEXT);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -13,30 +13,35 @@
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package name.maratik.cw.cwshopbot.application.service;
+package name.maratik.cw.cwshopbot.entity;
 
-import com.google.common.base.Ticker;
-import org.springframework.stereotype.Service;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
-@Service
-class CacheTickerService extends Ticker {
-    private final Clock clock;
-    private final Instant zero;
+@Value
+@Table("user_action")
+public class UserActionEntity {
+    @Id
+    private final Long id;
+    private final long tgUser;
+    @NonNull
+    private final String command;
+    @NonNull
+    private final LocalDateTime actionTime;
 
-    CacheTickerService(Clock clock) {
-        this.clock = clock;
-        zero = clock.instant();
-    }
-
-    @Override
-    public long read() {
-        return zero.until(clock.instant(), ChronoUnit.NANOS);
+    @Value
+    @Builder
+    public static class Agg {
+        private final TgUserEntity tgUserEntity;
+        private final String command;
+        private final int counter;
     }
 }
