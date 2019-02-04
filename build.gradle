@@ -20,7 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.2.RELEASE'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.7'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
     }
 }
@@ -100,7 +100,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.8'
     compile 'com.github.maratik123:spring-telegram:3.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
-    compile 'org.liquibase:liquibase-core:3.6.2'
+    compile 'org.liquibase:liquibase-core:3.6.3'
     compile 'org.apache.commons:commons-dbcp2:2.5.0'
     compile 'de.invesdwin:invesdwin-instrument:1.0.2'
 
