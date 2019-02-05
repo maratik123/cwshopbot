@@ -1,6 +1,8 @@
 language: java
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f  $HOME/.gradle/caches/journal-1/journal-1.lock
+  - rm -f  $HOME/.gradle/caches/journal-1/file-access.bin
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
   - rm -fr $HOME/.gradle/caches/*/javaCompile/
   - rm -f  $HOME/.gradle/caches/*/fileContent/fileContent.lock
