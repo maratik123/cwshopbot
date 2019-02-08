@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static name.maratik.cw.cwshopbot.util.Emoji.ALEMBIC;
 import static name.maratik.cw.cwshopbot.util.Emoji.HAMMERS;
+import static name.maratik.cw.cwshopbot.util.Emoji.SHIELD;
 import static name.maratik.cw.cwshopbot.util.Emoji.SWORDS;
 
 /**
@@ -37,7 +38,8 @@ import static name.maratik.cw.cwshopbot.util.Emoji.SWORDS;
 public enum Profession implements EnumWithCode {
     BLACKSMITH("Blacksmith", HAMMERS),
     ALCHEMIST("Alchemist", ALEMBIC),
-    KNIGHT("Knight", SWORDS);
+    KNIGHT("Knight", SWORDS),
+    SENTINEL("Sentinel", SHIELD);
 
     @Getter(onMethod_ = {@JsonValue})
     private final String code;
