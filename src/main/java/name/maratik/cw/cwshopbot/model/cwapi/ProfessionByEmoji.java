@@ -34,7 +34,8 @@ import static com.google.common.collect.Maps.toImmutableEnumMap;
 @RequiredArgsConstructor
 public enum ProfessionByEmoji implements EnumWithCode {
     BLACKSMITH(Profession.BLACKSMITH),
-    ALCHEMIST(Profession.ALCHEMIST);
+    ALCHEMIST(Profession.ALCHEMIST),
+    KNIGHT(Profession.KNIGHT);
 
     @Getter
     private final Profession profession;
