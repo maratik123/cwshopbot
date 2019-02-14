@@ -1222,7 +1222,7 @@ equipment:
     type: spear
     wear: primary hand
     att: 18
-    def: 2
+    def: 16
     recipe:
       r22: 1
       k22: 5
