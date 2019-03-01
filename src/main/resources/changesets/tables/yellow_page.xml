@@ -82,4 +82,14 @@
         <addNotNullConstraint tableName="yellow_page" columnName="max_mana"/>
         <addNotNullConstraint tableName="yellow_page" columnName="last_active_time"/>
     </changeSet>
+    <changeSet id="yellow_page_add_guild_castle_discounts" author="maratik">
+        <addColumn tableName="yellow_page">
+            <column name="guild_discount" type="integer" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="castle_discount" type="integer" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

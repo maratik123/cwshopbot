@@ -47,6 +47,8 @@ public class YellowPageEntity {
     private final Profession profession;
     private final int mana;
     private final int maxMana;
+    private final int guildDiscount;
+    private final int castleDiscount;
     private final boolean active;
     @NonNull
     private final LocalDateTime lastActiveTime;
@@ -60,6 +62,8 @@ public class YellowPageEntity {
             yellowPage.getKind().getProfession(),
             yellowPage.getMana(),
             yellowPage.getMana(),
+            yellowPage.getGuildDiscount(),
+            yellowPage.getCastleDiscount(),
             true,
             lastActiveTime
         );

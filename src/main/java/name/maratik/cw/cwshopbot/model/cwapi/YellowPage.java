@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
@@ -42,7 +43,10 @@ public class YellowPage {
     private final List<Offer> offers;
     private final Map<Specialization, Integer> specialization;
     private final boolean active;
+    private final int guildDiscount;
+    private final int castleDiscount;
 
+    @SuppressWarnings("UnstableApiUsage")
     public YellowPage(
         @JsonProperty("link") String link,
         @JsonProperty("name") String name,
@@ -52,7 +56,9 @@ public class YellowPage {
         @JsonProperty("mana") int mana,
         @JsonProperty("offers") List<Offer> offers,
         @JsonProperty("specialization") Map<Specialization, Integer> specialization,
-        @JsonProperty("active") boolean active
+        @JsonProperty("active") boolean active,
+        @JsonProperty("guildDiscount") OptionalInt guildDiscount,
+        @JsonProperty("castleDiscount") OptionalInt castleDiscount
     ) {
         this.link = Objects.requireNonNull(link, "link");
         this.name = Objects.requireNonNull(name, "name");
@@ -67,6 +73,8 @@ public class YellowPage {
             .map(Maps::immutableEnumMap)
             .orElseGet(ImmutableMap::of);
         this.active = active;
+        this.guildDiscount = guildDiscount.orElse(0);
+        this.castleDiscount = castleDiscount.orElse(0);
     }
 
     @Value

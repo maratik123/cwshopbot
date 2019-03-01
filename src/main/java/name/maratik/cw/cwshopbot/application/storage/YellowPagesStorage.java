@@ -109,6 +109,8 @@ public class YellowPagesStorage {
                 .ownerCastle(CastleByEmoji.findByCastle(yellowPageEntity.getOwnerCastle()))
                 .kind(ProfessionByEmoji.findByProfession(yellowPageEntity.getProfession()))
                 .mana(yellowPageEntity.getMana())
+                .guildDiscount(yellowPageEntity.getGuildDiscount())
+                .castleDiscount(yellowPageEntity.getCastleDiscount())
                 .active(yellowPageEntity.isActive())
                 .offers(yellowPageOfferRepository.findByYellowPageAndActiveIsTrue(yellowPageEntity.getLink())
                     .map(yellowPageOfferEntity -> YellowPage.Offer.builder()

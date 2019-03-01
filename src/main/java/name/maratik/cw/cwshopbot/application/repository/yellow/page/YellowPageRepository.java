@@ -30,7 +30,7 @@ import java.util.Optional;
 public interface YellowPageRepository extends Repository<YellowPageEntity, String>, CustomizedYellowPageRepository {
     @Transactional(readOnly = true)
     @Query("" +
-        "SELECT link, name, owner_name, owner_castle, profession, mana, max_mana, active, last_active_time" +
+        "SELECT link, name, owner_name, owner_castle, profession, mana, max_mana, guild_discount, castle_discount, active, last_active_time" +
         "  FROM yellow_page" +
         " WHERE link = :link")
     Optional<YellowPageEntity> findByLink(String link);
@@ -45,7 +45,7 @@ public interface YellowPageRepository extends Repository<YellowPageEntity, Strin
 
     @Transactional(readOnly = true)
     @Query("" +
-        "SELECT link, name, owner_name, owner_castle, profession, mana, max_mana, active, last_active_time" +
+        "SELECT link, name, owner_name, owner_castle, profession, mana, max_mana, guild_discount, castle_discount, active, last_active_time" +
         "  FROM yellow_page" +
         " WHERE link >= :link" +
         " ORDER BY link" +

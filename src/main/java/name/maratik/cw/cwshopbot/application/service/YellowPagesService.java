@@ -42,10 +42,10 @@ public class YellowPagesService extends Localizable {
     }
 
     public Optional<Map.Entry<NavigableYellowPage, String>> formattedYellowPages(String key) {
-        NavigableYellowPage navigableYellowPage = fetchYellowPages(key);
+        var navigableYellowPage = fetchYellowPages(key);
 
         return navigableYellowPage.getYellowPage().map(yellowPage -> {
-            StringBuilder sb = new StringBuilder(t("YellowPages.INFO",
+            var sb = new StringBuilder(t("YellowPages.INFO",
                 yellowPage.getLink(),
                 UNDERSCORE.matcher(yellowPage.getName()).replaceAll(UNDERSCORE_REPLACEMENT),
                 UNDERSCORE.matcher(yellowPage.getOwnerName()).replaceAll(UNDERSCORE_REPLACEMENT),
@@ -57,6 +57,13 @@ public class YellowPagesService extends Localizable {
                     : "YellowPages.INFO.INACTIVE"
                 )
             ));
+
+            if (yellowPage.getGuildDiscount() != 0) {
+                sb.append(t("YellowPages.INFO.guildDiscount", yellowPage.getGuildDiscount()));
+            }
+            if (yellowPage.getCastleDiscount() != 0) {
+                sb.append(t("YellowPages.INFO.castleDiscount", yellowPage.getCastleDiscount()));
+            }
 
             if (!yellowPage.getOffers().isEmpty()) {
                 yellowPage.getOffers().forEach(offer -> formatOfferLine(sb, offer));

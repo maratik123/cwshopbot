@@ -37,6 +37,8 @@ public class StorageUtils {
             .kind(ProfessionByEmoji.BLACKSMITH)
             .mana(100)
             .active(true)
+            .castleDiscount(7)
+            .guildDiscount(15)
             .offers(singletonList(
                 YellowPage.Offer.builder()
                     .price(200)

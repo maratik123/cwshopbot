@@ -43,9 +43,11 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
         "                        PROFESSION," +
         "                        MANA," +
         "                        MAX_MANA," +
+        "                        GUILD_DISCOUNT," +
+        "                        CASTLE_DISCOUNT," +
         "                        ACTIVE," +
         "                        LAST_ACTIVE_TIME)" +
-        "  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)" +
+        "  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" +
         "  ON CONFLICT (LINK) DO UPDATE SET" +
         "    NAME = EXCLUDED.NAME," +
         "    OWNER_NAME = EXCLUDED.OWNER_NAME," +
@@ -53,6 +55,8 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
         "    PROFESSION = EXCLUDED.PROFESSION," +
         "    MANA = EXCLUDED.MANA," +
         "    MAX_MANA = GREATEST(YP.MAX_MANA, EXCLUDED.MANA)," +
+        "    GUILD_DISCOUNT = EXCLUDED.GUILD_DISCOUNT," +
+        "    CASTLE_DISCOUNT = EXCLUDED.CASTLE_DISCOUNT," +
         "    ACTIVE = EXCLUDED.ACTIVE," +
         "    LAST_ACTIVE_TIME = EXCLUDED.LAST_ACTIVE_TIME";
 
@@ -88,6 +92,8 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
             text(yellowPageEntity.getProfession().getCode()),
             mana,
             mana,
+            number(yellowPageEntity.getGuildDiscount()),
+            number(yellowPageEntity.getCastleDiscount()),
             bool(yellowPageEntity.isActive()),
             timestamp(yellowPageEntity.getLastActiveTime())
         };
