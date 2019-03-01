@@ -15,6 +15,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package name.maratik.cw.cwshopbot.model.cwapi;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -47,18 +48,18 @@ public class YellowPage {
     private final int castleDiscount;
 
     @SuppressWarnings("UnstableApiUsage")
-    public YellowPage(
-        @JsonProperty("link") String link,
-        @JsonProperty("name") String name,
-        @JsonProperty("ownerName") String ownerName,
-        @JsonProperty("ownerCastle") CastleByEmoji ownerCastle,
-        @JsonProperty("kind") ProfessionByEmoji kind,
-        @JsonProperty("mana") int mana,
-        @JsonProperty("offers") List<Offer> offers,
-        @JsonProperty("specialization") Map<Specialization, Integer> specialization,
-        @JsonProperty("active") boolean active,
-        @JsonProperty("guildDiscount") OptionalInt guildDiscount,
-        @JsonProperty("castleDiscount") OptionalInt castleDiscount
+    private YellowPage(
+        String link,
+        String name,
+        String ownerName,
+        CastleByEmoji ownerCastle,
+        ProfessionByEmoji kind,
+        int mana,
+        List<Offer> offers,
+        Map<Specialization, Integer> specialization,
+        boolean active,
+        int guildDiscount,
+        int castleDiscount
     ) {
         this.link = Objects.requireNonNull(link, "link");
         this.name = Objects.requireNonNull(name, "name");
@@ -73,8 +74,26 @@ public class YellowPage {
             .map(Maps::immutableEnumMap)
             .orElseGet(ImmutableMap::of);
         this.active = active;
-        this.guildDiscount = guildDiscount.orElse(0);
-        this.castleDiscount = castleDiscount.orElse(0);
+        this.guildDiscount = guildDiscount;
+        this.castleDiscount = castleDiscount;
+    }
+
+    @JsonCreator
+    public YellowPage(
+        @JsonProperty("link") String link,
+        @JsonProperty("name") String name,
+        @JsonProperty("ownerName") String ownerName,
+        @JsonProperty("ownerCastle") CastleByEmoji ownerCastle,
+        @JsonProperty("kind") ProfessionByEmoji kind,
+        @JsonProperty("mana") int mana,
+        @JsonProperty("offers") List<Offer> offers,
+        @JsonProperty("specialization") Map<Specialization, Integer> specialization,
+        @JsonProperty("active") boolean active,
+        @JsonProperty("guildDiscount") OptionalInt guildDiscount,
+        @JsonProperty("castleDiscount") OptionalInt castleDiscount
+    ) {
+        this(link, name, ownerName, ownerCastle, kind, mana, offers, specialization, active,
+            guildDiscount.orElse(0), castleDiscount.orElse(0));
     }
 
     @Value
