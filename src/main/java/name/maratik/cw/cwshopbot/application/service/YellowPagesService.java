@@ -22,7 +22,7 @@ import name.maratik.spring.telegram.util.Localizable;
 
 import org.springframework.stereotype.Service;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -64,6 +64,7 @@ public class YellowPagesService extends Localizable {
             if (yellowPage.getCastleDiscount() != 0) {
                 sb.append(t("YellowPages.INFO.castleDiscount", yellowPage.getCastleDiscount()));
             }
+            sb.append('\n');
 
             if (!yellowPage.getOffers().isEmpty()) {
                 yellowPage.getOffers().forEach(offer -> formatOfferLine(sb, offer));
@@ -77,7 +78,7 @@ public class YellowPagesService extends Localizable {
                 );
             }
 
-            return new AbstractMap.SimpleImmutableEntry<>(navigableYellowPage, sb.toString());
+            return new SimpleImmutableEntry<>(navigableYellowPage, sb.toString());
         });
     }
 

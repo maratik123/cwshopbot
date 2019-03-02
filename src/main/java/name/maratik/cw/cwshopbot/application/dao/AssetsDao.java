@@ -39,8 +39,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class AssetsDao {
 
     public AssetsDao(Resource assets, TypeFactory typeFactory) throws IOException {
         log.info("Loading assets");
-        try (InputStream is = assets.getInputStream()) {
+        try (var is = assets.getInputStream()) {
             assetsDto = new ObjectMapper(new YAMLFactory())
                 .setTypeFactory(typeFactory)
                 .registerModules(
@@ -85,28 +84,28 @@ public class AssetsDao {
         log.info("Decoding assets");
         Map<String, String> reverseCraftbookMap = assetsDto.getCraftbook().entrySet().stream()
             .flatMap(entry -> entry.getValue().getItems().stream()
-                .map(id -> new AbstractMap.SimpleImmutableEntry<>(id, entry.getKey()))
+                .map(id -> new SimpleImmutableEntry<>(id, entry.getKey()))
             )
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        Assets result = Assets.builder()
+        var assets = Assets.builder()
             .setAllItemList(assetsDto.getAssetsPartMap().entrySet().stream()
                 .flatMap(assetsPartEntry -> {
-                    AssetsPartDto assetsPartDto = assetsPartEntry.getValue();
-                    ItemLocation itemLocation = ItemLocation.findByCode(assetsPartEntry.getKey())
+                    var assetsPartDto = assetsPartEntry.getValue();
+                    var itemLocation = ItemLocation.findByCode(assetsPartEntry.getKey())
                         .orElseThrow(RuntimeException::new);
                     return assetsPartDto.getItems().entrySet().stream()
                         .map(itemEntry -> {
-                            String id = itemEntry.getKey();
-                            ResourceItem resourceItem = itemEntry.getValue();
+                            var id = itemEntry.getKey();
+                            var resourceItem = itemEntry.getValue();
 
-                            Map<String, Integer> recipe = resourceItem.getRecipe();
+                            var recipe = resourceItem.getRecipe();
                             if (recipe == null) {
                                 return fillItemProps(Item.itemBuilder(), id, resourceItem, itemLocation, assetsPartDto)
                                     .build();
                             }
-                            Craftbook craftbook = Craftbook.findByCode(reverseCraftbookMap.get(id))
+                            var craftbook = Craftbook.findByCode(reverseCraftbookMap.get(id))
                                 .orElseThrow(RuntimeException::new);
-                            ItemType itemType = resourceItem.getType();
+                            var itemType = resourceItem.getType();
                             if (itemType == null) {
                                 return fillCraftableItemProps(CraftableItem.craftableItemBuilder(), id, resourceItem,
                                     itemLocation, assetsPartDto, craftbook, assetsDto, recipe)
@@ -119,9 +118,9 @@ public class AssetsDao {
                 }).collect(toImmutableList())
             ).build();
 
-        log.info("Assets loaded. Assets size is: {}", () -> result.getAllItems().size());
+        log.info("Assets loaded. Assets size is: {}", () -> assets.getAllItems().size());
 
-        return result;
+        return assets;
     }
 
     private static <T extends Item.AbstractItemBuilder<T, R>, R extends Item>

@@ -23,7 +23,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
@@ -97,7 +97,7 @@ public class Assets {
             Map<String, CraftableItem> craftableItems = craftableItemsBuilder.build();
             Map<String, Set<CraftableItem>> craftableItemsByRecipe = ImmutableMap.copyOf(craftableItems.values().stream()
                 .flatMap(craftableItem -> craftableItem.getRecipe().keySet().stream()
-                    .map(recipePart -> new AbstractMap.SimpleImmutableEntry<>(recipePart, craftableItem))
+                    .map(recipePart -> new SimpleImmutableEntry<>(recipePart, craftableItem))
                 ).collect(groupingBy(
                     Map.Entry::getKey,
                     mapping(Map.Entry::getValue, toImmutableSet())

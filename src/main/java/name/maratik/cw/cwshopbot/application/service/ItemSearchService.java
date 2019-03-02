@@ -27,14 +27,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -71,7 +70,7 @@ public class ItemSearchService extends Localizable {
     }
 
     public Optional<String> findByCodeThenByName(String search) {
-        Optional<String> result = findByCode(search);
+        var result = findByCode(search);
         if (result.isPresent()) {
             return result;
         }
@@ -80,11 +79,11 @@ public class ItemSearchService extends Localizable {
 
     @SuppressWarnings("WeakerAccess")
     public List<Item> findItemByNameList(String name, boolean ignoreCase, boolean partialMatch) {
-        final String searchName = ignoreCase
+        final var searchName = ignoreCase
             ? name.toLowerCase()
             : name;
         if (!partialMatch) {
-            final Map<String, Item> itemsByNameMap = ignoreCase
+            final var itemsByNameMap = ignoreCase
                 ? assets.getItemsByNameLowerCase()
                 : assets.getItemsByName();
             return Optional.ofNullable(itemsByNameMap.get(searchName))
@@ -104,7 +103,7 @@ public class ItemSearchService extends Localizable {
     @SuppressWarnings("WeakerAccess")
     public Optional<String> findItemByName(String name) {
         return output(() -> {
-            List<Item> items = findItemByNameList(name, true, true);
+            var items = findItemByNameList(name, true, true);
             switch (items.size()) {
                 case 0:
                     return Optional.empty();
@@ -120,7 +119,7 @@ public class ItemSearchService extends Localizable {
     }
 
     public Optional<String> findByCode(String code) {
-        String lowerCode = code.toLowerCase();
+        var lowerCode = code.toLowerCase();
         return Optional.ofNullable(assets.getAllItems().get(lowerCode))
             .map(ItemOutput::new)
             .map(SearchOutput::getMessage);
@@ -146,7 +145,7 @@ public class ItemSearchService extends Localizable {
 
     public Optional<String> findRecipeByIncludedItem(String code) {
         return output(() -> {
-            Set<CraftableItem> items = Optional.ofNullable(assets.getCraftableItemsByRecipe().get(code))
+            var items = Optional.ofNullable(assets.getCraftableItemsByRecipe().get(code))
                 .orElseGet(Collections::emptySet);
             switch (items.size()) {
                 case 0:
@@ -156,7 +155,7 @@ public class ItemSearchService extends Localizable {
                         .findAny()
                         .map(RecipeOutput::new);
                 default:
-                    Optional<Item> item = Optional.ofNullable(assets.getAllItems().get(code));
+                    var item = Optional.ofNullable(assets.getAllItems().get(code));
                     return Optional.of(new ListRecipes(item, items));
             }
         });
@@ -180,18 +179,18 @@ public class ItemSearchService extends Localizable {
 
         @Override
         protected String evalMessage() {
-            Map<String, Integer> recipe = craftableItem.getRecipe();
-            StringBuilder sb = new StringBuilder(t("ItemSearchService.RECIPE.HEADER",
+            var recipe = craftableItem.getRecipe();
+            var sb = new StringBuilder(t("ItemSearchService.RECIPE.HEADER",
                 craftableItem.getName(), createCommandLink(T_PREFIX, craftableItem), craftableItem.getMana()
             )).append('\n');
             recipe.entrySet().stream()
-                .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
+                .map(entry -> new SimpleImmutableEntry<>(
                     assets.getAllItems().get(entry.getKey()),
                     entry.getValue()
                 ))
                 .sorted(ITEM_NAME_IN_KEY_COMPARATOR)
                 .forEach(entry -> {
-                    Item item = entry.getKey();
+                    var item = entry.getKey();
                     sb.append(item.getName()).append(" (");
                     appendCommandLink(sb, A_PREFIX, item)
                         .append(") x ").append(entry.getValue()).append('\n');
@@ -232,7 +231,7 @@ public class ItemSearchService extends Localizable {
             public StringBuilder visit(CraftableItem craftableItem) {
                 Item.Visitor.super.visit(craftableItem);
 
-                Craftbook craftbook = craftableItem.getCraftbook();
+                var craftbook = craftableItem.getCraftbook();
                 if (craftbook.isVisible()) {
                     sb.append('\n')
                         .append(t("ItemSearchService.MESSAGE.CRAFTABLE_ITEM",
@@ -249,7 +248,7 @@ public class ItemSearchService extends Localizable {
             public StringBuilder visit(WearableItem wearableItem) {
                 Item.Visitor.super.visit(wearableItem).append('\n');
 
-                boolean needNewLine = false;
+                var needNewLine = false;
                 if (wearableItem.getAttack() > 0) {
                     sb.append(SWORDS + ": ");
                     appendPlusNumOrUnknown(wearableItem.getAttack()).append(' ');
@@ -288,7 +287,7 @@ public class ItemSearchService extends Localizable {
 
         @Override
         protected String evalMessage() {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             items.forEach(item -> appendCommandLink(sb, T_PREFIX, item)
                 .append(' ').append(item.getName()).append('\n')
             );
@@ -303,7 +302,7 @@ public class ItemSearchService extends Localizable {
 
         @Override
         protected String evalMessage() {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             optionalItem.ifPresent(item ->
                 sb.append(t("ItemSearchService.RECIPE_LIST.HEADER",
                     item.getName(), createCommandLink(T_PREFIX, item)
