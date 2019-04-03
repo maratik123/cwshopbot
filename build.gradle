@@ -144,7 +144,7 @@ generateGrammarSource {
 protobuf {
     generatedFilesBaseDir = project.file('generated').absolutePath
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.7.0'
+        artifact = 'com.google.protobuf:protoc:3.7.1'
     }
 }
 
