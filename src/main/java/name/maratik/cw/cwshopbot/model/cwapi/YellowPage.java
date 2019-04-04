@@ -95,7 +95,7 @@ public class YellowPage {
         @JsonProperty("specialization") Map<Specialization, Integer> specialization,
         @JsonProperty("active") boolean active,
         @JsonProperty("maintenanceEnabled") Optional<Boolean> maintenanceEnabled,
-        @JsonProperty("maintenanceEnabled") Optional<Integer> maintenanceCost,
+        @JsonProperty("maintenanceCost") Optional<Integer> maintenanceCost,
         @JsonProperty("guildDiscount") OptionalInt guildDiscount,
         @JsonProperty("castleDiscount") OptionalInt castleDiscount
     ) {
