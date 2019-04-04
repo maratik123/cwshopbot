@@ -27,6 +27,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static name.maratik.cw.cwshopbot.util.Emoji.GOLD;
+import static name.maratik.cw.cwshopbot.util.Emoji.HAMMER_AND_WRENCH;
+import static name.maratik.cw.cwshopbot.util.Emoji.MANA;
+
 /**
  * @author <a href="mailto:maratik@yandex-team.ru">Marat Bukharov</a>
  */
@@ -76,6 +80,14 @@ public class YellowPagesService extends Localizable {
                 yellowPage.getSpecialization().forEach((kind, value) ->
                     sb.append(t(kind)).append(": ").append(value).append('\n')
                 );
+                sb.append('\n');
+            }
+
+            if (yellowPage.isMaintenanceEnabled()) {
+                sb.append(t("YellowPages.MAINTENANCE.HEADER"))
+                    .append(HAMMER_AND_WRENCH + ':')
+                    .append(yellowPage.getMaintenanceCost())
+                    .append(GOLD + "/ 100" + MANA + '\n');
             }
 
             return new SimpleImmutableEntry<>(navigableYellowPage, sb.toString());

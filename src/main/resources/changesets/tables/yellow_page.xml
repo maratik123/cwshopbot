@@ -92,4 +92,14 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="yellow_page_add_maintenance" author="maratik">
+        <addColumn tableName="yellow_page">
+            <column name="maintenance_enabled" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="maintenance_cost" type="integer" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

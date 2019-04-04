@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -68,7 +67,7 @@ public class YellowPagesStorage {
     @Transactional
     public void saveYellowPages(List<YellowPage> yellowPages) {
         yellowPageRepository.setAllInactive();
-        LocalDateTime now = LocalDateTime.now(clockHolder);
+        var now = LocalDateTime.now(clockHolder);
         Set<String> links = yellowPages.stream()
             .map(YellowPage::getLink)
             .collect(toImmutableSet());
@@ -101,7 +100,7 @@ public class YellowPagesStorage {
     }
 
     public NavigableYellowPage findYellowPage(String link) {
-        Optional<YellowPage> yellowPage = yellowPageRepository.findFirstByLinkGreaterThanOrderByLink(link)
+        var yellowPage = yellowPageRepository.findFirstByLinkGreaterThanOrderByLink(link)
             .map(yellowPageEntity -> YellowPage.builder()
                 .link(yellowPageEntity.getLink())
                 .name(yellowPageEntity.getName())
@@ -109,6 +108,8 @@ public class YellowPagesStorage {
                 .ownerCastle(CastleByEmoji.findByCastle(yellowPageEntity.getOwnerCastle()))
                 .kind(ProfessionByEmoji.findByProfession(yellowPageEntity.getProfession()))
                 .mana(yellowPageEntity.getMana())
+                .maintenanceEnabled(yellowPageEntity.isMaintenanceEnabled())
+                .maintenanceCost(yellowPageEntity.getMaintenanceCost())
                 .guildDiscount(yellowPageEntity.getGuildDiscount())
                 .castleDiscount(yellowPageEntity.getCastleDiscount())
                 .active(yellowPageEntity.isActive())

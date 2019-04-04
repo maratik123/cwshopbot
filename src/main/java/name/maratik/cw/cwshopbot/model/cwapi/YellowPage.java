@@ -44,10 +44,11 @@ public class YellowPage {
     private final List<Offer> offers;
     private final Map<Specialization, Integer> specialization;
     private final boolean active;
+    private final boolean maintenanceEnabled;
+    private final int maintenanceCost;
     private final int guildDiscount;
     private final int castleDiscount;
 
-    @SuppressWarnings("UnstableApiUsage")
     private YellowPage(
         String link,
         String name,
@@ -58,6 +59,8 @@ public class YellowPage {
         List<Offer> offers,
         Map<Specialization, Integer> specialization,
         boolean active,
+        boolean maintenanceEnabled,
+        int maintenanceCost,
         int guildDiscount,
         int castleDiscount
     ) {
@@ -74,6 +77,8 @@ public class YellowPage {
             .map(Maps::immutableEnumMap)
             .orElseGet(ImmutableMap::of);
         this.active = active;
+        this.maintenanceEnabled = maintenanceEnabled;
+        this.maintenanceCost = maintenanceCost;
         this.guildDiscount = guildDiscount;
         this.castleDiscount = castleDiscount;
     }
@@ -89,10 +94,13 @@ public class YellowPage {
         @JsonProperty("offers") List<Offer> offers,
         @JsonProperty("specialization") Map<Specialization, Integer> specialization,
         @JsonProperty("active") boolean active,
+        @JsonProperty("maintenanceEnabled") Optional<Boolean> maintenanceEnabled,
+        @JsonProperty("maintenanceEnabled") Optional<Integer> maintenanceCost,
         @JsonProperty("guildDiscount") OptionalInt guildDiscount,
         @JsonProperty("castleDiscount") OptionalInt castleDiscount
     ) {
         this(link, name, ownerName, ownerCastle, kind, mana, offers, specialization, active,
+            maintenanceEnabled.orElse(false), maintenanceCost.orElse(0),
             guildDiscount.orElse(0), castleDiscount.orElse(0));
     }
 

@@ -47,4 +47,5 @@ public class Emoji {
     public static final String LEFTWARDS_ARROW = "\u2b05\ufe0f";
     public static final String RIGHTWARDS_ARROW = "\u27a1\ufe0f";
     public static final String URN = "\u26b1";
+    public static final String HAMMER_AND_WRENCH = "\uD83D\uDEE0";
 }

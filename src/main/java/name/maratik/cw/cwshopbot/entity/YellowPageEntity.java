@@ -47,6 +47,8 @@ public class YellowPageEntity {
     private final Profession profession;
     private final int mana;
     private final int maxMana;
+    private final boolean maintenanceEnabled;
+    private final int maintenanceCost;
     private final int guildDiscount;
     private final int castleDiscount;
     private final boolean active;
@@ -62,6 +64,8 @@ public class YellowPageEntity {
             yellowPage.getKind().getProfession(),
             yellowPage.getMana(),
             yellowPage.getMana(),
+            yellowPage.isMaintenanceEnabled(),
+            yellowPage.getMaintenanceCost(),
             yellowPage.getGuildDiscount(),
             yellowPage.getCastleDiscount(),
             true,

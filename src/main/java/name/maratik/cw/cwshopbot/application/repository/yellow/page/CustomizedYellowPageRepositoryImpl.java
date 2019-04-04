@@ -43,11 +43,13 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
         "                        PROFESSION," +
         "                        MANA," +
         "                        MAX_MANA," +
+        "                        MAINTENANCE_ENABLED," +
+        "                        MAINTENANCE_COST," +
         "                        GUILD_DISCOUNT," +
         "                        CASTLE_DISCOUNT," +
         "                        ACTIVE," +
         "                        LAST_ACTIVE_TIME)" +
-        "  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" +
+        "  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" +
         "  ON CONFLICT (LINK) DO UPDATE SET" +
         "    NAME = EXCLUDED.NAME," +
         "    OWNER_NAME = EXCLUDED.OWNER_NAME," +
@@ -55,6 +57,8 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
         "    PROFESSION = EXCLUDED.PROFESSION," +
         "    MANA = EXCLUDED.MANA," +
         "    MAX_MANA = GREATEST(YP.MAX_MANA, EXCLUDED.MANA)," +
+        "    MAINTENANCE_ENABLED = EXCLUDED.MAINTENANCE_ENABLED," +
+        "    MAINTENANCE_COST = EXCLUDED.MAINTENANCE_COST," +
         "    GUILD_DISCOUNT = EXCLUDED.GUILD_DISCOUNT," +
         "    CASTLE_DISCOUNT = EXCLUDED.CASTLE_DISCOUNT," +
         "    ACTIVE = EXCLUDED.ACTIVE," +
@@ -92,6 +96,8 @@ public class CustomizedYellowPageRepositoryImpl implements CustomizedYellowPageR
             text(yellowPageEntity.getProfession().getCode()),
             mana,
             mana,
+            bool(yellowPageEntity.isMaintenanceEnabled()),
+            number(yellowPageEntity.getMaintenanceCost()),
             number(yellowPageEntity.getGuildDiscount()),
             number(yellowPageEntity.getCastleDiscount()),
             bool(yellowPageEntity.isActive()),

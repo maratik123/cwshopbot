@@ -39,6 +39,8 @@ public class StorageUtils {
             .active(true)
             .castleDiscount(7)
             .guildDiscount(15)
+            .maintenanceEnabled(true)
+            .maintenanceCost(75)
             .offers(singletonList(
                 YellowPage.Offer.builder()
                     .price(200)
