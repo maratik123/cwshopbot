@@ -160,7 +160,7 @@ stock:
       20: 4
       05: 4
       12: 1
-  36:
+  636:
     name: Resurrection Mix
     tradeable: false
     ingredient: false
@@ -169,6 +169,28 @@ stock:
       03: 20
       13: 3
       24: 1
+  36:
+    name: Quality Cloth
+    tradeable: false
+    recipe:
+      09: 11
+      07: 3
+  37:
+    name: Blacksmith mold
+    tradeable: false
+    recipe:
+      29: 2
+      15: 2
+      23: 11
+      25: 5
+  38:
+    name: Artisan mold
+    tradeable: false
+    recipe:
+      30: 2
+      23: 11
+      13: 2
+      25: 5
 crafting:
   tradeable: false
   ingredient: true
@@ -1381,6 +1403,21 @@ equipment:
       18: 3
       30: 3
       17: 1
+  w92:
+    name: Minotaur Sword
+    type: sword
+    wear: primary hand
+    att: 41
+    recipe:
+      23: 119
+      36: 3
+      15: 3
+      Minotaur Sword recipe x 1
+      Artisan mold x 3
+      Metal plate x 79
+      Silver frame x 17
+      Hardener x 9
+      Minotaur Sword part x 6
 craftbook:
   1:
     mana: 10
@@ -1394,7 +1431,7 @@ craftbook:
       - 24
       - 31
       - 33
-      - 36
+      - 636
       - 100
       - 501
       - 505
