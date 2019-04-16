@@ -88,7 +88,7 @@ dependencies {
     compile 'org.springframework.data:spring-data-jdbc'
     compile 'org.springframework:spring-aspects'
     compile 'org.postgresql:postgresql:42.2.5'
-    compile 'org.telegram:telegrambots:4.1.2'
+    compile 'org.telegram:telegrambots:4.2'
     compile 'com.google.guava:guava:27.1-jre'
     compile 'org.apache.logging.log4j:log4j-jcl'
     compile 'org.apache.logging.log4j:log4j-jul'
